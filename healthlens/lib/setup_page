@@ -1,0 +1,221 @@
+import 'package:flutter/material.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class SetupPage extends StatefulWidget {
+  @override
+  _SetupPageState createState() => _SetupPageState();
+}
+
+class _SetupPageState extends State<SetupPage> {
+  PageController _pageController = PageController(initialPage: 0);
+  int _currentPageIndex = 0;
+
+  void _previousPage() {
+    if (_currentPageIndex > 0) {
+      _pageController.previousPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
+      setState(() {
+        _currentPageIndex--;
+      });
+    }
+  }
+
+  void _nextPage() {
+    if (_currentPageIndex < 4) {
+      // Assuming there are 5 pages (0 to 4)
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
+      setState(() {
+        _currentPageIndex++;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPageIndex = index;
+                  });
+                },
+                children: [
+                  PageViewPage(
+                    children: [
+                      Align(
+                        alignment: AlignmentDirectional(-1.0, 0.0),
+                        child: Text(
+                          'Welcome To HealthLens Pro!',
+                          style: GoogleFonts.outfit(
+                            fontSize: 40.0,
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: AlignmentDirectional(-1.0, -1.0),
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 4.0, 0.0, 15.0),
+                          child: Text(
+                            'HealthLens Pro is an Application to Help Manage Macronutrients intake.........',
+                            style: GoogleFonts.readexPro(
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: AlignmentDirectional(0.0, 0.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(
+                            'https://images.unsplash.com/photo-1494390248081-4e521a5940db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxOHx8aGVhbHRofGVufDB8fHx8MTcxMzk1NDY2MXww&ixlib=rb-4.0.3&q=80&w=1080',
+                            width: 300.0,
+                            height: 362.0,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  PageViewPage(
+                    children: [
+                      Text("Personal Information"),
+                      Column(
+                        children: [
+                          Text("Name"),
+                          Text("Email"),
+                          Text("Phone"),
+                          TextField(),
+                          TextField(),
+                          TextField(),
+                        ],
+                      ),
+                    ],
+                  ),
+                  PageViewPage(
+                    children: [
+                      Text("Address"),
+                      Column(
+                        children: [
+                          Text("Street"),
+                          Text("City"),
+                          Text("State"),
+                          TextField(),
+                          TextField(),
+                          TextField(),
+                        ],
+                      ),
+                    ],
+                  ),
+                  PageViewPage(
+                    children: [
+                      Text("Preferences"),
+                      Column(
+                        children: [
+                          Text("Choose your interests"),
+                          Text("Select your preferences"),
+                          Text("Subscribe to newsletters"),
+                          CheckboxGroup(),
+                        ],
+                      ),
+                    ],
+                  ),
+                  PageViewPage(
+                    children: [
+                      Text("Security"),
+                      Column(
+                        children: [
+                          Text("Set up PIN code"),
+                          Text("Enter a 4-digit PIN"),
+                          Text("Confirm PIN"),
+                          PincodeWidget(),
+                          Text("Note: You'll use this PIN for access."),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: _previousPage,
+                      child: Text("Back"),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: _nextPage,
+                  child: Text("Next"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PageViewPage extends StatelessWidget {
+  final List<Widget> children;
+
+  PageViewPage({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: children,
+      ),
+    );
+  }
+}
+
+class CheckboxGroup extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Implementation of Checkbox group widget
+    return Container();
+  }
+}
+
+class PincodeWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return PinCodeTextField(
+      appContext: context,
+      length: 4,
+      onChanged: (value) {},
+      onCompleted: (value) {},
+      keyboardType: TextInputType.number,
+      pinTheme: PinTheme(
+        shape: PinCodeFieldShape.box,
+        borderRadius: BorderRadius.circular(5),
+        fieldHeight: 50,
+        fieldWidth: 40,
+        activeFillColor: Colors.white,
+      ),
+    );
+  }
+}

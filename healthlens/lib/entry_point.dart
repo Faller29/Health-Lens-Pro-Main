@@ -1,0 +1,111 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
+import 'homePage.dart'; // Import the home page
+import 'camerapage.dart'; // Import the camera page
+import 'profilePage.dart'; // Import the profile page
+import 'analyticspage.dart'; // Import the analytics page
+import 'package:google_fonts/google_fonts.dart';
+
+class EntryPoint extends StatefulWidget {
+  final PageController? pageController;
+
+  const EntryPoint({Key? key, this.pageController}) : super(key: key);
+
+  @override
+  _EntryPointState createState() => _EntryPointState();
+}
+
+class _EntryPointState extends State<EntryPoint> {
+  int _selectedIndex = 0;
+  int currentPageIndex = 0;
+
+  // Define a list of titles corresponding to each page
+  final List<String> pageTitles = [
+    'Dashboard', // Title for the HomePage
+    'Camera', // Title for the CameraPage
+    'Analytics', // Title for the AnalyticsPage
+    'Profile', // Title for the ProfilePage
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      // Navigate to the selected page in the PageView
+      widget.pageController?.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+      // Close the drawer after selection
+      Navigator.pop(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          title: Text(
+            pageTitles[currentPageIndex],
+            style: GoogleFonts.titanOne(
+              fontSize: 25.0,
+            ),
+          ),
+          foregroundColor: Colors.white,
+          backgroundColor: Color(0xff4b39ef)),
+      body: Center(
+        child: [
+          HomePage(),
+          CameraPage(),
+          AnalyticsPage(),
+          ProfilePage(),
+        ][currentPageIndex],
+      ),
+      extendBody: true,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 0),
+        child: CrystalNavigationBar(
+          currentIndex: currentPageIndex,
+          height: 10,
+          outlineBorderColor: Colors.white,
+          indicatorColor: Colors.blue,
+          unselectedItemColor: Colors.white70,
+          backgroundColor: Colors.black.withOpacity(0.2),
+          onTap: (int index) {
+            setState(() {
+              currentPageIndex = index;
+            });
+          },
+          items: [
+            CrystalNavigationBarItem(
+              icon: IconlyBold.home,
+              unselectedIcon: IconlyLight.home,
+              selectedColor: Colors.white,
+            ),
+            CrystalNavigationBarItem(
+              icon: IconlyBold.scan,
+              unselectedIcon: IconlyLight.scan,
+              selectedColor: Colors.white,
+            ),
+            CrystalNavigationBarItem(
+              icon: IconlyBold.chart,
+              unselectedIcon: IconlyLight.chart,
+              selectedColor: Colors.white,
+            ),
+            CrystalNavigationBarItem(
+              icon: IconlyBold.profile,
+              unselectedIcon: IconlyLight.user,
+              selectedColor: Colors.white,
+            ),
+          ],
+          duration: Duration(milliseconds: 200),
+          curve: Curves.easeIn,
+          splashBorderRadius: 50,
+          enablePaddingAnimation: true,
+        ),
+      ),
+    );
+  }
+}
