@@ -14,6 +14,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor:
+            Color(0xfff1f4f8), // Change this to your desired background color
+      ),
       initialRoute: '/login',
       routes: {
         '/login': (context) => SetupPage(),
