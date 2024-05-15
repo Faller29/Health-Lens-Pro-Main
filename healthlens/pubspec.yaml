@@ -54,6 +54,8 @@ dependencies:
   permission_handler: ^10.2.0
   wolt_modal_sheet: ^0.5.0
   table_calendar: ^3.1.1
+  d_chart: ^2.6.9
+  syncfusion_flutter_charts: ^25.2.4
 
 
 dev_dependencies:
