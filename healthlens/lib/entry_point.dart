@@ -46,6 +46,8 @@ class _EntryPointState extends State<EntryPoint> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
           title: Text(
             pageTitles[currentPageIndex],
@@ -63,12 +65,12 @@ class _EntryPointState extends State<EntryPoint> {
           ProfilePage(),
         ][currentPageIndex],
       ),
-      extendBody: true,
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(bottom: 0),
         child: CrystalNavigationBar(
           currentIndex: currentPageIndex,
           height: 10,
+          enableFloatingNavBar: true,
           outlineBorderColor: Colors.white,
           indicatorColor: Colors.blue,
           unselectedItemColor: Colors.white70,
@@ -82,22 +84,22 @@ class _EntryPointState extends State<EntryPoint> {
             CrystalNavigationBarItem(
               icon: IconlyBold.home,
               unselectedIcon: IconlyLight.home,
-              selectedColor: Colors.white,
+              selectedColor: Color(0xff4b39ef),
             ),
             CrystalNavigationBarItem(
               icon: IconlyBold.scan,
               unselectedIcon: IconlyLight.scan,
-              selectedColor: Colors.white,
+              selectedColor: Color(0xff4b39ef),
             ),
             CrystalNavigationBarItem(
               icon: IconlyBold.chart,
               unselectedIcon: IconlyLight.chart,
-              selectedColor: Colors.white,
+              selectedColor: Color(0xff4b39ef),
             ),
             CrystalNavigationBarItem(
               icon: IconlyBold.profile,
               unselectedIcon: IconlyLight.user,
-              selectedColor: Colors.white,
+              selectedColor: Color(0xff4b39ef),
             ),
           ],
           duration: Duration(milliseconds: 200),

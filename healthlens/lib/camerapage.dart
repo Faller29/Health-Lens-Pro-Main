@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:iconly/iconly.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:camera/camera.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -12,65 +10,72 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
-  File? _selectedImage;
+  CameraController? _cameraController;
+  List<CameraDescription>? _cameras;
+  bool _isCameraInitialized = false;
+  bool _isPermissionGranted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissionsAndInitializeCamera();
+  }
+
+  Future<void> _checkPermissionsAndInitializeCamera() async {
+    // Check for camera permissions
+    PermissionStatus cameraStatus = await Permission.camera.status;
+    if (!cameraStatus.isGranted) {
+      cameraStatus = await Permission.camera.request();
+    }
+
+    if (cameraStatus.isGranted) {
+      _isPermissionGranted = true;
+      await _initializeCamera();
+    } else {
+      // Handle the case when the user denies the permission
+      setState(() {
+        _isPermissionGranted = false;
+      });
+    }
+  }
+
+  Future<void> _initializeCamera() async {
+    _cameras = await availableCameras();
+    if (_cameras != null && _cameras!.isNotEmpty) {
+      _cameraController = CameraController(_cameras![0], ResolutionPreset.high);
+      await _cameraController!.initialize();
+      setState(() {
+        _isCameraInitialized = true;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: ListView(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                IconlyLight.chart,
-                size: 120,
-                color: Colors.black,
-              ),
-              Text(
-                'Camera Page',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-          MaterialButton(
-            elevation: 4,
-            color: Colors.blueAccent,
-            child: Text('Camera'),
-            onPressed: () {
-              _pickImageFromCamera();
-            },
-          ),
-          MaterialButton(
-            elevation: 4,
-            color: Colors.blueAccent,
-            child: Text('Gallery'),
-            onPressed: () {
-              _pickImageFromGallery();
-            },
-          ),
-          _selectedImage != null ? Image.file(_selectedImage!) : Text('data'),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Live Camera Feed'),
       ),
+      body: _isPermissionGranted
+          ? _isCameraInitialized
+              ? Center(
+                  child: AspectRatio(
+                    aspectRatio: _cameraController!.value.aspectRatio,
+                    child: CameraPreview(_cameraController!),
+                  ),
+                )
+              : Center(
+                  child: CircularProgressIndicator(),
+                )
+          : Center(
+              child: Text('Camera permission denied'),
+            ),
     );
-  }
-
-  Future _pickImageFromCamera() async {
-    final returnedImage =
-        await ImagePicker().pickImage(source: ImageSource.camera);
-    setState(() {
-      _selectedImage = File(returnedImage!.path);
-    });
-  }
-
-  Future _pickImageFromGallery() async {
-    final returnedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    setState(() {
-      _selectedImage = File(returnedImage!.path);
-    });
   }
 }

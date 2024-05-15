@@ -50,6 +50,8 @@ dependencies:
   crea_radio_button: ^0.6.0
   equatable: ^2.0.5
   image_picker: ^1.1.0
+  camera: ^0.10.0+4
+  permission_handler: ^10.2.0
 
 
 dev_dependencies:

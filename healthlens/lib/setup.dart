@@ -17,13 +17,6 @@ List<Map> categories = [
   {"name": "Diabetes [Type 1]", "isChecked": false},
   {"name": "Diabetes [Type 2 ]", "isChecked": false},
   {"name": "Hypertension", "isChecked": false},
-  {"name": "Asthma", "isChecked": false},
-  {"name": "Chronic Obstructive Pulmonary Disease", "isChecked": false},
-  {"name": "Coronary Artery Disease", "isChecked": false},
-  {"name": "Chronic Kidney Disease", "isChecked": false},
-  {"name": "Rheumaroid Arthritis", "isChecked": false},
-  {"name": "Crohn's Disease", "isChecked": false},
-  {"name": "Parkinson's Disease", "isChecked": false},
 ];
 
 class _SetupPageState extends State<SetupPage> {
@@ -226,6 +219,7 @@ class _SetupPageState extends State<SetupPage> {
                                                 style: GoogleFonts.readexPro(
                                                   fontSize: 14.0,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               ),
                                               Expanded(
                                                 child: Column(
@@ -605,6 +599,7 @@ class _SetupPageState extends State<SetupPage> {
                                                 style: GoogleFonts.readexPro(
                                                   fontSize: 14.0,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               ),
                                               Expanded(
                                                 child: Column(
@@ -954,11 +949,12 @@ class _SetupPageState extends State<SetupPage> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    'Please Select your current health status and health goals.',
+                                                    'Please Select your current health status and Lifestyle.',
                                                     style:
                                                         GoogleFonts.readexPro(
                                                       fontSize: 14.0,
                                                     ),
+                                                    textAlign: TextAlign.center,
                                                   ),
                                                   SizedBox(
                                                     height: 20,
@@ -979,7 +975,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                 .fromLTRB(0, 10,
                                                                     0, 10),
                                                             child: Text(
-                                                              'Health Goal:',
+                                                              'Physical Lifestyle: ',
                                                               style: GoogleFonts
                                                                   .readexPro(
                                                                       fontSize:
@@ -1003,13 +999,20 @@ class _SetupPageState extends State<SetupPage> {
                                                                             CrossAxisAlignment
                                                                                 .center,
                                                                         spaceBetween:
-                                                                            15,
+                                                                            1,
+                                                                        betweenMultiLines:
+                                                                            10,
                                                                         buttonHeight:
-                                                                            25,
+                                                                            30,
                                                                         buttonWidth:
-                                                                            90,
+                                                                            115,
                                                                         circular:
                                                                             true,
+                                                                        textStyle: TextStyle(
+                                                                            fontSize:
+                                                                                14,
+                                                                            color: Colors
+                                                                                .white),
                                                                         mainColor:
                                                                             Colors
                                                                                 .grey,
@@ -1018,21 +1021,21 @@ class _SetupPageState extends State<SetupPage> {
                                                                                 0xff4b39ef),
                                                                         selectedBorderSide: BorderSide(
                                                                             width:
-                                                                                2,
+                                                                                1,
                                                                             color: Color(
                                                                                 0xff4b39ef)),
                                                                         preSelectedIdx:
                                                                             0,
                                                                         options: [
                                                                           RadioOption(
-                                                                              "FIT",
-                                                                              "Fit"),
+                                                                              "INACTIVE ",
+                                                                              "Inactive "),
                                                                           RadioOption(
-                                                                              "DIET",
-                                                                              "Diet"),
+                                                                              "SEDENTARY",
+                                                                              "Sedentary"),
                                                                           RadioOption(
-                                                                              "BULK",
-                                                                              "Bulk"),
+                                                                              "ACTIVE",
+                                                                              "Active"),
                                                                         ],
                                                                         callback:
                                                                             (RadioOption
@@ -1161,17 +1164,18 @@ class _SetupPageState extends State<SetupPage> {
                                                 ),
                                               ),
                                               Text(
-                                                'Security',
+                                                'Account & Security',
                                                 style: GoogleFonts.outfit(
                                                   fontSize: 30.0,
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ),
                                               Text(
-                                                'Please enter a Pin Code to secure your app.',
+                                                'Log in or Create an Account to save and retrieve your data.',
                                                 style: GoogleFonts.readexPro(
                                                   fontSize: 14.0,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               ),
                                               Align(
                                                 alignment: AlignmentDirectional(
@@ -1248,6 +1252,7 @@ class _SetupPageState extends State<SetupPage> {
                                                 style: GoogleFonts.readexPro(
                                                   fontSize: 14.0,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               )
                                             ],
                                           ),
