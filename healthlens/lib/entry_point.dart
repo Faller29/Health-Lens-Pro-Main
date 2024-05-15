@@ -51,7 +51,7 @@ class _EntryPointState extends State<EntryPoint> {
       appBar: AppBar(
           title: Text(
             pageTitles[currentPageIndex],
-            style: GoogleFonts.titanOne(
+            style: GoogleFonts.outfit(
               fontSize: 25.0,
             ),
           ),

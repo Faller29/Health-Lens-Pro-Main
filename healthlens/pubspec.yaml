@@ -40,7 +40,7 @@ dependencies:
   curved_navigation_bar_with_label: ^2.1.4
   crystal_navigation_bar: ^1.0.0
   iconly: ^1.0.1
-  fl_chart: ^0.67.0
+  fl_chart: ^0.68.0
   animated_text_kit: ^4.2.2
   google_fonts: ^6.2.1
   percent_indicator: ^4.2.3
@@ -52,6 +52,8 @@ dependencies:
   image_picker: ^1.1.0
   camera: ^0.10.0+4
   permission_handler: ^10.2.0
+  wolt_modal_sheet: ^0.5.0
+  table_calendar: ^3.1.1
 
 
 dev_dependencies:
