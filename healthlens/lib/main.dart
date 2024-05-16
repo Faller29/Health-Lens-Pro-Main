@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthlens/calendar_history.dart';
 import 'package:healthlens/entry_point.dart';
 import 'login_page.dart';
 import 'setup.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => SetupPage(),
         '/entry_point': (context) =>
             EntryPoint(pageController: PageController()),
+        '/calendar': (context) => CalendarScreen(),
       },
     );
   }

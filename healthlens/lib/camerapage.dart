@@ -18,9 +18,27 @@ class _CameraPageState extends State<CameraPage> {
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
   bool _isPermissionGranted = false;
-
+  Color detectionColor = Color(0xff4b39ef);
+  String detectionTitle = 'Start Detecting';
   // Aspect ratio variable (you can adjust this as needed)
   late double _aspectRatio;
+  bool _isCameraStreaming = false;
+
+  void _toggleCameraState() {
+    if (_cameraController != null && _cameraController!.value.isInitialized) {
+      setState(() {
+        _isCameraStreaming = !_isCameraStreaming; // Toggle the camera state
+      });
+
+      if (_isCameraStreaming) {
+        _cameraController!.startImageStream((CameraImage image) {
+          // Process the camera image here
+        });
+      } else {
+        _cameraController!.stopImageStream();
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -61,6 +79,8 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   void dispose() {
+    _cameraController
+        ?.stopImageStream(); // Stop the camera stream when disposing the widget
     _cameraController?.dispose();
     super.dispose();
   }
@@ -138,18 +158,152 @@ class _CameraPageState extends State<CameraPage> {
                                 ),
                               ),
                               Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(8.0, 14.0, 8.0, 14.0),
-                                child: Text(
-                                  "Ingredients Detected",
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
+                                  padding:
+                                      EdgeInsets.fromLTRB(8.0, 14.0, 8.0, 14.0),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Apple",
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Protein",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      " - ",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      "2g",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Carbs",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      " - ",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      "2g",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Fats",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      " - ",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      "2g",
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 12.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Divider(
+                                        height: 1,
+                                      )
+                                    ],
+                                  )),
                             ],
                           ),
                         ),
@@ -195,9 +349,21 @@ class _CameraPageState extends State<CameraPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
-                            onPressed: null,
+                            onPressed: () {
+                              setState(() {
+                                if (detectionColor == Color(0xff4b39ef) &&
+                                    detectionTitle == 'Start Detecting') {
+                                  detectionColor =
+                                      Color.fromARGB(255, 239, 57, 57);
+                                  detectionTitle = 'Stop Detecting';
+                                } else {
+                                  detectionColor = Color(0xff4b39ef);
+                                  detectionTitle = 'Start Detecting';
+                                }
+                              });
+                            },
                             child: Text(
-                              'Start Detecting',
+                              detectionTitle,
                               style: GoogleFonts.outfit(
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.bold,
@@ -205,7 +371,7 @@ class _CameraPageState extends State<CameraPage> {
                               ),
                             ),
                             style: TextButton.styleFrom(
-                              backgroundColor: Color(0xff4b39ef),
+                              backgroundColor: detectionColor,
                               foregroundColor: Colors.white,
                             ),
                           ),
@@ -213,7 +379,7 @@ class _CameraPageState extends State<CameraPage> {
                             width: 50,
                           ),
                           ElevatedButton(
-                            onPressed: null,
+                            onPressed: () {},
                             child: Text(
                               'Clear Ingredients',
                               style: GoogleFonts.outfit(

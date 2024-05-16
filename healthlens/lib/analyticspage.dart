@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'calendar_history.dart';
 
 class AnalyticsPage extends StatefulWidget {
   const AnalyticsPage({Key? key}) : super(key: key);
@@ -192,7 +193,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                   ),
                                 ),
                               ),
-                              onPressed: null,
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/calendar');
+                              },
                               icon: Icon(
                                 IconlyBroken.calendar,
                                 color: Color(0xff4b39ef),
@@ -206,6 +209,43 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   ),
                 ),
               ),
+              Padding(
+                padding: EdgeInsets.all(14),
+                child: Container(
+                  height: 200,
+                  width: MediaQuery.sizeOf(context).width,
+                  decoration: BoxDecoration(
+                    color: Color(0xffffffff),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 4.0,
+                        color: Color(0x33000000),
+                        offset: Offset(
+                          0.0,
+                          2.0,
+                        ),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(8.0),
+                    shape: BoxShape.rectangle,
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(14),
+                        child: Text(
+                          'Food History',
+                          style: GoogleFonts.readexPro(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
         ],
