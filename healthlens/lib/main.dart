@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor:
             Color(0xfff1f4f8), // Change this to your desired background color
       ),
-      initialRoute: '/login',
+      initialRoute: '/setup',
       routes: {
-        '/login': (context) => SetupPage(),
+        '/setup': (context) => SetupPage(),
         '/entry_point': (context) =>
             EntryPoint(pageController: PageController()),
         '/calendar': (context) => CalendarScreen(),

@@ -15,46 +15,49 @@ class AnalyticsPage extends StatefulWidget {
 class _AnalyticsPageState extends State<AnalyticsPage> {
   int _selectedDayIndex = 0;
   PageController _pageController = PageController(initialPage: 0);
+  Color protein = Color(0xffff5963);
+  Color fats = Color(0xff249689);
+  Color carbs = Color(0xff4b39ef);
 
   final List<ChartData> chartData = [
     ChartData('7am', 12, 10, 14),
     ChartData('8am', 14, 11, 18),
-    ChartData('9am', 16, 10, 15),
-    ChartData('10am', 18, 16, 18),
-    ChartData('11am', 14, 11, 18),
-    ChartData('12am', 16, 10, 15),
+    ChartData('9am', 14, 10, 15),
+    ChartData('10am', 14, 16, 18),
+    ChartData('11am', 13, 13, 18),
+    ChartData('12am', 16, 10, 14),
   ];
 
   final List<ChartData> chartData1 = [
-    ChartData('Mon', 12, 23, 43),
-    ChartData('Tue', 14, 34, 31),
-    ChartData('Wed', 16, 10, 12),
-    ChartData('Thu', 13, 23, 11),
-    ChartData('Fri', 14, 11, 18),
-    ChartData('Sat', 16, 22, 23),
-    ChartData('Sun', 54, 30, 11),
+    ChartData('Mon', 16, 13, 14),
+    ChartData('Tue', 14, 14, 16),
+    ChartData('Wed', 16, 11, 12),
+    ChartData('Thu', 19, 21, 11),
+    ChartData('Fri', 14, 12, 18),
+    ChartData('Sat', 17, 22, 23),
+    ChartData('Sun', 17, 16, 21),
   ];
 
   final List<ChartData> chartData2 = [
-    ChartData('1', 12, 10, 14),
+    ChartData('1', 16, 16, 14),
     ChartData('2', 14, 12, 18),
     ChartData('3', 16, 23, 15),
-    ChartData('4', 13, 16, 33),
-    ChartData('5', 21, 11, 18),
-    ChartData('6', 16, 10, 15),
-    ChartData('7', 16, 41, 25),
-    ChartData('8', 47, 23, 41),
-    ChartData('9', 11, 41, 11),
+    ChartData('4', 13, 16, 13),
+    ChartData('5', 21, 23, 18),
+    ChartData('6', 16, 11, 15),
+    ChartData('7', 16, 11, 25),
+    ChartData('8', 14, 23, 12),
+    ChartData('9', 11, 21, 23),
   ];
 
   List<AverageData> barChart = [
-    AverageData('Ave. Today', 20, 33, 10),
+    AverageData('Ave. Today', 14, 13, 18),
   ];
   List<AverageData> barChart1 = [
-    AverageData('Ave. 7 days', 35, 40, 11),
+    AverageData('Ave. 7 days', 16, 19, 18),
   ];
   List<AverageData> barChart2 = [
-    AverageData('Ave. 30 days', 10, 22, 32),
+    AverageData('Ave. 30 days', 24, 22, 19),
   ];
 
   @override
@@ -261,21 +264,50 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           width: MediaQuery.sizeOf(context).width,
           child: SfCartesianChart(
             primaryXAxis: CategoryAxis(),
-            legend: Legend(isVisible: true),
+            legend: Legend(
+              isVisible: true,
+            ),
             series: <CartesianSeries>[
               StackedColumnSeries<ChartData, String>(
+                  color: fats,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Fats',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y1,
                   pointColorMapper: (ChartData data, _) => Color(0xff249689)),
               StackedColumnSeries<ChartData, String>(
+                  color: protein,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Protein',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y2,
                   pointColorMapper: (ChartData data, _) => Color(0xffff5963)),
               StackedColumnSeries<ChartData, String>(
+                  color: carbs,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Carbohydrates',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
@@ -291,9 +323,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 primaryXAxis: CategoryAxis(),
                 series: <CartesianSeries>[
                   StackedBarSeries<AverageData, String>(
+                      color: fats,
                       dataLabelSettings: DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
+                        textStyle: TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold),
+                        labelAlignment: ChartDataLabelAlignment.middle,
+                        alignment: ChartAlignment.center,
                       ),
                       dataSource: barChart,
                       name: 'Fats',
@@ -302,9 +339,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       pointColorMapper: (AverageData data, _) =>
                           Color(0xff249689)),
                   StackedBarSeries<AverageData, String>(
+                      color: protein,
                       dataLabelSettings: DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
+                        textStyle: TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold),
+                        labelAlignment: ChartDataLabelAlignment.middle,
+                        alignment: ChartAlignment.center,
                       ),
                       dataSource: barChart,
                       name: 'Protein',
@@ -313,9 +355,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       pointColorMapper: (AverageData data, _) =>
                           Color(0xffff5963)),
                   StackedBarSeries<AverageData, String>(
+                    color: carbs,
                     dataLabelSettings: DataLabelSettings(
                       isVisible: true,
                       labelPosition: ChartDataLabelPosition.inside,
+                      textStyle:
+                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                      labelAlignment: ChartDataLabelAlignment.middle,
+                      alignment: ChartAlignment.center,
                     ),
                     dataSource: barChart,
                     name: 'Carbohydrates',
@@ -340,18 +387,45 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             legend: Legend(isVisible: true),
             series: <CartesianSeries>[
               StackedColumnSeries<ChartData, String>(
+                  color: fats,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Fats',
                   dataSource: chartData1,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y1,
                   pointColorMapper: (ChartData data, _) => Color(0xff249689)),
               StackedColumnSeries<ChartData, String>(
+                  color: protein,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Protein',
                   dataSource: chartData1,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y2,
                   pointColorMapper: (ChartData data, _) => Color(0xffff5963)),
               StackedColumnSeries<ChartData, String>(
+                  color: carbs,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Carbohydrates',
                   dataSource: chartData1,
                   xValueMapper: (ChartData data, _) => data.x,
@@ -367,9 +441,15 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 primaryXAxis: CategoryAxis(),
                 series: <CartesianSeries>[
                   StackedBarSeries<AverageData, String>(
+                      color: fats,
                       dataLabelSettings: DataLabelSettings(
-                          isVisible: true,
-                          labelPosition: ChartDataLabelPosition.inside),
+                        isVisible: true,
+                        labelPosition: ChartDataLabelPosition.inside,
+                        textStyle: TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold),
+                        labelAlignment: ChartDataLabelAlignment.middle,
+                        alignment: ChartAlignment.center,
+                      ),
                       dataSource: barChart1,
                       name: 'Fats',
                       xValueMapper: (AverageData data, _) => data.x,
@@ -377,9 +457,15 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       pointColorMapper: (AverageData data, _) =>
                           Color(0xff249689)),
                   StackedBarSeries<AverageData, String>(
+                      color: protein,
                       dataLabelSettings: DataLabelSettings(
-                          isVisible: true,
-                          labelPosition: ChartDataLabelPosition.inside),
+                        isVisible: true,
+                        labelPosition: ChartDataLabelPosition.inside,
+                        textStyle: TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold),
+                        labelAlignment: ChartDataLabelAlignment.middle,
+                        alignment: ChartAlignment.center,
+                      ),
                       dataSource: barChart1,
                       name: 'Protein',
                       xValueMapper: (AverageData data, _) => data.x,
@@ -387,9 +473,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       pointColorMapper: (AverageData data, _) =>
                           Color(0xffff5963)),
                   StackedBarSeries<AverageData, String>(
+                    color: carbs,
                     dataLabelSettings: DataLabelSettings(
                       isVisible: true,
                       labelPosition: ChartDataLabelPosition.inside,
+                      textStyle:
+                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                      labelAlignment: ChartDataLabelAlignment.middle,
+                      alignment: ChartAlignment.center,
                     ),
                     dataSource: barChart1,
                     name: 'Carbohydrates',
@@ -414,18 +505,45 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             legend: Legend(isVisible: true),
             series: <CartesianSeries>[
               StackedColumnSeries<ChartData, String>(
+                  color: fats,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Fats',
                   dataSource: chartData2,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y1,
                   pointColorMapper: (ChartData data, _) => Color(0xff249689)),
               StackedColumnSeries<ChartData, String>(
+                  color: protein,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Protein',
                   dataSource: chartData2,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y2,
                   pointColorMapper: (ChartData data, _) => Color(0xffff5963)),
               StackedColumnSeries<ChartData, String>(
+                  color: carbs,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
                   name: 'Carbohydrates',
                   dataSource: chartData2,
                   xValueMapper: (ChartData data, _) => data.x,
@@ -444,6 +562,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       dataLabelSettings: DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
+                        textStyle: TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold),
+                        labelAlignment: ChartDataLabelAlignment.middle,
+                        alignment: ChartAlignment.center,
                       ),
                       dataSource: barChart2,
                       name: 'Fats',
@@ -455,6 +577,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       dataLabelSettings: DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
+                        textStyle: TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold),
+                        labelAlignment: ChartDataLabelAlignment.middle,
+                        alignment: ChartAlignment.center,
                       ),
                       dataSource: barChart2,
                       name: 'Protein',
@@ -466,6 +592,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     dataLabelSettings: DataLabelSettings(
                       isVisible: true,
                       labelPosition: ChartDataLabelPosition.inside,
+                      textStyle:
+                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                      labelAlignment: ChartDataLabelAlignment.middle,
+                      alignment: ChartAlignment.center,
                     ),
                     dataSource: barChart2,
                     name: 'Carbohydrates',

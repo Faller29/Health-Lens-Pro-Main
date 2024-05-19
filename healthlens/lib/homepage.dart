@@ -22,139 +22,168 @@ class HomePage extends StatelessWidget {
         addAutomaticKeepAlives: true,
         children: [
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 8.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 8.0),
             child: Container(
-              width: 411.0,
+              width: MediaQuery.sizeOf(context).width,
               height: 100.0,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xffffffff),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 14.0, 0.0),
-                    child: Container(
-                      width: 70.0,
-                      height: 70.0,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: Image.network(
-                        'https://picsum.photos/seed/529/600',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 14.0, 0.0, 14.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  GestureDetector(
+                    child: Row(
                       children: [
-                        Text(
-                          'John Peter Faller',
-                          style: GoogleFonts.readexPro(
-                              fontSize: 17.0, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '17 Years Old',
-                          style: GoogleFonts.readexPro(
-                            fontSize: 14.0,
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              14.0, 0.0, 14.0, 0.0),
+                          child: Container(
+                            width: 70.0,
+                            height: 70.0,
+                            clipBehavior: Clip.antiAlias,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                            ),
+                            child: Image.network(
+                              'https://picsum.photos/seed/529/600',
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                        Text(
-                          'Weight: 75KG',
-                          style: GoogleFonts.readexPro(
-                            fontSize: 14.0,
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 14.0, 0.0, 14.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'John Peter Faller',
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                '17 Years Old',
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 12.0,
+                                ),
+                              ),
+                              Text(
+                                'BMI: Normal',
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 12.0,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
+                    onTap: () {
+                      // Show modal on tap
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Container(
+                            height: 150,
+                            color: Colors.white,
+                            child: const Center(
+                              child: Text("User Profile Overview"),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 0.0, 0.0),
-                      child: Container(
-                        width: 122.0,
-                        height: 100.0,
-                        decoration: BoxDecoration(
-                          color: Color(0xff4b39ef),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(8.0),
-                            bottomRight: Radius.circular(0.0),
-                            topLeft: Radius.circular(8.0),
-                            topRight: Radius.circular(0.0),
+                  GestureDetector(
+                    child: Expanded(
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            14.0, 0.0, 0.0, 0.0),
+                        child: Container(
+                          width: 122.0,
+                          height: 100.0,
+                          decoration: const BoxDecoration(
+                            color: Color(0xff4b39ef),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              bottomRight: Radius.circular(0.0),
+                              topLeft: Radius.circular(8.0),
+                              topRight: Radius.circular(0.0),
+                            ),
                           ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Text(
-                                  'DAY 01',
-                                  style: GoogleFonts.readexPro(
-                                    fontSize: 20.0,
-                                    textStyle: TextStyle(
-                                      color: Color(0xffffffff),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text(
+                                    'DAY 01',
+                                    style: GoogleFonts.readexPro(
+                                      fontSize: 20.0,
+                                      textStyle: const TextStyle(
+                                        color: Color(0xffffffff),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  'Time: 11:30',
-                                  style: GoogleFonts.readexPro(
-                                    fontSize: 11.0,
-                                    textStyle: TextStyle(
-                                      color: Color(0xffffffff),
+                                  Text(
+                                    'Time: 11:30',
+                                    style: GoogleFonts.readexPro(
+                                      fontSize: 11.0,
+                                      textStyle: const TextStyle(
+                                        color: Color(0xffffffff),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              'BMI: Normal',
-                              style: GoogleFonts.readexPro(
-                                fontSize: 13.0,
-                                textStyle: TextStyle(
-                                  color: Color(0xffffffff),
+                                ],
+                              ),
+                              Text(
+                                'Weight: 71kg',
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 15.0,
+                                  textStyle: const TextStyle(
+                                    color: Color(0xffffffff),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              'Assesment: 71kg',
-                              style: GoogleFonts.readexPro(
-                                fontSize: 13.0,
-                                textStyle: TextStyle(
-                                  color: Color(0xffffffff),
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
+                    onTap: () {
+                      // Show modal on tap
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Container(
+                            height: 150,
+                            color: Colors.white,
+                            child: const Center(
+                              child: Text("Update Weight & Health Assessment"),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               ),
             ),
           ),
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 14.0, 0.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 14.0, 0.0),
             child: Container(
               width: 350.0,
-              height: 210.0,
               decoration: BoxDecoration(
-                color: Color(0xffffffff),
+                color: const Color(0xffffffff),
                 boxShadow: [
-                  BoxShadow(
+                  const BoxShadow(
                     blurRadius: 4.0,
                     color: Color(0x33000000),
                     offset: Offset(
@@ -168,7 +197,7 @@ class HomePage extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Padding(
+                  const Padding(
                     padding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 14.0, 0.0, 14.0),
                     child: Text(
@@ -190,14 +219,14 @@ class HomePage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 0.0, 0.0, 8.0),
                                 child: Text(
                                   'Carbohydrates',
                                   style: GoogleFonts.readexPro(
                                     fontSize: 14.0,
                                     fontWeight: FontWeight.bold,
-                                    textStyle: TextStyle(
+                                    textStyle: const TextStyle(
                                       color: Color(0xff4b39ef),
                                     ),
                                   ),
@@ -213,13 +242,13 @@ class HomePage extends StatelessWidget {
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
-                                header: Padding(
+                                header: const Padding(
                                   padding: EdgeInsets.only(
                                       bottom:
                                           10.0), // Adjust bottom padding as needed
                                 ),
                                 circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: Color(0xff4b39ef),
+                                progressColor: const Color(0xff4b39ef),
                               ),
                             ],
                           ),
@@ -228,11 +257,11 @@ class HomePage extends StatelessWidget {
                             style: GoogleFonts.readexPro(
                               fontSize: 12.0,
                               fontWeight: FontWeight.bold,
-                              textStyle: TextStyle(
+                              textStyle: const TextStyle(
                                 color: Color(0xff4b39ef),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
 
@@ -245,14 +274,14 @@ class HomePage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 0.0, 0.0, 8.0),
                                 child: Text(
                                   'Protein',
                                   style: GoogleFonts.readexPro(
                                     fontSize: 14.0,
                                     fontWeight: FontWeight.bold,
-                                    textStyle: TextStyle(
+                                    textStyle: const TextStyle(
                                       color: Color(0xffff5963),
                                     ),
                                   ),
@@ -268,20 +297,20 @@ class HomePage extends StatelessWidget {
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
-                                header: Padding(
+                                header: const Padding(
                                   padding: EdgeInsets.only(
                                       bottom:
                                           10.0), // Adjust bottom padding as needed
                                 ),
                                 circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: Color(0xffff5963),
+                                progressColor: const Color(0xffff5963),
                               ),
                               Text(
                                 "50/100g",
                                 style: GoogleFonts.readexPro(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
-                                  textStyle: TextStyle(
+                                  textStyle: const TextStyle(
                                     color: Color(0xffff5963),
                                   ),
                                 ),
@@ -300,14 +329,14 @@ class HomePage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 0.0, 0.0, 8.0),
                                 child: Text(
                                   'Fats',
                                   style: GoogleFonts.readexPro(
                                     fontSize: 14.0,
                                     fontWeight: FontWeight.bold,
-                                    textStyle: TextStyle(
+                                    textStyle: const TextStyle(
                                       color: Color(0xff249689),
                                     ),
                                   ),
@@ -323,20 +352,20 @@ class HomePage extends StatelessWidget {
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
-                                header: Padding(
+                                header: const Padding(
                                   padding: EdgeInsets.only(
                                       bottom:
                                           10.0), // Adjust bottom padding as needed
                                 ),
                                 circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: Color(0xff249689),
+                                progressColor: const Color(0xff249689),
                               ),
                               Text(
                                 "30/100g",
                                 style: GoogleFonts.readexPro(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
-                                  textStyle: TextStyle(
+                                  textStyle: const TextStyle(
                                     color: Color(0xff249689),
                                   ),
                                 ),
@@ -347,12 +376,46 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: TextButton.icon(
+                      label: Text(
+                        'Exercise',
+                        style: GoogleFonts.readexPro(
+                          fontSize: 14.0,
+                          textStyle: const TextStyle(
+                            color: Color(0xff4b39ef),
+                          ),
+                        ),
+                        textAlign: TextAlign.end,
+                      ),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Container(
+                              height: 300,
+                              width: 500,
+                              child: const Center(
+                                child: Text("Exercises"),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.fitness_center,
+                        color: Color(0xff4b39ef),
+                        size: 20,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
           Container(
-            padding: EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(10.0),
             height: 110,
             child: GestureDetector(
               onTap: () {
@@ -363,7 +426,7 @@ class HomePage extends StatelessWidget {
                     return Container(
                       height: 150,
                       color: Colors.white,
-                      child: Center(
+                      child: const Center(
                         child: Text("All  Suggested Food"),
                       ),
                     );
@@ -400,7 +463,7 @@ class HomePage extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(
+            padding: const EdgeInsetsDirectional.fromSTEB(
               14.0,
               0.0,
               14.0,
@@ -410,9 +473,9 @@ class HomePage extends StatelessWidget {
               width: 350.0,
               height: 210.0,
               decoration: BoxDecoration(
-                color: Color(0xffffffff),
+                color: const Color(0xffffffff),
                 boxShadow: [
-                  BoxShadow(
+                  const BoxShadow(
                     blurRadius: 4.0,
                     color: Color(0x33000000),
                     offset: Offset(
@@ -429,7 +492,7 @@ class HomePage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: EdgeInsets.fromLTRB(0.0, 14.0, 0.0, 14.0),
+                    padding: const EdgeInsets.fromLTRB(0.0, 14.0, 0.0, 14.0),
                     child: Text(
                       "Activity",
                       style: GoogleFonts.readexPro(

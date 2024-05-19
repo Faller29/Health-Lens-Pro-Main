@@ -67,7 +67,8 @@ class _CameraPageState extends State<CameraPage> {
   Future<void> _initializeCamera() async {
     _cameras = await availableCameras();
     if (_cameras != null && _cameras!.isNotEmpty) {
-      _cameraController = CameraController(_cameras![0], ResolutionPreset.high);
+      _cameraController =
+          CameraController(_cameras![0], ResolutionPreset.veryHigh);
       await _cameraController!.initialize();
       setState(() {
         _isCameraInitialized = true;
@@ -115,7 +116,7 @@ class _CameraPageState extends State<CameraPage> {
               )),
       ),
       Positioned(
-        top: 100,
+        top: 110,
         right: 0,
         child: _isPermissionGranted
             ? _isCameraInitialized
@@ -345,7 +346,6 @@ class _CameraPageState extends State<CameraPage> {
                     child: Align(
                       alignment: Alignment.center,
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
@@ -365,7 +365,7 @@ class _CameraPageState extends State<CameraPage> {
                             child: Text(
                               detectionTitle,
                               style: GoogleFonts.outfit(
-                                fontSize: 14.0,
+                                fontSize: 12.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -375,15 +375,12 @@ class _CameraPageState extends State<CameraPage> {
                               foregroundColor: Colors.white,
                             ),
                           ),
-                          SizedBox(
-                            width: 50,
-                          ),
                           ElevatedButton(
                             onPressed: () {},
                             child: Text(
                               'Clear Ingredients',
                               style: GoogleFonts.outfit(
-                                fontSize: 14.0,
+                                fontSize: 12.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
