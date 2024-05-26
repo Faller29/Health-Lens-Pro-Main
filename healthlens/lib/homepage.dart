@@ -18,7 +18,7 @@ const double contHeight = 140;
 
 class ScaleSize {
   static double textScaleFactor(BuildContext context,
-      {double maxTextScaleFactor = 4}) {
+      {double maxTextScaleFactor = 3}) {
     final width = MediaQuery.of(context).size.width;
     double val = (width / 1400) * maxTextScaleFactor;
     return max(1, min(val, maxTextScaleFactor));
@@ -27,7 +27,7 @@ class ScaleSize {
 
 class SubScaleSize {
   static double textScaleFactor(BuildContext context,
-      {double maxTextScaleFactor = 2}) {
+      {double maxTextScaleFactor = 1}) {
     final width = MediaQuery.of(context).size.width;
     double val = (width / 1400) * maxTextScaleFactor;
     return max(1, min(val, maxTextScaleFactor));
@@ -219,18 +219,11 @@ class _HomePage extends State<HomePage> {
                                       child: SfCartesianChart(
                                         zoomPanBehavior: ZoomPanBehavior(
                                           enablePinching: true,
-                                          zoomMode: ZoomMode.y,
+                                          zoomMode: ZoomMode.x,
                                           enablePanning: true,
                                         ),
-                                        primaryXAxis: CategoryAxis(
-                                          edgeLabelPlacement:
-                                              EdgeLabelPlacement.shift,
-                                          interval: 1,
-                                        ),
-                                        primaryYAxis: CategoryAxis(
-                                          maximum: 100,
-                                          minimum: 0,
-                                        ),
+                                        primaryXAxis: CategoryAxis(),
+                                        primaryYAxis: CategoryAxis(),
                                         legend: Legend(isVisible: true),
                                         series: <CartesianSeries>[
                                           StackedColumnSeries<ChartData,
