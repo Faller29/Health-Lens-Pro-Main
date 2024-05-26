@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/food_data_history.dart';
 import 'package:healthlens/graph_data.dart';
 import 'package:healthlens/models/category_model.dart';
 import 'package:healthlens/widgets/hero_carousel_card.dart';
@@ -33,8 +34,15 @@ class SubScaleSize {
   }
 }
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePage();
+}
+
+class _HomePage extends State<HomePage> {
+  final List<Item> _data = generateItems(1);
 
   @override
   @override
@@ -629,7 +637,6 @@ class HomePage extends StatelessWidget {
             ),
             child: Container(
               width: 350.0,
-              height: 210.0,
               decoration: BoxDecoration(
                 color: const Color(0xffffffff),
                 boxShadow: [
@@ -651,12 +658,51 @@ class HomePage extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0.0, 14.0, 0.0, 14.0),
-                    child: Text(
-                      "Activity",
-                      style: GoogleFonts.readexPro(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            "Activity",
+                            style: GoogleFonts.readexPro(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        ExpansionPanelList(
+                          expansionCallback: (int index, bool isExpanded) {
+                            setState(() {
+                              _data[index].isExpanded = isExpanded;
+                            });
+                          },
+                          children: _data.map<ExpansionPanel>((Item item) {
+                            return ExpansionPanel(
+                              headerBuilder:
+                                  (BuildContext context, bool isExpanded) {
+                                return ListTile(
+                                  title: Text(
+                                    item.headerValue,
+                                    style: GoogleFonts.readexPro(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      textStyle: const TextStyle(
+                                        color: Color.fromARGB(255, 0, 0, 0),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              body: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: item.expandedContent,
+                              ),
+                              isExpanded: item.isExpanded,
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     ),
                   ),
                 ],

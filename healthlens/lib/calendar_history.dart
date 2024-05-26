@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/food_data_history.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -32,6 +33,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Color protein = Color(0xffff5963);
   Color fats = Color(0xff249689);
   Color carbs = Color(0xff4b39ef);
+  final List<Item> _data = generateItems(1);
 
   @override
   Widget build(BuildContext context) {
@@ -340,15 +342,61 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(8, 14, 8, 10),
                     child: Container(
-                      height: 200,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            'Food History',
-                            style: GoogleFonts.outfit(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          Padding(
+                            padding:
+                                const EdgeInsets.fromLTRB(0.0, 14.0, 0.0, 14.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    "Activity",
+                                    style: GoogleFonts.readexPro(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                ExpansionPanelList(
+                                  expansionCallback:
+                                      (int index, bool isExpanded) {
+                                    setState(() {
+                                      _data[index].isExpanded = isExpanded;
+                                    });
+                                  },
+                                  children:
+                                      _data.map<ExpansionPanel>((Item item) {
+                                    return ExpansionPanel(
+                                      headerBuilder: (BuildContext context,
+                                          bool isExpanded) {
+                                        return ListTile(
+                                          title: Text(
+                                            item.headerValue,
+                                            style: GoogleFonts.readexPro(
+                                              fontSize: 20.0,
+                                              fontWeight: FontWeight.bold,
+                                              textStyle: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 0, 0, 0),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      body: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: item.expandedContent,
+                                      ),
+                                      isExpanded: item.isExpanded,
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
                             ),
                           ),
                         ],

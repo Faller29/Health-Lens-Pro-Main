@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/food_data_history.dart';
 import 'package:healthlens/graph_data.dart';
 import 'package:iconly/iconly.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -17,6 +18,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   Color protein = Color(0xffff5963);
   Color fats = Color(0xff249689);
   Color carbs = Color(0xff4b39ef);
+  final List<Item> _data = generateItems(1);
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +175,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               Padding(
                 padding: EdgeInsets.all(14),
                 child: Container(
-                  height: 200,
                   width: MediaQuery.sizeOf(context).width,
                   decoration: BoxDecoration(
                     color: Color(0xffffffff),
@@ -191,16 +192,57 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     shape: BoxShape.rectangle,
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(14),
-                        child: Text(
-                          'Food History',
-                          style: GoogleFonts.readexPro(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                        padding:
+                            const EdgeInsets.fromLTRB(0.0, 14.0, 0.0, 14.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                "Food History",
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            ExpansionPanelList(
+                              expansionCallback: (int index, bool isExpanded) {
+                                setState(() {
+                                  _data[index].isExpanded = isExpanded;
+                                });
+                              },
+                              children: _data.map<ExpansionPanel>((Item item) {
+                                return ExpansionPanel(
+                                  headerBuilder:
+                                      (BuildContext context, bool isExpanded) {
+                                    return ListTile(
+                                      title: Text(
+                                        item.headerValue,
+                                        style: GoogleFonts.readexPro(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold,
+                                          textStyle: const TextStyle(
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  body: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: item.expandedContent,
+                                  ),
+                                  isExpanded: item.isExpanded,
+                                );
+                              }).toList(),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -361,6 +403,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     alignment: ChartAlignment.center,
                   ),
                   groupName: 'Fats',
+                  name: 'Fats',
                   dataSource: chartData1,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y1,
@@ -376,6 +419,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     alignment: ChartAlignment.center,
                   ),
                   groupName: 'Protein',
+                  name: 'Protein',
                   dataSource: chartData1,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y2,
@@ -391,6 +435,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     alignment: ChartAlignment.center,
                   ),
                   groupName: 'Carbohydrates',
+                  name: 'Carbohydrates',
                   dataSource: chartData1,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y3,
