@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+
+import 'graph_data.dart';
 
 void main() {
   runApp(CalendarHistory());
@@ -24,6 +28,10 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
+
+  Color protein = Color(0xffff5963);
+  Color fats = Color(0xff249689);
+  Color carbs = Color(0xff4b39ef);
 
   @override
   Widget build(BuildContext context) {
@@ -143,9 +151,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(14),
+                    padding: EdgeInsets.fromLTRB(10, 20, 10, 30),
                     child: Text(
-                      'Selected Date',
+                      'May 30, 2024',
                       style: GoogleFonts.readexPro(
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,
@@ -153,79 +161,178 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ),
                     ),
                   ),
-                  Padding(
+                  Container(
                     padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Colors.black),
-                            borderRadius: BorderRadius.circular(8.0),
-                            shape: BoxShape.rectangle,
-                          ),
-                          child: Text(
-                            'Protein',
-                            style: GoogleFonts.outfit(
-                              fontSize: 14.0,
-                              color: Colors.black,
-                            ),
-                            textAlign: TextAlign.center,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 0.0, 0.0, 8.0),
+                                child: Text(
+                                  'Protein',
+                                  style: GoogleFonts.readexPro(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                    textStyle: const TextStyle(
+                                      color: Color(0xffff5963),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              CircularPercentIndicator(
+                                radius: 40.0,
+                                lineWidth: 14.0,
+                                animation: true,
+                                percent: 0.5,
+                                center: new Text(
+                                  "50.0%",
+                                  style: new TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                header: const Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom:
+                                          10.0), // Adjust bottom padding as needed
+                                ),
+                                circularStrokeCap: CircularStrokeCap.round,
+                                progressColor: const Color(0xffff5963),
+                              ),
+                              Text(
+                                "50/100g",
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.bold,
+                                  textStyle: const TextStyle(
+                                    color: Color(0xffff5963),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
                         Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Colors.black),
-                            borderRadius: BorderRadius.circular(8.0),
-                            shape: BoxShape.rectangle,
-                          ),
-                          child: Text(
-                            'Carbohydrates',
-                            style: GoogleFonts.outfit(
-                              fontSize: 14.0,
-                              color: Colors.black,
+                            child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 8.0),
+                                  child: Text(
+                                    'Carbohydrates',
+                                    style: GoogleFonts.readexPro(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.bold,
+                                      textStyle: const TextStyle(
+                                        color: Color(0xff4b39ef),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                CircularPercentIndicator(
+                                  radius: 40.0,
+                                  lineWidth: 14.0,
+                                  animation: true,
+                                  percent: 0.7,
+                                  center: new Text(
+                                    "70.0%",
+                                    style: new TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  header: const Padding(
+                                    padding: EdgeInsets.only(
+                                        bottom:
+                                            10.0), // Adjust bottom padding as needed
+                                  ),
+                                  circularStrokeCap: CircularStrokeCap.round,
+                                  progressColor: const Color(0xff4b39ef),
+                                ),
+                              ],
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+                            Text(
+                              "89/110g",
+                              style: GoogleFonts.readexPro(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
+                                textStyle: const TextStyle(
+                                  color: Color(0xff4b39ef),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )),
                         Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Colors.black),
-                            borderRadius: BorderRadius.circular(8.0),
-                            shape: BoxShape.rectangle,
-                          ),
-                          child: Text(
-                            'Fats',
-                            style: GoogleFonts.outfit(
-                              fontSize: 14.0,
-                              color: Colors.black,
+                            child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 0.0, 8.0),
+                              child: Text(
+                                'Protein',
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.bold,
+                                  textStyle: const TextStyle(
+                                    color: Color(0xffff5963),
+                                  ),
+                                ),
+                              ),
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+                            CircularPercentIndicator(
+                              radius: 40.0,
+                              lineWidth: 14.0,
+                              animation: true,
+                              percent: 0.5,
+                              center: new Text(
+                                "50.0%",
+                                style:
+                                    new TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              header: const Padding(
+                                padding: EdgeInsets.only(
+                                    bottom:
+                                        10.0), // Adjust bottom padding as needed
+                              ),
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor: const Color(0xffff5963),
+                            ),
+                            Text(
+                              "50/100g",
+                              style: GoogleFonts.readexPro(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
+                                textStyle: const TextStyle(
+                                  color: Color(0xffff5963),
+                                ),
+                              ),
+                            )
+                          ],
+                        )),
                       ],
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(8, 14, 8, 10),
+                    padding: EdgeInsets.fromLTRB(8, 50, 8, 10),
                     child: Container(
-                      height: 200,
                       child: Column(
                         children: [
                           Text(
                             'Analytics',
                             style: GoogleFonts.outfit(
-                              fontSize: 18.0,
+                              fontSize: 20.0,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           ),
+                          _buildStackedColumnChart(),
                         ],
                       ),
                     ),
@@ -254,6 +361,132 @@ class _CalendarScreenState extends State<CalendarScreen> {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildStackedColumnChart() {
+    return Column(
+      children: [
+        Container(
+          height: 220,
+          width: MediaQuery.sizeOf(context).width,
+          child: SfCartesianChart(
+            primaryXAxis: CategoryAxis(),
+            legend: Legend(
+              isVisible: true,
+            ),
+            series: <CartesianSeries>[
+              StackedLineSeries<ChartData, String>(
+                  color: fats,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    margin: EdgeInsets.all(3),
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                    useSeriesColor: true,
+                  ),
+                  name: 'Fats',
+                  dataSource: chartData,
+                  xValueMapper: (ChartData data, _) => data.x,
+                  yValueMapper: (ChartData data, _) => data.y1,
+                  pointColorMapper: (ChartData data, _) => Color(0xff249689)),
+              StackedLineSeries<ChartData, String>(
+                  color: protein,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    margin: EdgeInsets.all(3),
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                    useSeriesColor: true,
+                  ),
+                  name: 'Protein',
+                  dataSource: chartData,
+                  xValueMapper: (ChartData data, _) => data.x,
+                  yValueMapper: (ChartData data, _) => data.y2,
+                  pointColorMapper: (ChartData data, _) => Color(0xffff5963)),
+              StackedLineSeries<ChartData, String>(
+                  color: carbs,
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    margin: EdgeInsets.all(3),
+                    labelPosition: ChartDataLabelPosition.inside,
+                    useSeriesColor: true,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
+                  name: 'Carbohydrates',
+                  dataSource: chartData,
+                  xValueMapper: (ChartData data, _) => data.x,
+                  yValueMapper: (ChartData data, _) => data.y3,
+                  pointColorMapper: (ChartData data, _) => Color(0xff4b39ef)),
+            ],
+          ),
+        ),
+        Container(
+            width: MediaQuery.sizeOf(context).width,
+            height: 80,
+            child: SfCartesianChart(
+                primaryXAxis: CategoryAxis(),
+                series: <CartesianSeries>[
+                  StackedBarSeries<AverageData, String>(
+                      color: fats,
+                      dataLabelSettings: DataLabelSettings(
+                        isVisible: true,
+                        labelPosition: ChartDataLabelPosition.inside,
+                        textStyle: TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold),
+                        labelAlignment: ChartDataLabelAlignment.middle,
+                        alignment: ChartAlignment.center,
+                      ),
+                      dataSource: barChart,
+                      name: 'Fats',
+                      xValueMapper: (AverageData data, _) => data.x,
+                      yValueMapper: (AverageData data, _) => data.y,
+                      pointColorMapper: (AverageData data, _) =>
+                          Color(0xff249689)),
+                  StackedBarSeries<AverageData, String>(
+                      color: protein,
+                      dataLabelSettings: DataLabelSettings(
+                        isVisible: true,
+                        labelPosition: ChartDataLabelPosition.inside,
+                        textStyle: TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.bold),
+                        labelAlignment: ChartDataLabelAlignment.middle,
+                        alignment: ChartAlignment.center,
+                      ),
+                      dataSource: barChart,
+                      name: 'Protein',
+                      xValueMapper: (AverageData data, _) => data.x,
+                      yValueMapper: (AverageData data, _) => data.y2,
+                      pointColorMapper: (AverageData data, _) =>
+                          Color(0xffff5963)),
+                  StackedBarSeries<AverageData, String>(
+                    color: carbs,
+                    dataLabelSettings: DataLabelSettings(
+                      isVisible: true,
+                      labelPosition: ChartDataLabelPosition.inside,
+                      textStyle:
+                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                      labelAlignment: ChartDataLabelAlignment.middle,
+                      alignment: ChartAlignment.center,
+                    ),
+                    dataSource: barChart,
+                    name: 'Carbohydrates',
+                    xValueMapper: (AverageData data, _) => data.x,
+                    yValueMapper: (AverageData data, _) => data.y3,
+                    pointColorMapper: (AverageData data, _) =>
+                        Color(0xff4b39ef),
+                  )
+                ]))
+      ],
     );
   }
 }

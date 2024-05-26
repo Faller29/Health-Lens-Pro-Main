@@ -16,8 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor:
-            Color(0xfff1f4f8), // Change this to your desired background color
+        scaffoldBackgroundColor: Color(0xfff1f4f8),
       ),
       initialRoute: '/setup',
       routes: {

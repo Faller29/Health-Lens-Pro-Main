@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/rendering.dart';
@@ -20,7 +21,7 @@ class _CameraPageState extends State<CameraPage> {
   bool _isPermissionGranted = false;
   Color detectionColor = Color(0xff4b39ef);
   String detectionTitle = 'Start Detecting';
-  // Aspect ratio variable (you can adjust this as needed)
+  // Aspect ratio variable
   late double _aspectRatio;
   bool _isCameraStreaming = false;
 
@@ -172,7 +173,7 @@ class _CameraPageState extends State<CameraPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "Apple",
+                                              "Mango",
                                               style: GoogleFonts.outfit(
                                                 fontSize: 12.0,
                                                 fontWeight: FontWeight.bold,
@@ -209,7 +210,7 @@ class _CameraPageState extends State<CameraPage> {
                                                           TextAlign.center,
                                                     ),
                                                     Text(
-                                                      "2g",
+                                                      "3g",
                                                       style: GoogleFonts.outfit(
                                                         fontSize: 12.0,
                                                         fontWeight:
@@ -246,7 +247,7 @@ class _CameraPageState extends State<CameraPage> {
                                                           TextAlign.center,
                                                     ),
                                                     Text(
-                                                      "2g",
+                                                      "50g",
                                                       style: GoogleFonts.outfit(
                                                         fontSize: 12.0,
                                                         fontWeight:
@@ -283,7 +284,7 @@ class _CameraPageState extends State<CameraPage> {
                                                           TextAlign.center,
                                                     ),
                                                     Text(
-                                                      "2g",
+                                                      "1g",
                                                       style: GoogleFonts.outfit(
                                                         fontSize: 12.0,
                                                         fontWeight:

@@ -30,10 +30,24 @@ class LoginPage extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   Text(
-                    'Welcome, John Peter Faller',
+                    'Welcome to HealthLens Pro',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: null,
+                    icon: Icon(Icons.switch_account,
+                        color: Color(0xff4b39ef), size: 30),
+                    label: Text(
+                      'Change Account',
+                      style: GoogleFonts.readexPro(
+                        fontSize: 16.0,
+                        textStyle: TextStyle(
+                          color: Color(0xff4b39ef),
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(height: 20),

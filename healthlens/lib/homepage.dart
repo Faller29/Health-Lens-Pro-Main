@@ -1,18 +1,40 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/graph_data.dart';
 import 'package:healthlens/models/category_model.dart';
 import 'package:healthlens/widgets/hero_carousel_card.dart';
 import 'package:iconly/iconly.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 const double contWidth = 100;
 const double contHeight = 140;
 
+class ScaleSize {
+  static double textScaleFactor(BuildContext context,
+      {double maxTextScaleFactor = 4}) {
+    final width = MediaQuery.of(context).size.width;
+    double val = (width / 1400) * maxTextScaleFactor;
+    return max(1, min(val, maxTextScaleFactor));
+  }
+}
+
+class SubScaleSize {
+  static double textScaleFactor(BuildContext context,
+      {double maxTextScaleFactor = 2}) {
+    final width = MediaQuery.of(context).size.width;
+    double val = (width / 1400) * maxTextScaleFactor;
+    return max(1, min(val, maxTextScaleFactor));
+  }
+}
+
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   @override
@@ -31,6 +53,7 @@ class HomePage extends StatelessWidget {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
                     child: Row(
@@ -62,20 +85,21 @@ class HomePage extends StatelessWidget {
                               Text(
                                 'John Peter Faller',
                                 style: GoogleFonts.readexPro(
-                                    fontSize: 14.0,
                                     fontWeight: FontWeight.bold),
+                                textScaler: TextScaler.linear(
+                                    ScaleSize.textScaleFactor(context)),
                               ),
                               Text(
                                 '17 Years Old',
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 12.0,
-                                ),
+                                style: GoogleFonts.readexPro(),
+                                textScaler: TextScaler.linear(
+                                    SubScaleSize.textScaleFactor(context)),
                               ),
                               Text(
                                 'BMI: Normal',
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 12.0,
-                                ),
+                                style: GoogleFonts.readexPro(),
+                                textScaler: TextScaler.linear(
+                                    SubScaleSize.textScaleFactor(context)),
                               ),
                             ],
                           ),
@@ -162,10 +186,144 @@ class HomePage extends StatelessWidget {
                         context: context,
                         builder: (BuildContext context) {
                           return Container(
-                            height: 150,
+                            height: 500,
                             color: Colors.white,
-                            child: const Center(
-                              child: Text("Update Weight & Health Assessment"),
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                      child: Text(
+                                        'Health Assesment',
+                                        style: GoogleFonts.readexPro(
+                                          fontSize: 20.0,
+                                          textStyle: const TextStyle(
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 200,
+                                      child: SfCartesianChart(
+                                        zoomPanBehavior: ZoomPanBehavior(
+                                          enablePinching: true,
+                                          zoomMode: ZoomMode.y,
+                                          enablePanning: true,
+                                        ),
+                                        primaryXAxis: CategoryAxis(
+                                          edgeLabelPlacement:
+                                              EdgeLabelPlacement.shift,
+                                          interval: 1,
+                                        ),
+                                        primaryYAxis: CategoryAxis(
+                                          maximum: 100,
+                                          minimum: 0,
+                                        ),
+                                        legend: Legend(isVisible: true),
+                                        series: <CartesianSeries>[
+                                          StackedColumnSeries<ChartData,
+                                                  String>(
+                                              color: Color(0xff4b39ef),
+                                              dataLabelSettings:
+                                                  DataLabelSettings(
+                                                isVisible: true,
+                                                showZeroValue: true,
+                                                labelPosition:
+                                                    ChartDataLabelPosition
+                                                        .inside,
+                                                textStyle: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                labelAlignment:
+                                                    ChartDataLabelAlignment
+                                                        .middle,
+                                                alignment:
+                                                    ChartAlignment.center,
+                                              ),
+                                              name: 'Weight',
+                                              dataSource: weight,
+                                              xValueMapper:
+                                                  (ChartData data, _) => data.x,
+                                              yValueMapper:
+                                                  (ChartData data, _) =>
+                                                      data.y1,
+                                              pointColorMapper:
+                                                  (ChartData data, _) =>
+                                                      Color(0xff4b39ef)),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'Update Weight: ',
+                                        style: GoogleFonts.readexPro(
+                                          fontSize: 18.0,
+                                          textStyle: const TextStyle(
+                                            color: Color.fromARGB(255, 0, 0, 0),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.fromLTRB(10, 0, 10, 10),
+                                      child: TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                          labelText: 'Enter Weight [kg]',
+                                          labelStyle: GoogleFonts.outfit(
+                                            fontSize: 15.0,
+                                          ),
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Color(0xffe0e3e7),
+                                              width: 2.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Color(0xff4b39ef),
+                                              width: 2.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          errorBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black,
+                                              width: 2.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          focusedErrorBorder:
+                                              UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black,
+                                              width: 2.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                        ),
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           );
                         },
