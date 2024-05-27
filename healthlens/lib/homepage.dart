@@ -52,12 +52,22 @@ class _HomePage extends State<HomePage> {
         addAutomaticKeepAlives: true,
         children: [
           Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 8.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 8.0),
             child: Container(
               width: MediaQuery.sizeOf(context).width,
               height: 100.0,
-              decoration: const BoxDecoration(
-                color: Color(0xffffffff),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 3.0,
+                    color: Color(0x33000000),
+                    offset: Offset(
+                      0.0,
+                      1.0,
+                    ),
+                  )
+                ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
@@ -175,7 +185,7 @@ class _HomePage extends State<HomePage> {
                                 ],
                               ),
                               Text(
-                                'Weight: 71kg',
+                                'Weight: 75kg',
                                 style: GoogleFonts.readexPro(
                                   fontSize: 15.0,
                                   textStyle: const TextStyle(

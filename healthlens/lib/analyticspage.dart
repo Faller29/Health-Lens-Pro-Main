@@ -263,7 +263,15 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           height: 220,
           width: MediaQuery.sizeOf(context).width,
           child: SfCartesianChart(
+            zoomPanBehavior: ZoomPanBehavior(
+              enablePinching: true,
+              zoomMode: ZoomMode.x,
+              enablePanning: true,
+            ),
             primaryXAxis: CategoryAxis(),
+            primaryYAxis: CategoryAxis(
+              rangePadding: ChartRangePadding.none,
+            ),
             legend: Legend(
               isVisible: true,
             ),
@@ -272,6 +280,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   color: fats,
                   dataLabelSettings: DataLabelSettings(
                     isVisible: true,
+                    showZeroValue: true,
                     margin: EdgeInsets.all(3),
                     labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
@@ -390,6 +399,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           width: MediaQuery.sizeOf(context).width,
           child: SfCartesianChart(
             primaryXAxis: CategoryAxis(),
+            primaryYAxis: CategoryAxis(
+              rangePadding: ChartRangePadding.none,
+            ),
             legend: Legend(isVisible: true),
             series: <CartesianSeries>[
               StackedColumnSeries<ChartData, String>(
@@ -511,6 +523,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           width: MediaQuery.sizeOf(context).width,
           child: SfCartesianChart(
             primaryXAxis: CategoryAxis(),
+            primaryYAxis: CategoryAxis(
+              rangePadding: ChartRangePadding.none,
+            ),
             legend: Legend(isVisible: true),
             series: <CartesianSeries>[
               StackedColumnSeries<ChartData, String>(

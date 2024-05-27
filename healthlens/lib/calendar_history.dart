@@ -169,55 +169,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Container(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 0.0, 0.0, 8.0),
-                                child: Text(
-                                  'Protein',
-                                  style: GoogleFonts.readexPro(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    textStyle: const TextStyle(
-                                      color: Color(0xffff5963),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              CircularPercentIndicator(
-                                radius: 40.0,
-                                lineWidth: 14.0,
-                                animation: true,
-                                percent: 0.5,
-                                center: new Text(
-                                  "50.0%",
-                                  style: new TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                header: const Padding(
-                                  padding: EdgeInsets.only(
-                                      bottom:
-                                          10.0), // Adjust bottom padding as needed
-                                ),
-                                circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: const Color(0xffff5963),
-                              ),
-                              Text(
-                                "50/100g",
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  textStyle: const TextStyle(
-                                    color: Color(0xffff5963),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Container(
                             child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -271,53 +222,103 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ],
                         )),
                         Container(
-                            child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 0.0, 0.0, 8.0),
-                              child: Text(
-                                'Protein',
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 0.0, 0.0, 8.0),
+                                child: Text(
+                                  'Protein',
+                                  style: GoogleFonts.readexPro(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                    textStyle: const TextStyle(
+                                      color: Color(0xffff5963),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              CircularPercentIndicator(
+                                radius: 40.0,
+                                lineWidth: 14.0,
+                                animation: true,
+                                percent: 0.5,
+                                center: new Text(
+                                  "50.0%",
+                                  style: new TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                header: const Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom:
+                                          10.0), // Adjust bottom padding as needed
+                                ),
+                                circularStrokeCap: CircularStrokeCap.round,
+                                progressColor: const Color(0xffff5963),
+                              ),
+                              Text(
+                                "50/100g",
                                 style: GoogleFonts.readexPro(
-                                  fontSize: 14.0,
+                                  fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
                                   textStyle: const TextStyle(
                                     color: Color(0xffff5963),
                                   ),
                                 ),
-                              ),
-                            ),
-                            CircularPercentIndicator(
-                              radius: 40.0,
-                              lineWidth: 14.0,
-                              animation: true,
-                              percent: 0.5,
-                              center: new Text(
-                                "50.0%",
-                                style:
-                                    new TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              header: const Padding(
-                                padding: EdgeInsets.only(
-                                    bottom:
-                                        10.0), // Adjust bottom padding as needed
-                              ),
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: const Color(0xffff5963),
-                            ),
-                            Text(
-                              "50/100g",
-                              style: GoogleFonts.readexPro(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.bold,
-                                textStyle: const TextStyle(
-                                  color: Color(0xffff5963),
+                              )
+                            ],
+                          ),
+                        ),
+                        Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 0.0, 0.0, 8.0),
+                                child: Text(
+                                  'Fats',
+                                  style: GoogleFonts.readexPro(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                    textStyle: const TextStyle(
+                                      color: Color(0xff249689),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            )
-                          ],
-                        )),
+                              CircularPercentIndicator(
+                                radius: 40.0,
+                                lineWidth: 14.0,
+                                animation: true,
+                                percent: 0.3,
+                                center: new Text(
+                                  "30.0%",
+                                  style: new TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                header: const Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom:
+                                          10.0), // Adjust bottom padding as needed
+                                ),
+                                circularStrokeCap: CircularStrokeCap.round,
+                                progressColor: const Color(0xff249689),
+                              ),
+                              Text(
+                                "30/100g",
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.bold,
+                                  textStyle: const TextStyle(
+                                    color: Color(0xff249689),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),

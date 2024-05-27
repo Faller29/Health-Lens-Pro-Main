@@ -164,146 +164,146 @@ class _CameraPageState extends State<CameraPage> {
                                       EdgeInsets.fromLTRB(8.0, 14.0, 8.0, 14.0),
                                   child: Column(
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(8),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Mango",
-                                              style: GoogleFonts.outfit(
-                                                fontSize: 12.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "Protein",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                    Text(
-                                                      " - ",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                    Text(
-                                                      "3g",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "Carbs",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                    Text(
-                                                      " - ",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                    Text(
-                                                      "50g",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "Fats",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                    Text(
-                                                      " - ",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                    Text(
-                                                      "1g",
-                                                      style: GoogleFonts.outfit(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Divider(
-                                        height: 1,
-                                      )
+                                      // Padding(
+                                      //   padding: EdgeInsets.all(8),
+                                      //   child: Row(
+                                      //     mainAxisAlignment:
+                                      //         MainAxisAlignment.spaceBetween,
+                                      //     crossAxisAlignment:
+                                      //         CrossAxisAlignment.start,
+                                      //     children: [
+                                      //       Text(
+                                      //         "Mango",
+                                      //         style: GoogleFonts.outfit(
+                                      //           fontSize: 12.0,
+                                      //           fontWeight: FontWeight.bold,
+                                      //           color: Colors.white,
+                                      //         ),
+                                      //         textAlign: TextAlign.center,
+                                      //       ),
+                                      //       Column(
+                                      //         crossAxisAlignment:
+                                      //             CrossAxisAlignment.end,
+                                      //         children: [
+                                      //           Row(
+                                      //             children: [
+                                      //               Text(
+                                      //                 "Protein",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //               Text(
+                                      //                 " - ",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //               Text(
+                                      //                 "3g",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //             ],
+                                      //           ),
+                                      //           Row(
+                                      //             children: [
+                                      //               Text(
+                                      //                 "Carbs",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //               Text(
+                                      //                 " - ",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //               Text(
+                                      //                 "50g",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //             ],
+                                      //           ),
+                                      //           Row(
+                                      //             children: [
+                                      //               Text(
+                                      //                 "Fats",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //               Text(
+                                      //                 " - ",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //               Text(
+                                      //                 "1g",
+                                      //                 style: GoogleFonts.outfit(
+                                      //                   fontSize: 12.0,
+                                      //                   fontWeight:
+                                      //                       FontWeight.bold,
+                                      //                   color: Colors.white,
+                                      //                 ),
+                                      //                 textAlign:
+                                      //                     TextAlign.center,
+                                      //               ),
+                                      //             ],
+                                      //           ),
+                                      //         ],
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                      // Divider(
+                                      //   height: 1,
+                                      // )
                                     ],
                                   )),
                             ],

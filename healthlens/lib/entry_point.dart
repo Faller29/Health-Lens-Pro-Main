@@ -2,10 +2,10 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
-import 'homePage.dart'; // Import the home page
-import 'camerapage.dart'; // Import the camera page
-import 'profilePage.dart'; // Import the profile page
-import 'analyticspage.dart'; // Import the analytics page
+import 'homePage.dart';
+import 'camerapage.dart';
+import 'profilePage.dart';
+import 'analyticspage.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class EntryPoint extends StatefulWidget {
@@ -38,7 +38,6 @@ class _EntryPointState extends State<EntryPoint> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-      // Close the drawer after selection
       Navigator.pop(context);
     });
   }
@@ -49,14 +48,15 @@ class _EntryPointState extends State<EntryPoint> {
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-          title: Text(
-            pageTitles[currentPageIndex],
-            style: GoogleFonts.outfit(
-              fontSize: 25.0,
-            ),
+        title: Text(
+          pageTitles[currentPageIndex],
+          style: GoogleFonts.outfit(
+            fontSize: 25.0,
           ),
-          foregroundColor: Colors.white,
-          backgroundColor: Color(0xff4b39ef)),
+        ),
+        foregroundColor: Colors.white,
+        backgroundColor: Color(0xff4b39ef),
+      ),
       body: Center(
         child: [
           HomePage(),

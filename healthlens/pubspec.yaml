@@ -57,6 +57,9 @@ dependencies:
   d_chart: ^2.6.9
   syncfusion_flutter_charts: ^25.2.4
   syncfusion_flutter_calendar: ^25.2.4
+  flutter_settings_ui: ^3.0.0
+  provider: ^6.1.2
+  cached_network_image: ^3.3.1
 
 
 dev_dependencies:
