@@ -67,11 +67,15 @@ class _ProfilePageState extends State<ProfilePage> {
                             padding: EdgeInsets.all(2.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(50.0),
-                              child: Image.network(
-                                'https://picsum.photos/seed/529/600',
+                              child: CachedNetworkImage(
+                                imageUrl: 'https://picsum.photos/seed/529/600',
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                                fit: BoxFit.cover,
                                 height: 60.0,
                                 width: 60.0,
-                                fit: BoxFit.cover,
                               ),
                             ),
                           ),

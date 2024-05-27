@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crea_radio_button/crea_radio_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -110,6 +111,14 @@ class _SetupPageState extends State<SetupPage> {
                     top: 10,
                     right: 10,
                     child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginPage(),
+                          ),
+                        );
+                      },
                       label: Text(
                         'Log In',
                         style: GoogleFonts.readexPro(
@@ -120,14 +129,6 @@ class _SetupPageState extends State<SetupPage> {
                         ),
                         textAlign: TextAlign.end,
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginPage(),
-                          ),
-                        );
-                      },
                       icon: Icon(
                         IconlyBroken.login,
                         color: Color(0xff4b39ef),
@@ -187,14 +188,20 @@ class _SetupPageState extends State<SetupPage> {
                                             child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(8.0),
-                                              child: Image.network(
-                                                'https://images.unsplash.com/photo-1494390248081-4e521a5940db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxOHx8aGVhbHRofGVufDB8fHx8MTcxMzk1NDY2MXww&ixlib=rb-4.0.3&q=80&w=1080',
+                                              child: CachedNetworkImage(
+                                                imageUrl:
+                                                    'https://images.unsplash.com/photo-1494390248081-4e521a5940db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxOHx8aGVhbHRofGVufDB8fHx8MTcxMzk1NDY2MXww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                placeholder: (context, url) =>
+                                                    CircularProgressIndicator(),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(Icons.error),
+                                                fit: BoxFit.cover,
                                                 width: 300.0,
                                                 height: MediaQuery.of(context)
                                                         .size
                                                         .height *
                                                     0.3,
-                                                fit: BoxFit.cover,
                                               ),
                                             ),
                                           ),

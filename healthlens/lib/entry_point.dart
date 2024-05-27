@@ -1,5 +1,3 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'homePage.dart';
@@ -19,26 +17,17 @@ class EntryPoint extends StatefulWidget {
 
 class _EntryPointState extends State<EntryPoint> {
   int _selectedIndex = 0;
-  int currentPageIndex = 0;
 
-  // Define a list of titles corresponding to each page
   final List<String> pageTitles = [
-    'Dashboard', // Title for the HomePage
-    'Camera', // Title for the CameraPage
-    'Analytics', // Title for the AnalyticsPage
-    'Profile', // Title for the ProfilePage
+    'Dashboard',
+    'Camera',
+    'Analytics',
+    'Profile',
   ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // Navigate to the selected page in the PageView
-      widget.pageController?.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-      Navigator.pop(context);
     });
   }
 
@@ -48,8 +37,9 @@ class _EntryPointState extends State<EntryPoint> {
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        elevation: 1,
         title: Text(
-          pageTitles[currentPageIndex],
+          pageTitles[_selectedIndex],
           style: GoogleFonts.outfit(
             fontSize: 25.0,
           ),
@@ -63,51 +53,95 @@ class _EntryPointState extends State<EntryPoint> {
           CameraPage(),
           AnalyticsPage(),
           ProfilePage(),
-        ][currentPageIndex],
+        ][_selectedIndex],
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 0),
-        child: CrystalNavigationBar(
-          currentIndex: currentPageIndex,
-          height: 10,
-          enableFloatingNavBar: true,
-          outlineBorderColor: Colors.white,
-          indicatorColor: Colors.blue,
-          unselectedItemColor: Colors.white70,
-          backgroundColor: Colors.black.withOpacity(0.2),
-          onTap: (int index) {
-            setState(() {
-              currentPageIndex = index;
-            });
-          },
-          items: [
-            CrystalNavigationBarItem(
-              icon: IconlyBold.home,
-              unselectedIcon: IconlyLight.home,
-              selectedColor: Color(0xff4b39ef),
-            ),
-            CrystalNavigationBarItem(
-              icon: IconlyBold.scan,
-              unselectedIcon: IconlyLight.scan,
-              selectedColor: Color(0xff4b39ef),
-            ),
-            CrystalNavigationBarItem(
-              icon: IconlyBold.chart,
-              unselectedIcon: IconlyLight.chart,
-              selectedColor: Color(0xff4b39ef),
-            ),
-            CrystalNavigationBarItem(
-              icon: IconlyBold.profile,
-              unselectedIcon: IconlyLight.user,
-              selectedColor: Color(0xff4b39ef),
-            ),
-          ],
-          duration: Duration(milliseconds: 200),
-          curve: Curves.easeIn,
-          splashBorderRadius: 50,
-          enablePaddingAnimation: true,
-        ),
+      bottomNavigationBar: CustomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: [
+          CustomNavigationBarItem(
+            icon: IconlyBold.home,
+            label: 'Home',
+          ),
+          CustomNavigationBarItem(
+            icon: IconlyBold.camera,
+            label: 'Camera',
+          ),
+          CustomNavigationBarItem(
+            icon: IconlyBold.graph,
+            label: 'Analytics',
+          ),
+          CustomNavigationBarItem(
+            icon: IconlyBold.profile,
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
+}
+
+class CustomNavigationBar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+  final List<CustomNavigationBarItem> items;
+
+  CustomNavigationBar({
+    required this.currentIndex,
+    required this.onTap,
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(50),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+      margin: EdgeInsets.only(bottom: 20, left: 50, right: 50),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: items.asMap().entries.map((entry) {
+          int index = entry.key;
+          CustomNavigationBarItem item = entry.value;
+          bool isSelected = index == currentIndex;
+          return GestureDetector(
+            onTap: () => onTap(index),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  item.icon,
+                  color: isSelected
+                      ? Color(0xff4b39ef)
+                      : Color.fromARGB(255, 255, 255, 255),
+                ),
+                Text(
+                  item.label,
+                  style: TextStyle(
+                      color: isSelected
+                          ? Color(0xff4b39ef)
+                          : Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class CustomNavigationBarItem {
+  final IconData icon;
+  final String label;
+
+  CustomNavigationBarItem({
+    required this.icon,
+    required this.label,
+  });
 }

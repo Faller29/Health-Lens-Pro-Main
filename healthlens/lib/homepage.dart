@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -86,8 +87,12 @@ class _HomePage extends State<HomePage> {
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                             ),
-                            child: Image.network(
-                              'https://picsum.photos/seed/529/600',
+                            child: CachedNetworkImage(
+                              imageUrl: 'https://picsum.photos/seed/529/600',
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
                               fit: BoxFit.cover,
                             ),
                           ),
