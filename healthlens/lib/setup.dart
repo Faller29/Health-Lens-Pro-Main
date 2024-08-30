@@ -1684,6 +1684,7 @@ class _SetupPageState extends State<SetupPage> {
                               ElevatedButton(
                                 onPressed: _nextPage,
                                 child: Text(nextText),
+
                                 style: TextButton.styleFrom(
                                   backgroundColor: Color(0xff4b39ef),
                                   foregroundColor: Colors.white,
@@ -1704,6 +1705,8 @@ class _SetupPageState extends State<SetupPage> {
     );
   }
 }
+
+
 
 class PageViewPage extends StatelessWidget {
   final List<Widget> children;

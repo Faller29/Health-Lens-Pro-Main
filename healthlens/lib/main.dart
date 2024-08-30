@@ -5,14 +5,18 @@ import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/firebase_options.dart';
 import 'login_page.dart';
 import 'setup.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
+  await Firebase.initializeApp();
+  try {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    users.add({'test': 'connected'});
+    print('Data added successfully!');
+  } catch (e) {
+    print('Error adding data: $e');
+  }
   runApp(const MyApp());
 }
 

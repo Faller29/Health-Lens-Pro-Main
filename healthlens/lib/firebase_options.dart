@@ -17,17 +17,29 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -40,49 +52,11 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDNFzD4z4enU6gy25n4rsyLQsSkK_hIgdo',
-    appId: '1:211469976440:web:1aa68653a1375345c83e8d',
-    messagingSenderId: '211469976440',
-    projectId: 'healthlens-fd034',
-    authDomain: 'healthlens-fd034.firebaseapp.com',
-    storageBucket: 'healthlens-fd034.appspot.com',
-    measurementId: 'G-SQDF6K8QY7',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB4nRJsmNA3wb2ARtco-Dg_9Jls5coXLy4',
-    appId: '1:211469976440:android:1a283faffade1393c83e8d',
-    messagingSenderId: '211469976440',
-    projectId: 'healthlens-fd034',
-    storageBucket: 'healthlens-fd034.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBimGikip5XZbUDnG_duwFn4pvzx_G9P_8',
-    appId: '1:211469976440:ios:4882fb216614dd43c83e8d',
-    messagingSenderId: '211469976440',
-    projectId: 'healthlens-fd034',
-    storageBucket: 'healthlens-fd034.appspot.com',
-    iosBundleId: 'com.example.healthlens',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBimGikip5XZbUDnG_duwFn4pvzx_G9P_8',
-    appId: '1:211469976440:ios:4882fb216614dd43c83e8d',
-    messagingSenderId: '211469976440',
-    projectId: 'healthlens-fd034',
-    storageBucket: 'healthlens-fd034.appspot.com',
-    iosBundleId: 'com.example.healthlens',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDNFzD4z4enU6gy25n4rsyLQsSkK_hIgdo',
-    appId: '1:211469976440:web:9175c9bd70c73d00c83e8d',
-    messagingSenderId: '211469976440',
-    projectId: 'healthlens-fd034',
-    authDomain: 'healthlens-fd034.firebaseapp.com',
-    storageBucket: 'healthlens-fd034.appspot.com',
-    measurementId: 'G-Y61LFR0DKV',
+    apiKey: 'AIzaSyCCKewWP7QJxa6PRXirgzQ0fOKkJ4hQKkw',
+    appId: '1:609845300476:android:d475e05e7df903aaf55b79',
+    messagingSenderId: '609845300476',
+    projectId: 'healthlenspro',
+    storageBucket: 'healthlenspro.appspot.com',
   );
 }
