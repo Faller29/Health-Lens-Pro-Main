@@ -16,7 +16,6 @@ void main() async {
   );
 
   // Connect to the Authentication emulator
-  FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
   runApp(const MyApp());
 }
 

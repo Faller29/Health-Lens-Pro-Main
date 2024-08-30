@@ -11,6 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart'
     as smooth_page_indicator;
 
+import 'backend_firebase/signIn.dart';
+
 class SetupPage extends StatefulWidget {
   @override
   _SetupPageState createState() => _SetupPageState();
@@ -30,6 +32,9 @@ class _SetupPageState extends State<SetupPage> {
     RadioOption("MALE", "Male"),
     RadioOption("FEMALE", "Female")
   ];
+  String enterUser = '';
+  String email = '';
+  String password = '';
   String nextText = "Next";
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -1341,10 +1346,26 @@ class _SetupPageState extends State<SetupPage> {
                                                                   .outfit(
                                                                 fontSize: 14.0,
                                                               ),
+                                                                    onChanged: (value){
+                                                                setState(() {
+
+                                                                  if (value == null || value.isEmpty){
+                                                                    enterUser = 'Please enter a username';
+                                                                  }
+                                                                  enterUser = '';
+                                                                  email = value;
+                                                                });
+                                                                    }
                                                             ),
                                                           ),
                                                           SizedBox(
                                                             height: 10,
+                                                              child: Text(enterUser, style: GoogleFonts
+                                                                  .readexPro(
+                                                                fontSize: 12.0,
+                                                              ),
+                                                                textAlign:
+                                                                TextAlign.center,),
                                                           ),
                                                           Container(
                                                             width: MediaQuery
@@ -1485,6 +1506,16 @@ class _SetupPageState extends State<SetupPage> {
                                                                               style: GoogleFonts.outfit(
                                                                                 fontSize: 14.0,
                                                                               ),
+                                                                                    onChanged: (value){
+                                                                                      setState(() {
+
+                                                                                        if (value == null || value.isEmpty){
+                                                                                          enterUser = 'Please enter a code';
+                                                                                        }
+                                                                                        enterUser = '';
+                                                                                        password = value;
+                                                                                      });
+                                                                                    }
                                                                             ),
                                                                           ),
                                                                           TextButton(
@@ -1683,6 +1714,18 @@ class _SetupPageState extends State<SetupPage> {
                               ),
                               ElevatedButton(
                                 onPressed: _nextPage,
+                                child: Text(nextText),
+
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Color(0xff4b39ef),
+                                  foregroundColor: Colors.white,
+                                ),
+                              ),
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    // Assuming you have variables email, password, and username
+                                    await signUp(email,password);
+                                  },
                                 child: Text(nextText),
 
                                 style: TextButton.styleFrom(
