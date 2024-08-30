@@ -6,17 +6,17 @@ import 'package:healthlens/firebase_options.dart';
 import 'login_page.dart';
 import 'setup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  try {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    users.add({'test': 'connected'});
-    print('Data added successfully!');
-  } catch (e) {
-    print('Error adding data: $e');
-  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Connect to the Authentication emulator
+  FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
   runApp(const MyApp());
 }
 

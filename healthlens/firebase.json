@@ -1,1 +1,30 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"healthlenspro","appId":"1:609845300476:android:d475e05e7df903aaf55b79","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"healthlenspro","configurations":{"android":"1:609845300476:android:d475e05e7df903aaf55b79"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "healthlenspro",
+          "appId": "1:609845300476:android:d475e05e7df903aaf55b79",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "healthlenspro",
+          "configurations": {
+            "android": "1:609845300476:android:d475e05e7df903aaf55b79"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
+  }
+}
