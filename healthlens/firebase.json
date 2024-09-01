@@ -22,6 +22,21 @@
     "auth": {
       "port": 9099
     },
+    "firestore": {
+      "port": 9098
+    },
+    "database": {
+      "port": 9097
+    },
+    "pubsub": {
+      "port": 9094
+    },
+    "hosting": {
+      "port": 9096
+    },
+    "functions": {
+      "port": 9095
+    },
     "ui": {
       "enabled": true
     },

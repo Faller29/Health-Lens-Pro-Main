@@ -8,8 +8,10 @@ import 'package:healthlens/login_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart'
     as smooth_page_indicator;
+import 'package:string_extensions/string_extensions.dart';
 
 import 'backend_firebase/signIn.dart';
 
@@ -18,11 +20,9 @@ class SetupPage extends StatefulWidget {
   _SetupPageState createState() => _SetupPageState();
 }
 
-List<Map> categories = [
-  {"name": "Diabetes [Type 1 & 2]", "isChecked": false},
-  {"name": "Hypertension", "isChecked": false},
-  {"name": "Obesity", "isChecked": false},
-];
+
+
+
 
 class _SetupPageState extends State<SetupPage> {
   PageController _pageController = PageController(initialPage: 0);
@@ -32,10 +32,33 @@ class _SetupPageState extends State<SetupPage> {
     RadioOption("MALE", "Male"),
     RadioOption("FEMALE", "Female")
   ];
-  String enterUser = '';
-  String email = '';
-  String password = '';
+
+
+  List<Map> categories = [
+    {"name": "Diabetes [Type 1 & 2]", "isChecked": false},
+    {"name": "Hypertension", "isChecked": false},
+    {"name": "Obesity", "isChecked": false},
+  ];
+
+  List<String> chronicDisease = [];
   String nextText = "Next";
+  String ?  username, email, code, gender, lifeStyle, fName,mName,lName;
+  late double age,height,weight,phoneNumber;
+  late String pinCode;
+  int genderIndex = 0;
+
+  final emailRegex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter an email';
+    }
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
+    return null; // Validation successful
+  }
+
+  final formKey = GlobalKey<FormState>();
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   void _handlePageChange(int index) {
@@ -49,8 +72,19 @@ class _SetupPageState extends State<SetupPage> {
     });
   }
 
+
+  void getCheckedDiseases() {
+    chronicDisease = categories
+        .where((disease) => disease['isChecked'] == true)
+        .map((disease) => disease['name'] as String)
+        .toList();
+
+    print(chronicDisease);
+  }
+
   void _previousPage() {
     if (_currentPageIndex > 0) {
+
       _pageController.previousPage(
         duration: Duration(milliseconds: 300),
         curve: Curves.ease,
@@ -71,7 +105,20 @@ class _SetupPageState extends State<SetupPage> {
     }
   }
 
-  void _nextPage() {
+  void _nextPage() async {
+    if(gender == 'Female'){
+      genderIndex = 1;
+    }else{
+      genderIndex = 0;
+    }
+    if (_currentPageIndex > 0 ){
+      formKey.currentState!.validate();
+
+      if (formKey.currentState!.validate() == false) {
+        return;
+      }
+
+    }
     if (_currentPageIndex < 4) {
       _pageController.nextPage(
         duration: Duration(milliseconds: 300),
@@ -85,9 +132,33 @@ class _SetupPageState extends State<SetupPage> {
       });
       print(_currentPageIndex);
     } else if (_currentPageIndex == 4) {
-      // Navigate to EntryPoint page
-      Navigator.pushReplacementNamed(context, '/entry_point');
+
+      try {
+        bool signUpSuccess = await signUp(username!, email!, pinCode!);
+        if (signUpSuccess) {
+          Navigator.pushReplacementNamed(context, '/entry_point');
+        } else {
+          // Generic sign-up failed message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sign up failed. Please try again.')),
+          );
+        }
+      } on WeakPasswordException {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Weak password. Please choose a stronger one.')),
+        );
+      } on EmailAlreadyInUseException {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Email already in use. Please use a different email.')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign up failed. Please try again.')),
+        );
+      }
     }
+    print(chronicDisease);
+
   }
 
   @override
@@ -102,8 +173,11 @@ class _SetupPageState extends State<SetupPage> {
       child: Scaffold(
         key: scaffoldKey,
         body: SafeArea(
+
           top: true,
-          child: SingleChildScrollView(
+          child:
+    Form( key:formKey, child:
+          SingleChildScrollView(
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height * 0.935,
@@ -156,11 +230,12 @@ class _SetupPageState extends State<SetupPage> {
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 10.0),
                                   child: PageView(
-                                    controller: _pageController,
+                                      controller: _pageController ,
                                     onPageChanged: _handlePageChange,
                                     scrollDirection: Axis.horizontal,
                                     children: [
                                       PageViewPage(
+                                      
                                         children: [
                                           Align(
                                             alignment:
@@ -294,8 +369,10 @@ class _SetupPageState extends State<SetupPage> {
                                                                             30.0,
                                                                             8.0,
                                                                             0.0),
-                                                                child:
+
+                                                                  child:
                                                                     TextFormField(
+                                                                      initialValue: fName,
                                                                   decoration:
                                                                       InputDecoration(
                                                                     labelText:
@@ -337,7 +414,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                       borderSide:
                                                                           BorderSide(
                                                                         color: Colors
-                                                                            .black,
+                                                                            .red,
                                                                         width:
                                                                             2.0,
                                                                       ),
@@ -349,8 +426,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                         UnderlineInputBorder(
                                                                       borderSide:
                                                                           BorderSide(
-                                                                        color: Colors
-                                                                            .black,
+                                                                        color: Color(
+                                                                            0xff4b39ef),
                                                                         width:
                                                                             2.0,
                                                                       ),
@@ -365,6 +442,20 @@ class _SetupPageState extends State<SetupPage> {
                                                                     fontSize:
                                                                         14.0,
                                                                   ),
+                                                                      onChanged: (value) {
+                                                                        if (value == null || value.isEmpty) {
+                                                                          // Handle empty or null value
+                                                                        } else {
+                                                                          fName = value.toTitleCase;
+                                                                        }
+                                                                      },
+                                                                      validator: (value) {
+                                                                        if (value == null || value.isEmpty) {
+                                                                          return 'Please enter your First Name';
+                                                                        }
+                                                                        return null; // Validation successful
+                                                                      },
+
                                                                 ),
                                                               ),
                                                             ),
@@ -381,8 +472,9 @@ class _SetupPageState extends State<SetupPage> {
                                                                             30.0,
                                                                             8.0,
                                                                             0.0),
-                                                                child:
-                                                                    TextFormField(
+
+                                                                    child: TextFormField(
+                                                                      initialValue: mName,
                                                                   decoration:
                                                                       InputDecoration(
                                                                     labelText:
@@ -424,7 +516,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                       borderSide:
                                                                           BorderSide(
                                                                         color: Colors
-                                                                            .black,
+                                                                            .red,
                                                                         width:
                                                                             2.0,
                                                                       ),
@@ -436,8 +528,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                         UnderlineInputBorder(
                                                                       borderSide:
                                                                           BorderSide(
-                                                                        color: Colors
-                                                                            .black,
+                                                                        color: Color(
+                                                                            0xff4b39ef),
                                                                         width:
                                                                             2.0,
                                                                       ),
@@ -452,6 +544,20 @@ class _SetupPageState extends State<SetupPage> {
                                                                     fontSize:
                                                                         14.0,
                                                                   ),
+                                                                      onChanged: (value) {
+                                                                        if (value == null || value.isEmpty) {
+                                                                          // Handle empty or null value
+                                                                        } else {
+                                                                          print(mName);
+                                                                          mName = value.toTitleCase;
+                                                                        }
+                                                                      },
+                                                                      validator: (value) {
+                                                                        if (value == null || value.isEmpty) {
+                                                                          return 'Please enter your Middle Name';
+                                                                        }
+                                                                         // Validation successful
+                                                                      },
                                                                 ),
                                                               ),
                                                             ),
@@ -468,8 +574,9 @@ class _SetupPageState extends State<SetupPage> {
                                                                             30.0,
                                                                             8.0,
                                                                             0.0),
-                                                                child:
+                                                                  child:
                                                                     TextFormField(
+                                                                      initialValue: lName,
                                                                   decoration:
                                                                       InputDecoration(
                                                                     labelText:
@@ -511,7 +618,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                       borderSide:
                                                                           BorderSide(
                                                                         color: Colors
-                                                                            .black,
+                                                                            .red,
                                                                         width:
                                                                             2.0,
                                                                       ),
@@ -523,8 +630,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                         UnderlineInputBorder(
                                                                       borderSide:
                                                                           BorderSide(
-                                                                        color: Colors
-                                                                            .black,
+                                                                        color: Color(
+                                                                            0xff4b39ef),
                                                                         width:
                                                                             2.0,
                                                                       ),
@@ -539,6 +646,19 @@ class _SetupPageState extends State<SetupPage> {
                                                                     fontSize:
                                                                         14.0,
                                                                   ),
+                                                                     onChanged: (value) {
+                                                                      if (value == null || value.isEmpty) {
+                                                                        // Handle empty or null value
+                                                                      } else {
+                                                                        lName = value.toTitleCase;
+                                                                      }
+                                                                    },
+                                                                      validator: (value) {
+                                                                        if (value == null || value.isEmpty) {
+                                                                          return 'Please enter your Last Name';
+                                                                        }
+                                                                        return null; // Validation successful
+                                                                      },
                                                                 ),
                                                               ),
                                                             ),
@@ -587,13 +707,15 @@ class _SetupPageState extends State<SetupPage> {
                                                                               color: Color(
                                                                                   0xff4b39ef)),
                                                                           preSelectedIdx:
-                                                                              0,
+                                                                              genderIndex,
                                                                           options:
                                                                               options,
                                                                           callback:
                                                                               (RadioOption val) {
                                                                             setState(() {
                                                                               label = val.label;
+                                                                              gender = val.label;
+
                                                                             });
                                                                           })
                                                                     ],
@@ -699,7 +821,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                 keyboardType: TextInputType
                                                                     .numberWithOptions(
                                                                         decimal:
-                                                                            false),
+                                                                            true),
                                                                 inputFormatters: [
                                                                   FilteringTextInputFormatter
                                                                       .allow(RegExp(
@@ -776,6 +898,19 @@ class _SetupPageState extends State<SetupPage> {
                                                                   fontSize:
                                                                       14.0,
                                                                 ),
+                                                                    onChanged: (value) {
+                                                                      if (value == null || value.isEmpty) {
+                                                                        // Handle empty or null value
+                                                                      } else {
+                                                                        age = value as double;
+                                                                      }
+                                                                    },
+                                                                    validator: (value) {
+                                                                      if (value == null || value.isEmpty) {
+                                                                        return 'Please enter your age';
+                                                                      }
+                                                                      return null; // Validation successful
+                                                                    },
                                                               ),
                                                             ),
                                                           ),
@@ -872,6 +1007,19 @@ class _SetupPageState extends State<SetupPage> {
                                                                   fontSize:
                                                                       14.0,
                                                                 ),
+                                                                    onChanged: (value) {
+                                                                      if (value == null || value.isEmpty) {
+                                                                        // Handle empty or null value
+                                                                      } else {
+                                                                        height = value as double;
+                                                                      }
+                                                                    },
+                                                                    validator: (value) {
+                                                                      if (value == null || value.isEmpty) {
+                                                                        return 'Please enter your Phone Number';
+                                                                      }
+                                                                      return null; // Validation successful
+                                                                    },
                                                               ),
                                                             ),
                                                           ),
@@ -968,6 +1116,19 @@ class _SetupPageState extends State<SetupPage> {
                                                                   fontSize:
                                                                       14.0,
                                                                 ),
+                                                                    onChanged: (value) {
+                                                                      if (value == null || value.isEmpty) {
+                                                                        // Handle empty or null value
+                                                                      } else {
+                                                                        weight = value as double;
+                                                                      }
+                                                                    },
+                                                                    validator: (value) {
+                                                                      if (value == null || value.isEmpty) {
+                                                                        return 'Please enter your Phone Number';
+                                                                      }
+                                                                      return null; // Validation successful
+                                                                    },
                                                               ),
                                                             ),
                                                           ),
@@ -1115,6 +1276,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                           callback: (RadioOption val) {
                                                                             setState(() {
                                                                               label = val.label;
+                                                                              lifeStyle = label;
                                                                             });
                                                                           }),
                                                                     ),
@@ -1176,12 +1338,11 @@ class _SetupPageState extends State<SetupPage> {
                                                                     ),
                                                                     value: disease[
                                                                         'isChecked'],
-                                                                    onChanged:
-                                                                        (val) {
-                                                                      setState(
-                                                                          () {
-                                                                        disease['isChecked'] =
-                                                                            val;
+                                                                    onChanged: (val) {
+                                                                      setState(() {
+                                                                        disease['isChecked'] = val;
+                                                                        getCheckedDiseases();
+                                                                        print('${disease['name']} isChecked: ${disease['isChecked']}');
                                                                       });
                                                                     },
                                                                   );
@@ -1279,6 +1440,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                 1.5,
                                                             child:
                                                                 TextFormField(
+                                                                  initialValue: username,
                                                               decoration:
                                                                   InputDecoration(
                                                                 labelText:
@@ -1346,26 +1508,113 @@ class _SetupPageState extends State<SetupPage> {
                                                                   .outfit(
                                                                 fontSize: 14.0,
                                                               ),
-                                                                    onChanged: (value){
-                                                                setState(() {
-
-                                                                  if (value == null || value.isEmpty){
-                                                                    enterUser = 'Please enter a username';
-                                                                  }
-                                                                  enterUser = '';
-                                                                  email = value;
-                                                                });
+                                                                  onChanged: (value) {
+                                                                    if (value == null || value.isEmpty) {
+                                                                      // Handle empty or null value
+                                                                    } else {
+                                                                      username = value.toTitleCase;
                                                                     }
+                                                                  },
+                                                                  validator: (value) {
+                                                                    if (value == null || value.isEmpty) {
+                                                                      return 'Please enter your username';
+                                                                    }
+                                                                    return null; // Validation successful
+                                                                  },
                                                             ),
                                                           ),
                                                           SizedBox(
                                                             height: 10,
-                                                              child: Text(enterUser, style: GoogleFonts
-                                                                  .readexPro(
-                                                                fontSize: 12.0,
+
+                                                          ),Container(
+                                                            width: MediaQuery
+                                                                .sizeOf(
+                                                                context)
+                                                                .width /
+                                                                1.5,
+                                                            child:
+                                                            TextFormField(
+                                                              initialValue: email,
+                                                              decoration:
+                                                              InputDecoration(
+                                                                labelText:
+                                                                'Email',
+                                                                labelStyle:
+                                                                GoogleFonts
+                                                                    .outfit(
+                                                                  fontSize:
+                                                                  15.0,
+                                                                ),
+                                                                enabledBorder:
+                                                                UnderlineInputBorder(
+                                                                  borderSide:
+                                                                  BorderSide(
+                                                                    color: Color(
+                                                                        0xffe0e3e7),
+                                                                    width: 2.0,
+                                                                  ),
+                                                                  borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                      8.0),
+                                                                ),
+                                                                focusedBorder:
+                                                                UnderlineInputBorder(
+                                                                  borderSide:
+                                                                  BorderSide(
+                                                                    color: Color(
+                                                                        0xff4b39ef),
+                                                                    width: 2.0,
+                                                                  ),
+                                                                  borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                      8.0),
+                                                                ),
+                                                                errorBorder:
+                                                                UnderlineInputBorder(
+                                                                  borderSide:
+                                                                  BorderSide(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width: 2.0,
+                                                                  ),
+                                                                  borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                      8.0),
+                                                                ),
+                                                                focusedErrorBorder:
+                                                                UnderlineInputBorder(
+                                                                  borderSide:
+                                                                  BorderSide(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width: 2.0,
+                                                                  ),
+                                                                  borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                      8.0),
+                                                                ),
                                                               ),
-                                                                textAlign:
-                                                                TextAlign.center,),
+                                                              style: GoogleFonts
+                                                                  .outfit(
+                                                                fontSize: 14.0,
+                                                              ),
+                                                              onChanged: (value) {
+                                                                if (value == null || value.isEmpty) {
+                                                                  // Handle empty or null value
+                                                                } else {
+                                                                  email = value;
+                                                                }
+                                                              },
+                                                              validator: validateEmail,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+
                                                           ),
                                                           Container(
                                                             width: MediaQuery
@@ -1386,6 +1635,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             TextFormField(
                                                                           keyboardType:
                                                                               TextInputType.number,
+                                                                          maxLength: 11,
                                                                           decoration:
                                                                               InputDecoration(
                                                                             labelText:
@@ -1432,6 +1682,19 @@ class _SetupPageState extends State<SetupPage> {
                                                                             fontSize:
                                                                                 14.0,
                                                                           ),
+                                                                              onChanged: (value) {
+                                                                                if (value == null || value.isEmpty) {
+                                                                                  // Handle empty or null value
+                                                                                } else {
+                                                                                  phoneNumber = value as double;
+                                                                                }
+                                                                              },
+                                                                              validator: (value) {
+                                                                                if (value == null || value.isEmpty) {
+                                                                                  return 'Please enter your Phone Number';
+                                                                                }
+                                                                                return null; // Validation successful
+                                                                              },
                                                                         ),
                                                                       ),
                                                                       Padding(
@@ -1468,6 +1731,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                                 MediaQuery.sizeOf(context).width / 3,
                                                                             child:
                                                                                 TextFormField(
+                                                                                initialValue: code,
                                                                               keyboardType: TextInputType.number,
                                                                               decoration: InputDecoration(
                                                                                 labelText: 'Enter Code',
@@ -1510,10 +1774,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                                       setState(() {
 
                                                                                         if (value == null || value.isEmpty){
-                                                                                          enterUser = 'Please enter a code';
                                                                                         }
-                                                                                        enterUser = '';
-                                                                                        password = value;
+                                                                                        code = value;
                                                                                       });
                                                                                     }
                                                                             ),
@@ -1567,7 +1829,7 @@ class _SetupPageState extends State<SetupPage> {
                                                             textStyle:
                                                                 GoogleFonts
                                                                     .readexPro(
-                                                              fontSize: 18.0,
+                                                              fontSize: 10.0,
                                                             ),
                                                             mainAxisAlignment:
                                                                 MainAxisAlignment
@@ -1625,10 +1887,19 @@ class _SetupPageState extends State<SetupPage> {
                                                                   Color(
                                                                       0xff4b39ef),
                                                             ),
-                                                            onChanged: (_) {},
-                                                            autovalidateMode:
+                                                                onCompleted: (value) async {
+                                                                  pinCode = value;
+                                                                  print(pinCode);
+
+                                                                  final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                                  await prefs.setString('pinCode', pinCode);
+                                                                  // You can add additional logic here, like navigating to a new screen
+                                                                print(pinCode);
+                                                                },
+                                                              autovalidateMode:
                                                                 AutovalidateMode
                                                                     .onUserInteraction,
+                                                                onChanged: (String value) {  },
                                                           ),
                                                         ),
                                                       ),
@@ -1721,10 +1992,10 @@ class _SetupPageState extends State<SetupPage> {
                                   foregroundColor: Colors.white,
                                 ),
                               ),
-                              ElevatedButton(
+                              /*ElevatedButton(
                                   onPressed: () async {
                                     // Assuming you have variables email, password, and username
-                                    await signUp(email,password);
+                                    await signUp(username!,password!);
                                   },
                                 child: Text(nextText),
 
@@ -1732,7 +2003,7 @@ class _SetupPageState extends State<SetupPage> {
                                   backgroundColor: Color(0xff4b39ef),
                                   foregroundColor: Colors.white,
                                 ),
-                              ),
+                              ),*/
                             ],
                           ),
                         ),
@@ -1743,7 +2014,7 @@ class _SetupPageState extends State<SetupPage> {
               ),
             ),
           ),
-        ),
+        ),),
       ),
     );
   }

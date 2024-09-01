@@ -16,6 +16,19 @@ void main() async {
   );
 
   // Connect to the Authentication emulator
+  //FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  //FirebaseFirestore.instance.useFirestoreEmulator('localhost', 9098);
+
+  //test connection to firebase
+  /**try {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    users.add({'test': 'connected'});
+    print('Data added successfully!');
+  } catch (e) {
+    print('Error adding data: $e');
+  }**/
+
+
   runApp(const MyApp());
 }
 

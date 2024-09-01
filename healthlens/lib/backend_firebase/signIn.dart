@@ -1,9 +1,10 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future<void> signUp(String email, String password) async {
+class WeakPasswordException implements Exception {}
+class EmailAlreadyInUseException implements Exception {}
+
+Future<bool> signUp(String username, String email, String password) async {
   try {
-    String username = 'peter';
     // Create a new user with email and password
     UserCredential userCredential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
@@ -12,13 +13,16 @@ Future<void> signUp(String email, String password) async {
     await userCredential.user?.updateDisplayName(username);
 
     // Sign up successful
+    return true;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
-      // Handle weak password error
+      throw WeakPasswordException();
     } else if (e.code == 'email-already-in-use') {
-      // Handle email already in use error
+      throw EmailAlreadyInUseException();
     }
+    return false;
   } catch (e) {
     // Handle other errors
+    return false;
   }
 }
