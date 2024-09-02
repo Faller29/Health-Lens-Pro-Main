@@ -3,9 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ProfilePage.dart';
+import 'backend_firebase/auth.dart';
 export 'ProfilePage.dart';
+import 'package:healthlens/login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -448,12 +451,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
+                onTap: () async {
+                  // Call the signOut method from your Auth class
+                  await Auth().signOut();
+
+                  // Save the email and username locally before navigating
+                  //SharedPreferences prefs =
+                  //    await SharedPreferences.getInstance();
+                  //await prefs.setString('email', _email);
+                  //await prefs.setString('userName', _userName);
+
+                  // Navigate to the LoginPage using pushAndRemoveUntil to clear the navigation stack
+                  Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    (route) => false, // Remove all previous routes
                   );
                 },
                 child: Padding(

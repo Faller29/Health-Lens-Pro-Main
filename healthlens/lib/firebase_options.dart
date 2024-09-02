@@ -53,10 +53,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCCKewWP7QJxa6PRXirgzQ0fOKkJ4hQKkw',
-    appId: '1:609845300476:android:d475e05e7df903aaf55b79',
-    messagingSenderId: '609845300476',
-    projectId: 'healthlenspro',
-    storageBucket: 'healthlenspro.appspot.com',
+    apiKey: 'AIzaSyDiecjuy3mdu6ioQiyzdOx78k-HdcvKEz4',
+    appId: '1:409461810626:android:570351964e43d68088a25b',
+    messagingSenderId: '409461810626',
+    projectId: 'healthlenspro-435d1',
+    storageBucket: 'healthlenspro-435d1.appspot.com',
   );
 }

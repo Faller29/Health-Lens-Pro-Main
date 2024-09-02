@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/login_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -12,8 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart'
     as smooth_page_indicator;
 import 'package:string_extensions/string_extensions.dart';
-
-import 'backend_firebase/signIn.dart';
+import 'backend_firebase/signUp.dart';
 
 class SetupPage extends StatefulWidget {
   @override
@@ -129,7 +129,11 @@ class _SetupPageState extends State<SetupPage> {
       try {
         bool signUpSuccess = await signUp(username!, email!, pinCode!);
         if (signUpSuccess) {
-          Navigator.pushReplacementNamed(context, '/entry_point');
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => EntryPoint()),
+            (route) => false, // Remove all previous routes
+          );
         } else {
           // Generic sign-up failed message
           ScaffoldMessenger.of(context).showSnackBar(

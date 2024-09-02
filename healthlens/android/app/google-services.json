@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "609845300476",
-    "project_id": "healthlenspro",
-    "storage_bucket": "healthlenspro.appspot.com"
+    "project_number": "409461810626",
+    "project_id": "healthlenspro-435d1",
+    "storage_bucket": "healthlenspro-435d1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:609845300476:android:d475e05e7df903aaf55b79",
+        "mobilesdk_app_id": "1:409461810626:android:570351964e43d68088a25b",
         "android_client_info": {
           "package_name": "com.example.healthlens"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCCKewWP7QJxa6PRXirgzQ0fOKkJ4hQKkw"
+          "current_key": "AIzaSyDiecjuy3mdu6ioQiyzdOx78k-HdcvKEz4"
         }
       ],
       "services": {

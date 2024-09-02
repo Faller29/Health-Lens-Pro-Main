@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:healthlens/backend_firebase/auth_service.dart';
+import 'package:healthlens/backend_firebase/auth.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/homepage.dart';
 import 'package:healthlens/setup.dart';
@@ -12,8 +12,8 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:string_extensions/string_extensions.dart';
+import 'profilepage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -23,7 +23,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final AuthService _authService = AuthService();
+  final Auth _authService = Auth();
   String _userName = '';
   String _email = ''; // Add this to store the email
   bool _isChangingAccount = false;
@@ -36,10 +36,16 @@ class _LoginPageState extends State<LoginPage> {
     _loadUserName();
   }
 
+  Future<void> fromSignOut(String email, String username) async {
+    _email = email;
+    _userName = username;
+  }
+
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userName = await _authService.getUserName();
     String? email = prefs.getString('email'); // Load the saved email
+
     setState(() {
       _userName = userName ?? '';
       _email = email ?? ''; // Set the email to the saved one
@@ -72,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
 
     print(_emailController.text);
     print('emailC');
-
+    print(user);
     if (user != null) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('email', email); // Save the email locally

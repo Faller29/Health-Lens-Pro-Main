@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 class WeakPasswordException implements Exception {}
+
 class EmailAlreadyInUseException implements Exception {}
 
 Future<bool> signUp(String username, String email, String password) async {
