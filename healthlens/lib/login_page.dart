@@ -1,16 +1,95 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/backend_firebase/auth_service.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/homepage.dart';
 import 'package:healthlens/setup.dart';
 import 'package:iconly/iconly.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:string_extensions/string_extensions.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final AuthService _authService = AuthService();
+  String _userName = '';
+  String _email = ''; // Add this to store the email
+  bool _isChangingAccount = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _pincodeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userName = await _authService.getUserName();
+    String? email = prefs.getString('email'); // Load the saved email
+    setState(() {
+      _userName = userName ?? '';
+      _email = email ?? ''; // Set the email to the saved one
+      if (!_isChangingAccount) {
+        _emailController.text = _email; // Pre-fill the email field
+      }
+    });
+  }
+
+  Future<void> _signOut() async {
+    await _authService.signOut();
+    setState(() {
+      _userName = '';
+      _email = '';
+      _isChangingAccount = true;
+      _emailController.clear(); // Clear the email controller when signing out
+    });
+  }
+
+  void _onLogin() async {
+    _emailController.text = _email;
+    String email = _emailController.text;
+    String pincode = _pincodeController.text;
+    User? user = await _authService.signInWithEmailAndPincode(email, pincode);
+    print(_email);
+    print('_email');
+
+    print(email);
+    print('email');
+
+    print(_emailController.text);
+    print('emailC');
+
+    if (user != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('email', email); // Save the email locally
+      await prefs.setString(
+          'userName', user.displayName ?? ''); // Save the username locally
+
+      setState(() {
+        _userName = user.displayName ?? '';
+        _isChangingAccount = false;
+      });
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => EntryPoint()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +99,8 @@ class LoginPage extends StatelessWidget {
         alignment: AlignmentDirectional(0.0, 0.0),
         child: Container(
           width: double.infinity,
-          constraints: BoxConstraints(
-            maxWidth: 670.0,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-          ),
+          constraints: BoxConstraints(maxWidth: 670.0),
+          decoration: BoxDecoration(color: Colors.white),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
@@ -84,7 +159,16 @@ class LoginPage extends StatelessWidget {
                         children: [
                           TextButton.icon(
                             onPressed: () {
-                              print('Button pressed ...');
+                              setState(() {
+                                _isChangingAccount = !_isChangingAccount;
+                                if (!_isChangingAccount) {
+                                  _emailController.text = _email;
+                                } else {
+                                  _emailController.clear();
+                                }
+                                print(_email);
+                                print(_emailController.text);
+                              });
                             },
                             label: Text(
                               'Change Account',
@@ -122,18 +206,77 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                       child: Align(
                         alignment: Alignment.center,
-                        child: Text(
-                          'John Peter Faller',
-                          style: GoogleFonts.urbanist(
-                            color: Colors.black,
-                            fontSize: 22.0,
-                            letterSpacing: 0.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isChangingAccount
+                            ? Padding(
+                                padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
+                                child: TextFormField(
+                                  initialValue: _email,
+                                  decoration: InputDecoration(
+                                    contentPadding:
+                                        EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                    labelText: 'Email',
+                                    labelStyle: GoogleFonts.outfit(
+                                      fontSize: 15.0,
+                                    ),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0xffe0e3e7),
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0xff4b39ef),
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    errorBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.red,
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    focusedErrorBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0xff4b39ef),
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 18.0,
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (value == null || value.isEmpty) {
+                                        // Handle empty or null value
+                                      } else {
+                                        _email = value;
+                                      }
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your Email';
+                                    }
+                                    return null; // Validation successful
+                                  },
+                                ),
+                              )
+                            : Text(
+                                _userName.isNotEmpty ? _userName : 'No User',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 22.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
                       ),
                     ),
                     Padding(
@@ -147,6 +290,7 @@ class LoginPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               PinCodeTextField(
+                                controller: _pincodeController,
                                 autoDisposeControllers: false,
                                 appContext: context,
                                 length: 6,
@@ -194,34 +338,22 @@ class LoginPage extends StatelessWidget {
                                   child: TextButton(
                                     child: Text(
                                       'Forgot Password',
-                                      style: GoogleFonts.readexPro(
-                                        fontSize: 14.0,
-                                        textStyle: const TextStyle(
-                                          color: Color(0xff4b39ef),
-                                        ),
-                                      ),
-                                      textAlign: TextAlign.end,
+                                      style: TextStyle(
+                                          color: Colors.blue, fontSize: 14.0),
                                     ),
                                     onPressed: () {
-                                      print('Button pressed ...');
+                                      print('Forgot Password button pressed');
                                     },
                                   ),
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EntryPoint(),
-                          ),
-                        );
-                      },
+                      onPressed: _onLogin,
                       child: Text(
                         'Log In',
                         style: GoogleFonts.urbanist(
@@ -252,43 +384,44 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(
-                            0.0, 24.0, 0.0, 64.0),
-                        child: RichText(
-                          textScaler: MediaQuery.of(context).textScaler,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Don\'t have an account?',
-                                style: GoogleFonts.plusJakartaSans(
-                                  color: Color(0xFF57636C),
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 64.0),
+                      child: RichText(
+                        textScaler: MediaQuery.of(context).textScaler,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Don\'t have an account?',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color(0xFF57636C),
+                                fontSize: 16.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.w500,
                               ),
-                              TextSpan(
-                                text: ' Sign Up!',
-                                style: GoogleFonts.plusJakartaSans(
-                                  color: Color(0xFF101213),
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SetupPage(),
-                                      ),
-                                    );
-                                  },
-                              )
-                            ],
-                          ),
-                        ))
+                            ),
+                            TextSpan(
+                              text: ' Sign Up!',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Color(0xFF101213),
+                                fontSize: 16.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SetupPage(),
+                                    ),
+                                  );
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
