@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:healthlens/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WeakPasswordException implements Exception {}
@@ -16,12 +17,14 @@ class Auth {
         password: pincode,
       );
 
-      User? user = userCredential.user;
-      if (user != null) {
-        await _saveUserDetails(user.displayName ?? 'Unknown User', email);
+      currentUser = userCredential.user;
+
+      if (currentUser != null) {
+        await _saveUserDetails(
+            currentUser?.displayName ?? 'Unknown User', email);
       }
       print('success Log in');
-      return user;
+      return currentUser;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');

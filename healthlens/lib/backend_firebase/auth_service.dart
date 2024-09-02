@@ -1,4 +1,7 @@
-// auth_service.dart
+//doesn't used anymore but working for log in
+//replaced by auth.dart which is compiled with other backend
+
+/* // auth_service.dart
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,3 +63,4 @@ class AuthService {
     return prefs.getString('userEmail');
   }
 }
+ */

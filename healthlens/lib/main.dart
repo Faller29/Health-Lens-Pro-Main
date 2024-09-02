@@ -10,6 +10,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'backend_firebase/auth.dart'; // Import your combined Auth class
 
+User? currentUser;
+DocumentReference? currentUserDoc;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(

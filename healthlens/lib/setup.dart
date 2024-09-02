@@ -20,10 +20,11 @@ class SetupPage extends StatefulWidget {
   _SetupPageState createState() => _SetupPageState();
 }
 
+// Usage:
+
 class _SetupPageState extends State<SetupPage> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
-  String label = "";
   List<RadioOption> options = [
     RadioOption("MALE", "Male"),
     RadioOption("FEMALE", "Female")
@@ -37,12 +38,18 @@ class _SetupPageState extends State<SetupPage> {
 
   List<String> chronicDisease = [];
   String nextText = "Next";
-  String? username, email, code, gender, lifeStyle, fName, mName, lName;
-  late double age, height, weight;
+  String? username,
+      email,
+      code,
+      gender = 'Male',
+      lifeStyle = 'Sedentary',
+      fName,
+      mName,
+      lName;
   late String pinCode;
   int genderIndex = 0;
-  late int phoneNumber;
-
+  late int phoneNumber, age;
+  late double height, weight;
   final emailRegex =
       RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
   String? validateEmail(String? value) {
@@ -127,7 +134,21 @@ class _SetupPageState extends State<SetupPage> {
       print(_currentPageIndex);
     } else if (_currentPageIndex == 4) {
       try {
-        bool signUpSuccess = await signUp(username!, email!, pinCode!);
+        bool signUpSuccess = await signUp(
+          username!,
+          email!,
+          pinCode,
+          gender!,
+          lifeStyle!,
+          fName!,
+          mName!,
+          lName!,
+          age,
+          height,
+          weight,
+          phoneNumber,
+          chronicDisease,
+        );
         if (signUpSuccess) {
           Navigator.pushAndRemoveUntil(
             context,
@@ -157,7 +178,6 @@ class _SetupPageState extends State<SetupPage> {
         );
       }
     }
-    print(chronicDisease);
   }
 
   @override
@@ -445,6 +465,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                       } else {
                                                                         fName =
                                                                             value.toTitleCase;
+                                                                        print(
+                                                                            fName);
                                                                       }
                                                                     },
                                                                     validator:
@@ -649,15 +671,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                     ),
                                                                     onChanged:
                                                                         (value) {
-                                                                      if (value ==
-                                                                              null ||
-                                                                          value
-                                                                              .isEmpty) {
-                                                                        // Handle empty or null value
-                                                                      } else {
-                                                                        lName =
-                                                                            value.toTitleCase;
-                                                                      }
+                                                                      lName = value
+                                                                          .toTitleCase;
                                                                     },
                                                                     validator:
                                                                         (value) {
@@ -715,8 +730,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                             options: options,
                                                                             callback: (RadioOption val) {
                                                                               setState(() {
-                                                                                label = val.label;
                                                                                 gender = val.label;
+                                                                                print(gender);
                                                                               });
                                                                             })
                                                                       ],
@@ -829,7 +844,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                   inputFormatters: [
                                                                     FilteringTextInputFormatter
                                                                         .allow(RegExp(
-                                                                            '[0-9]')),
+                                                                            '[0-9.]')),
                                                                   ],
                                                                   //onChanged: (value) => doubleVar = double.parse(value),
 
@@ -904,15 +919,9 @@ class _SetupPageState extends State<SetupPage> {
                                                                   ),
                                                                   onChanged:
                                                                       (value) {
-                                                                    if (value ==
-                                                                            null ||
-                                                                        value
-                                                                            .isEmpty) {
-                                                                      // Handle empty or null value
-                                                                    } else {
-                                                                      age = value
-                                                                          as double;
-                                                                    }
+                                                                    age = int.tryParse(value ??
+                                                                            '') ??
+                                                                        0;
                                                                   },
                                                                   validator:
                                                                       (value) {
@@ -1023,15 +1032,10 @@ class _SetupPageState extends State<SetupPage> {
                                                                   ),
                                                                   onChanged:
                                                                       (value) {
-                                                                    if (value ==
-                                                                            null ||
-                                                                        value
-                                                                            .isEmpty) {
-                                                                      // Handle empty or null value
-                                                                    } else {
-                                                                      height = value
-                                                                          as double;
-                                                                    }
+                                                                    height =
+                                                                        double.tryParse(value ??
+                                                                                '') ??
+                                                                            0;
                                                                   },
                                                                   validator:
                                                                       (value) {
@@ -1142,15 +1146,10 @@ class _SetupPageState extends State<SetupPage> {
                                                                   ),
                                                                   onChanged:
                                                                       (value) {
-                                                                    if (value ==
-                                                                            null ||
-                                                                        value
-                                                                            .isEmpty) {
-                                                                      // Handle empty or null value
-                                                                    } else {
-                                                                      weight = value
-                                                                          as double;
-                                                                    }
+                                                                    weight =
+                                                                        double.tryParse(value ??
+                                                                                '') ??
+                                                                            0;
                                                                   },
                                                                   validator:
                                                                       (value) {
@@ -1158,7 +1157,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             null ||
                                                                         value
                                                                             .isEmpty) {
-                                                                      return 'Please enter your Weight';
+                                                                      return 'Please enter your weight';
                                                                     }
                                                                     return null; // Validation successful
                                                                   },
@@ -1307,8 +1306,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             ],
                                                                             callback: (RadioOption val) {
                                                                               setState(() {
-                                                                                label = val.label;
-                                                                                lifeStyle = label;
+                                                                                lifeStyle = val.label;
                                                                               });
                                                                             }),
                                                                       ),
@@ -1555,15 +1553,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                 ),
                                                                 onChanged:
                                                                     (value) {
-                                                                  if (value ==
-                                                                          null ||
-                                                                      value
-                                                                          .isEmpty) {
-                                                                    // Handle empty or null value
-                                                                  } else {
-                                                                    username = value
-                                                                        .toTitleCase;
-                                                                  }
+                                                                  username = value
+                                                                      .toTitleCase;
                                                                 },
                                                                 validator:
                                                                     (value) {
@@ -1737,17 +1728,9 @@ class _SetupPageState extends State<SetupPage> {
                                                                                 GoogleFonts.outfit(
                                                                               fontSize: 14.0,
                                                                             ),
-                                                                            onSaved:
-                                                                                (value) {
-                                                                              phoneNumber = int.tryParse(value ?? '') ?? 0;
-                                                                            },
                                                                             onChanged:
                                                                                 (value) {
-                                                                              if (value == null || value.isEmpty) {
-                                                                                // Handle empty or null value
-                                                                              } else {
-                                                                                phoneNumber = int.tryParse(value ?? '') ?? 0;
-                                                                              }
+                                                                              phoneNumber = int.tryParse(value ?? '') ?? 0;
                                                                             },
                                                                             validator:
                                                                                 (value) {
