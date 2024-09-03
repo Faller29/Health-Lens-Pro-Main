@@ -45,6 +45,45 @@ Future<bool> signUp(
     bmi = 'Obesity Class 3';
   }
 
+  int PA;
+  //getting TER
+  switch (lifestyle) {
+    case 'Sedentary':
+      PA = 30;
+      break;
+    case 'Light':
+      PA = 35;
+      break;
+    case 'Moderate':
+      PA = 40;
+      break;
+    case 'Vigorous':
+      PA = 45;
+      break;
+    default:
+      PA = 0;
+  }
+
+  double TER = weight * PA;
+  double carbs, protein, fats;
+  for (String chronic in chronicDisease) {
+    if (chronic == 'Diabetes [Type 1 & 2]') {
+      carbs = TER * 0.55;
+      protein = TER * 0.20;
+      fats = TER * 0.25;
+    } else if (chronic == 'Hypertension') {
+      carbs = TER * 0.60;
+      protein = TER * 0.15;
+      fats = TER * 0.25;
+    } else if (chronic == 'Obesity') {
+      carbs = TER * 0.55;
+      protein = TER * 0.20;
+      fats = TER * 0.25;
+    } else {
+      print('Error determining');
+    }
+  }
+
   try {
     // Create a new user with email and password
     UserCredential userCredential = await FirebaseAuth.instance
@@ -66,6 +105,11 @@ Future<bool> signUp(
       'phoneNumber': phoneNumber,
       'sex': sex,
       'weight': weight,
+      'TER': TER,
+      'Physical Activity': PA,
+      'reqCarbs': carbs,
+      'reqProtein': protein,
+      'reqFats': fats,
     });
 
     // Sign up successful

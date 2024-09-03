@@ -1300,9 +1300,10 @@ class _SetupPageState extends State<SetupPage> {
                                                                             selectedBorderSide: BorderSide(width: 1, color: Color(0xff4b39ef)),
                                                                             preSelectedIdx: 0,
                                                                             options: [
-                                                                              RadioOption("INACTIVE ", "Inactive "),
                                                                               RadioOption("SEDENTARY", "Sedentary"),
-                                                                              RadioOption("ACTIVE", "Active"),
+                                                                              RadioOption("LIGHT", "Light"),
+                                                                              RadioOption("MODERATE", "Moderate"),
+                                                                              RadioOption("VIGOROUS", "Vigorous"),
                                                                             ],
                                                                             callback: (RadioOption val) {
                                                                               setState(() {
