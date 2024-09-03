@@ -7,6 +7,15 @@ class WeakPasswordException implements Exception {}
 
 class EmailAlreadyInUseException implements Exception {}
 
+int roundToNearest50(int number) {
+  int remainder = number % 50;
+  if (remainder >= 25) {
+    return number + (50 - remainder);
+  } else {
+    return number - remainder;
+  }
+}
+
 Future<bool> signUp(
   String username,
   String email,
@@ -18,12 +27,15 @@ Future<bool> signUp(
   String lName,
   int age,
   double height,
-  double weight,
+  double doubleWeight,
   int phoneNumber,
   List<String> chronicDisease,
 ) async {
   //concatenating name
   String fullName = fName + " " + mName + " " + lName;
+  print(fullName);
+  String strWeight = doubleWeight.toStringAsFixed(0);
+  int weight = int.parse(strWeight);
 
   //getting the bmi
   double bodyMass = (weight / pow(height / 100, 2));
@@ -64,25 +76,38 @@ Future<bool> signUp(
       PA = 0;
   }
 
-  double TER = weight * PA;
-  double carbs, protein, fats;
+  int TER = weight * PA;
+  int carbs = 0, protein = 0, fats = 0;
+  double doubleCarbs = 0, doubleProtein = 0, doubleFats = 0;
+
+  //required TER per chronic disease
   for (String chronic in chronicDisease) {
-    if (chronic == 'Diabetes [Type 1 & 2]') {
-      carbs = TER * 0.55;
-      protein = TER * 0.20;
-      fats = TER * 0.25;
+    if (chronic == 'Diabetes [Type 1 & 2]' || chronic == 'Obesity') {
+      carbs = (TER * 0.55).round();
+      protein = (TER * 0.20).round();
+      fats = (TER * 0.25).round();
     } else if (chronic == 'Hypertension') {
-      carbs = TER * 0.60;
-      protein = TER * 0.15;
-      fats = TER * 0.25;
-    } else if (chronic == 'Obesity') {
-      carbs = TER * 0.55;
-      protein = TER * 0.20;
-      fats = TER * 0.25;
+      carbs = (TER * 0.60).round();
+      protein = (TER * 0.15).round();
+      fats = (TER * 0.25).round();
     } else {
       print('Error determining');
     }
   }
+
+  //required daily grams of macronutrients
+
+  doubleCarbs = carbs / 4;
+  doubleFats = fats / 9;
+  doubleProtein = protein / 4;
+
+  //parsing double to interget no need to pay attention
+  String strCarbs = doubleCarbs.toStringAsFixed(0);
+  String strProtein = doubleProtein.toStringAsFixed(0);
+  String strFats = doubleFats.toStringAsFixed(0);
+  int gCarbs = int.parse(strCarbs);
+  int gFats = int.parse(strFats);
+  int gProtein = int.parse(strProtein);
 
   try {
     // Create a new user with email and password
@@ -104,12 +129,15 @@ Future<bool> signUp(
       'name': fullName,
       'phoneNumber': phoneNumber,
       'sex': sex,
-      'weight': weight,
+      'weight': doubleWeight,
       'TER': TER,
-      'Physical Activity': PA,
+      'physicalActivity': PA,
       'reqCarbs': carbs,
       'reqProtein': protein,
       'reqFats': fats,
+      'gramCarbs': gCarbs,
+      'gramProtein': gProtein,
+      'gramFats': gFats,
     });
 
     // Sign up successful

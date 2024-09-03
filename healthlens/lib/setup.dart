@@ -133,6 +133,19 @@ class _SetupPageState extends State<SetupPage> {
       });
       print(_currentPageIndex);
     } else if (_currentPageIndex == 4) {
+      print(username);
+      print(email);
+      print(pinCode);
+      print(gender);
+      print(lifeStyle);
+      print(fName);
+      print(mName);
+      print(lName);
+      print(age);
+      print(height);
+      print(weight);
+      print(phoneNumber);
+      print(chronicDisease);
       try {
         bool signUpSuccess = await signUp(
           username!,
@@ -922,6 +935,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                     age = int.tryParse(value ??
                                                                             '') ??
                                                                         0;
+                                                                    print(age);
                                                                   },
                                                                   validator:
                                                                       (value) {
@@ -1036,6 +1050,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                         double.tryParse(value ??
                                                                                 '') ??
                                                                             0;
+                                                                    print(
+                                                                        height);
                                                                   },
                                                                   validator:
                                                                       (value) {
@@ -1150,6 +1166,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                         double.tryParse(value ??
                                                                                 '') ??
                                                                             0;
+                                                                    print(
+                                                                        weight);
                                                                   },
                                                                   validator:
                                                                       (value) {
@@ -1308,6 +1326,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             callback: (RadioOption val) {
                                                                               setState(() {
                                                                                 lifeStyle = val.label;
+                                                                                print(lifeStyle);
                                                                               });
                                                                             }),
                                                                       ),
@@ -1662,6 +1681,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                     email =
                                                                         value;
                                                                   }
+                                                                  print(email);
                                                                 },
                                                                 validator:
                                                                     validateEmail,
@@ -1732,6 +1752,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             onChanged:
                                                                                 (value) {
                                                                               phoneNumber = int.tryParse(value ?? '') ?? 0;
+                                                                              print(phoneNumber);
                                                                             },
                                                                             validator:
                                                                                 (value) {
