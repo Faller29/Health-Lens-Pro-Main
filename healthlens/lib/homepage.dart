@@ -13,6 +13,7 @@ import 'package:iconly/iconly.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'main.dart' hide weight;
 
 const double contWidth = 100;
 const double contHeight = 140;
@@ -106,20 +107,23 @@ class _HomePage extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'John Peter Faller',
+                                userFullName.split(" ").first,
                                 style: GoogleFonts.readexPro(
-                                    fontWeight: FontWeight.bold),
-                                textScaler: TextScaler.linear(
-                                    ScaleSize.textScaleFactor(context)),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: MediaQuery.of(context)
+                                      .textScaler
+                                      .scale(20),
+                                ),
                               ),
                               Text(
-                                '17 Years Old',
+                                textAlign: TextAlign.left,
+                                age.toString() + ' Years Old',
                                 style: GoogleFonts.readexPro(),
                                 textScaler: TextScaler.linear(
                                     SubScaleSize.textScaleFactor(context)),
                               ),
                               Text(
-                                'BMI: Normal',
+                                'BMI: ' + userBMI.toString(),
                                 style: GoogleFonts.readexPro(),
                                 textScaler: TextScaler.linear(
                                     SubScaleSize.textScaleFactor(context)),

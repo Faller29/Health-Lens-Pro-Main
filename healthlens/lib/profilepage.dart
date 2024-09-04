@@ -4,11 +4,11 @@ import 'package:healthlens/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'ProfilePage.dart';
 import 'backend_firebase/auth.dart';
 export 'ProfilePage.dart';
 import 'package:healthlens/login_page.dart';
+import 'main.dart' hide Auth;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,6 +16,18 @@ class ProfilePage extends StatefulWidget {
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
+/* 
+Future<> class backend_firebase async{
+  final currentUserInfo = await db.collection("user")
+          .doc('l4eONpueCoSlfLiUDjr0Y6meYBg2')
+          .get();
+      if (currentUserInfo.exists) {
+        final data = currentUserInfo.data() as Map<String, dynamic>;
+        _username = data['name'];
+        notifyListeners(); // Notify listeners about the change
+        print('Username updated: $_username');
+      }
+} */
 
 class _ProfilePageState extends State<ProfilePage> {
   late ProfilePage _model;
@@ -92,10 +104,12 @@ class _ProfilePageState extends State<ProfilePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'John Peter Faller',
+                                userFullName,
                                 style: GoogleFonts.readexPro(
                                   color: Color(0xFF14181B),
-                                  fontSize: 24.0,
+                                  fontSize: MediaQuery.of(context)
+                                      .textScaler
+                                      .scale(20),
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -106,7 +120,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   child: Column(
                                     children: [
                                       Text(
-                                        '17 Years Old',
+                                        textAlign: TextAlign.start,
+                                        age.toString() + ' Years Old',
                                         style: GoogleFonts.readexPro(
                                           color: Color(0xFF57636C),
                                           fontSize: 14.0,
@@ -115,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                       ),
                                       Text(
-                                        'BMI: Normal',
+                                        'BMI: ' + userBMI.toString(),
                                         style: GoogleFonts.readexPro(
                                           color: Color(0xFF57636C),
                                           fontSize: 14.0,

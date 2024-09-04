@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:healthlens/main.dart';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WeakPasswordException implements Exception {}
 
@@ -139,6 +140,9 @@ Future<bool> signUp(
       'gramProtein': gProtein,
       'gramFats': gFats,
     });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userName', currentUser?.displayName ?? 'No user');
 
     // Sign up successful
     return true;

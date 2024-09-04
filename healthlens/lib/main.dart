@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:healthlens/backend_firebase/firestore_provider.dart';
 import 'package:healthlens/calendar_history.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/firebase_options.dart';
+import 'package:provider/provider.dart';
 import 'login_page.dart';
 import 'setup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,13 +14,28 @@ import 'backend_firebase/auth.dart'; // Import your combined Auth class
 
 User? currentUser;
 DocumentReference? currentUserDoc;
+final db = FirebaseFirestore.instance;
+String userFullName = '';
+int age = 0;
+String gender = '';
+String email = '';
+int TER = 0;
+String lifestyle = '';
+double height = 0;
+double weight = 0;
+int phoneNumber = 0;
+List<dynamic>? chronicDisease = [];
+int gramCarbs = 0;
+int gramProtein = 0;
+int gramFats = 0;
+String physicalActivity = '';
+String userBMI = '';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final db = FirebaseFirestore.instance;
   db.settings = const Settings(persistenceEnabled: true);
 
   // Enable offline persistence
@@ -36,7 +53,7 @@ void main() async {
     print('Error adding data: $e');
   }**/
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

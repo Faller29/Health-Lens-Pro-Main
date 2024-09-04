@@ -1599,6 +1599,9 @@ class _SetupPageState extends State<SetupPage> {
                                                                   1.5,
                                                               child:
                                                                   TextFormField(
+                                                                keyboardType:
+                                                                    TextInputType
+                                                                        .emailAddress,
                                                                 initialValue:
                                                                     email,
                                                                 decoration:

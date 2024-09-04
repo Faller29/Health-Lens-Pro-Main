@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:healthlens/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class WeakPasswordException implements Exception {}
 
@@ -19,9 +23,30 @@ class Auth {
 
       currentUser = userCredential.user;
 
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('currentUser', currentUser.toString());
+
       if (currentUser != null) {
         await _saveUserDetails(
             currentUser?.displayName ?? 'Unknown User', email);
+        final currentUserInfo =
+            await db.collection("user").doc(currentUser?.uid).get();
+        if (currentUserInfo.exists) {
+          final data = currentUserInfo.data() as Map<String, dynamic>;
+          userFullName = data['name'];
+          age = data['age'];
+          gender = data['sex'];
+          TER = data['TER'];
+          height = data['height'];
+          weight = data['weight'];
+          phoneNumber = data['phoneNumber'];
+          chronicDisease = data['chronicDisease'];
+          gramCarbs = data['reqCarbs'];
+          gramProtein = data['reqProtein'];
+          gramFats = data['reqFats'];
+          physicalActivity = data['lifestyle'];
+          userBMI = data['bmi'];
+        }
       }
       print('success Log in');
       return currentUser;
