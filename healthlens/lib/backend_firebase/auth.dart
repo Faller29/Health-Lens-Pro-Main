@@ -29,24 +29,6 @@ class Auth {
       if (currentUser != null) {
         await _saveUserDetails(
             currentUser?.displayName ?? 'Unknown User', email);
-        final currentUserInfo =
-            await db.collection("user").doc(currentUser?.uid).get();
-        if (currentUserInfo.exists) {
-          final data = currentUserInfo.data() as Map<String, dynamic>;
-          userFullName = data['name'];
-          age = data['age'];
-          gender = data['sex'];
-          TER = data['TER'];
-          height = data['height'];
-          weight = data['weight'];
-          phoneNumber = data['phoneNumber'];
-          chronicDisease = data['chronicDisease'];
-          gramCarbs = data['reqCarbs'];
-          gramProtein = data['reqProtein'];
-          gramFats = data['reqFats'];
-          physicalActivity = data['lifestyle'];
-          userBMI = data['bmi'];
-        }
       }
       print('success Log in');
       return currentUser;
@@ -73,6 +55,26 @@ class Auth {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userName', userName);
     await prefs.setString('userEmail', email);
+
+    final currentUserInfo =
+        await db.collection("user").doc(currentUser?.uid).get();
+    final data = currentUserInfo.data() as Map<String, dynamic>;
+
+    await prefs.setString('userFullName', data['name']);
+    await prefs.setInt('age', data['age']);
+    await prefs.setString('gender', data['sex']);
+    await prefs.setInt('TER', data['TER']);
+    await prefs.setDouble('height', data['height']);
+    await prefs.setDouble('weight', data['weight']);
+    await prefs.setInt('phoneNumber', data['phoneNumber']);
+    await prefs.setInt('gramCarbs', data['reqCarbs']);
+    await prefs.setInt('gramProtein', data['reqProtein']);
+    await prefs.setInt('gramFats', data['reqFats']);
+    await prefs.setString('physicalActivity', data['lifestyle']);
+    await prefs.setString('userBMI', data['bmi']);
+
+    chronicDisease = data['chronicDisease'];
+    saveData();
     print('saved Locally');
     print(userName);
   }

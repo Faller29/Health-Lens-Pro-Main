@@ -264,6 +264,8 @@ class _SetupPageState extends State<SetupPage> {
                                       controller: _pageController,
                                       onPageChanged: _handlePageChange,
                                       scrollDirection: Axis.horizontal,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
                                       children: [
                                         PageViewPage(
                                           children: [

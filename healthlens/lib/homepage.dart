@@ -118,15 +118,21 @@ class _HomePage extends State<HomePage> {
                               Text(
                                 textAlign: TextAlign.left,
                                 age.toString() + ' Years Old',
-                                style: GoogleFonts.readexPro(),
-                                textScaler: TextScaler.linear(
-                                    SubScaleSize.textScaleFactor(context)),
+                                style: GoogleFonts.readexPro(
+                                  color: Color(0xFF57636C),
+                                  fontSize: MediaQuery.of(context)
+                                      .textScaler
+                                      .scale(14),
+                                ),
                               ),
                               Text(
                                 'BMI: ' + userBMI.toString(),
-                                style: GoogleFonts.readexPro(),
-                                textScaler: TextScaler.linear(
-                                    SubScaleSize.textScaleFactor(context)),
+                                style: GoogleFonts.readexPro(
+                                  color: Color(0xFF57636C),
+                                  fontSize: MediaQuery.of(context)
+                                      .textScaler
+                                      .scale(12),
+                                ),
                               ),
                             ],
                           ),
@@ -414,9 +420,9 @@ class _HomePage extends State<HomePage> {
                                 radius: 40.0,
                                 lineWidth: 14.0,
                                 animation: true,
-                                percent: 0.7,
-                                center: new Text(
-                                  "70.0%",
+                                percent: 49 / (gramCarbs ?? 0),
+                                center: Text(
+                                  '${(49 / (gramCarbs ?? 0) * 100).toStringAsFixed(0)}%',
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -431,7 +437,7 @@ class _HomePage extends State<HomePage> {
                             ],
                           ),
                           Text(
-                            "89/110g",
+                            '${49}/${gramCarbs}',
                             style: GoogleFonts.readexPro(
                               fontSize: 12.0,
                               fontWeight: FontWeight.bold,
@@ -469,9 +475,9 @@ class _HomePage extends State<HomePage> {
                                 radius: 40.0,
                                 lineWidth: 14.0,
                                 animation: true,
-                                percent: 0.5,
-                                center: new Text(
-                                  "50.0%",
+                                percent: 49 / (gramProtein ?? 0),
+                                center: Text(
+                                  '${(49 / (gramProtein ?? 0) * 100).toStringAsFixed(0)}%',
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -484,7 +490,7 @@ class _HomePage extends State<HomePage> {
                                 progressColor: const Color(0xffff5963),
                               ),
                               Text(
-                                "50/100g",
+                                '${49}/${gramProtein}',
                                 style: GoogleFonts.readexPro(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
@@ -524,9 +530,9 @@ class _HomePage extends State<HomePage> {
                                 radius: 40.0,
                                 lineWidth: 14.0,
                                 animation: true,
-                                percent: 0.3,
-                                center: new Text(
-                                  "30.0%",
+                                percent: 49 / (gramFats ?? 0),
+                                center: Text(
+                                  '${(49 / (gramFats ?? 0) * 100).toStringAsFixed(0)}%',
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -539,7 +545,7 @@ class _HomePage extends State<HomePage> {
                                 progressColor: const Color(0xff249689),
                               ),
                               Text(
-                                "30/100g",
+                                '${49}/${gramFats}',
                                 style: GoogleFonts.readexPro(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,

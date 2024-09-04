@@ -47,7 +47,7 @@ Future<bool> signUp(
   if (totalBMI < 18.5) {
     bmi = 'Underweight';
   } else if (totalBMI >= 18.5 && totalBMI <= 24.9) {
-    bmi = 'Normal weight';
+    bmi = 'Normal';
   } else if (totalBMI >= 25.0 && totalBMI <= 29.9) {
     bmi = 'Pre-obesity';
   } else if (totalBMI >= 30.0 && totalBMI <= 34.9) {
@@ -141,9 +141,25 @@ Future<bool> signUp(
       'gramFats': gFats,
     });
 
+    final currentUserInfo =
+        await db.collection("user").doc(currentUser?.uid).get();
+    final data = currentUserInfo.data() as Map<String, dynamic>;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userName', currentUser?.displayName ?? 'No user');
 
+    await prefs.setString('userFullName', data['name']);
+    await prefs.setInt('age', data['age']);
+    await prefs.setString('gender', data['sex']);
+    await prefs.setInt('TER', data['TER']);
+    await prefs.setDouble('height', data['height']);
+    await prefs.setDouble('weight', data['weight']);
+    await prefs.setInt('phoneNumber', data['phoneNumber']);
+    await prefs.setInt('gramCarbs', data['reqCarbs']);
+    await prefs.setInt('gramProtein', data['reqProtein']);
+    await prefs.setInt('gramFats', data['reqFats']);
+    await prefs.setString('physicalActivity', data['lifestyle']);
+    await prefs.setString('userBMI', data['bmi']);
+    saveData();
     // Sign up successful
     return true;
   } on FirebaseAuthException catch (e) {

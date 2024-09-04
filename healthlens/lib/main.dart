@@ -16,20 +16,39 @@ User? currentUser;
 DocumentReference? currentUserDoc;
 final db = FirebaseFirestore.instance;
 String userFullName = '';
-int age = 0;
-String gender = '';
-String email = '';
-int TER = 0;
-String lifestyle = '';
-double height = 0;
-double weight = 0;
-int phoneNumber = 0;
-List<dynamic>? chronicDisease = [];
-int gramCarbs = 0;
-int gramProtein = 0;
-int gramFats = 0;
-String physicalActivity = '';
-String userBMI = '';
+int? age;
+String? gender;
+String? email;
+int? TER;
+String? lifestyle;
+double? height;
+double? weight;
+int? phoneNumber;
+List<dynamic>? chronicDisease;
+int? gramCarbs;
+int? gramProtein;
+int? gramFats;
+String? physicalActivity;
+String? userBMI;
+Timestamp timestamp = Timestamp.now();
+
+void saveData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  userFullName = prefs.getString('userFullName') ?? '';
+  age = prefs.getInt('age') ?? 0;
+  gender = prefs.getString('gender') ?? '';
+  email = prefs.getString('userEmail') ?? '';
+  TER = prefs.getInt('TER') ?? 0;
+  lifestyle = prefs.getString('lifestyle') ?? '';
+  height = prefs.getDouble('height') ?? 0.0;
+  weight = prefs.getDouble('weight') ?? 0.0;
+  phoneNumber = prefs.getInt('phoneNumber') ?? 0;
+  gramCarbs = prefs.getInt('gramCarbs') ?? 0;
+  gramProtein = prefs.getInt('gramProtein') ?? 0;
+  gramFats = prefs.getInt('gramFats') ?? 0;
+  physicalActivity = prefs.getString('physicalActivity') ?? '';
+  userBMI = prefs.getString('userBMI') ?? '';
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +56,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   db.settings = const Settings(persistenceEnabled: true);
-
+  saveData();
   // Enable offline persistence
 
   // Connect to the Authentication emulator
