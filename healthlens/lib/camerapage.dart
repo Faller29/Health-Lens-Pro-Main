@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'foodServing.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -36,7 +37,10 @@ class _CameraPageState extends State<CameraPage> {
           // Process the camera image here
         });
       } else {
-        _cameraController!.stopImageStream();
+        // Check for streaming state before stopping
+        if (_isCameraStreaming) {
+          _cameraController!.stopImageStream();
+        }
       }
     }
   }
@@ -350,19 +354,16 @@ class _CameraPageState extends State<CameraPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                if (detectionColor == Color(0xff4b39ef) &&
-                                    detectionTitle == 'Start Detecting') {
-                                  detectionColor =
-                                      Color.fromARGB(255, 239, 57, 57);
-                                  detectionTitle = 'Stop Detecting';
-                                } else {
-                                  detectionColor = Color(0xff4b39ef);
-                                  detectionTitle = 'Start Detecting';
-                                }
-                              });
-                            },
+                            onPressed: () => setState(() {
+                              detectionColor =
+                                  detectionColor == Color(0xff4b39ef)
+                                      ? Color.fromARGB(255, 239, 57, 57)
+                                      : Color(0xff4b39ef);
+                              detectionTitle =
+                                  detectionTitle == 'Start Detecting'
+                                      ? 'Stop Detecting'
+                                      : 'Start Detecting';
+                            }),
                             child: Text(
                               detectionTitle,
                               style: GoogleFonts.outfit(
@@ -404,42 +405,13 @@ class _CameraPageState extends State<CameraPage> {
     ]);
   }
 
+  // ... other code
+
   Future<dynamic> foodServing() {
-    return showModalBottomSheet(
+    return showCupertinoModalPopup(
+      barrierColor: Color.fromARGB(144, 0, 0, 0),
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
-      ),
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      builder: (BuildContext context) {
-        return Container(
-            height: 300,
-            width: MediaQuery.of(context).size.width,
-            color: Colors.white,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(0, 18, 0, 10),
-                  child: Text(
-                    'Food Serving',
-                    style: GoogleFonts.outfit(
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [],
-                )
-              ],
-            ));
-      },
+      builder: (BuildContext context) => FoodServing(),
     );
   }
 }
