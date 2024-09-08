@@ -22,10 +22,9 @@ class Auth {
       );
 
       currentUser = userCredential.user;
-
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('currentUser', currentUser.toString());
-
+      await prefs.setString('currentUser', currentUser!.uid.toString());
+      userUid = prefs.getString('currentUser')!;
       if (currentUser != null) {
         await _saveUserDetails(
             currentUser?.displayName ?? 'Unknown User', email);
@@ -60,6 +59,9 @@ class Auth {
         await db.collection("user").doc(currentUser?.uid).get();
     final data = currentUserInfo.data() as Map<String, dynamic>;
 
+    await prefs.setString('firstName', data['firstName']);
+    await prefs.setString('middleName', data['middleName']);
+    await prefs.setString('lastName', data['lastName']);
     await prefs.setString('userFullName', data['name']);
     await prefs.setInt('age', data['age']);
     await prefs.setString('gender', data['sex']);

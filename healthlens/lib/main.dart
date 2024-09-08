@@ -4,6 +4,7 @@ import 'package:healthlens/backend_firebase/firestore_provider.dart';
 import 'package:healthlens/calendar_history.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/firebase_options.dart';
+import 'package:healthlens/userProfile.dart';
 import 'package:provider/provider.dart';
 import 'login_page.dart';
 import 'setup.dart';
@@ -13,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'backend_firebase/auth.dart'; // Import your combined Auth class
 
 User? currentUser;
+String userUid = '';
 DocumentReference? currentUserDoc;
 final db = FirebaseFirestore.instance;
 String userFullName = '';
@@ -24,13 +26,16 @@ String? lifestyle;
 double? height;
 double? weight;
 int? phoneNumber;
-List<String>? chronicDisease = [];
+List<dynamic>? chronicDisease = [];
 int? gramCarbs;
 int? gramProtein;
 int? gramFats;
 String? physicalActivity;
 String? userBMI;
 Timestamp timestamp = Timestamp.now();
+String? firstName;
+String? middleName;
+String? lastName;
 
 void saveData() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -48,6 +53,10 @@ void saveData() async {
   gramFats = prefs.getInt('gramFats') ?? 0;
   physicalActivity = prefs.getString('physicalActivity') ?? '';
   userBMI = prefs.getString('userBMI') ?? '';
+  chronicDisease = prefs.getStringList('chronicDisease');
+  firstName = prefs.getString('firstName') ?? '';
+  middleName = prefs.getString('middleName') ?? '';
+  lastName = prefs.getString('lastName') ?? '';
 }
 
 void main() async {
@@ -107,6 +116,7 @@ class MyApp extends StatelessWidget {
         '/entry_point': (context) =>
             EntryPoint(pageController: PageController()),
         '/calendar': (context) => CalendarScreen(),
+        '/editUser': (context) => UserProfilePage(),
       },
     );
   }

@@ -67,6 +67,7 @@ dependencies:
   string_extensions: ^0.7.3
   shared_preferences: ^2.2.3
   flutter_popup: ^3.3.0
+  firebase_storage: ^12.2.0
 
 dev_dependencies:
   flutter_test:

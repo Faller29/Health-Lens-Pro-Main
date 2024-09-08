@@ -184,7 +184,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     shape: BoxShape.rectangle,
                   ),
                   child: GestureDetector(
-                    onTap: () => {print('k')},
+                    onTap: () => {Navigator.pushNamed(context, '/editUser')},
                     child: Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(

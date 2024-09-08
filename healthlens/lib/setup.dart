@@ -133,19 +133,6 @@ class _SetupPageState extends State<SetupPage> {
       });
       print(_currentPageIndex);
     } else if (_currentPageIndex == 4) {
-      print(username);
-      print(email);
-      print(pinCode);
-      print(gender);
-      print(lifeStyle);
-      print(fName);
-      print(mName);
-      print(lName);
-      print(age);
-      print(height);
-      print(weight);
-      print(phoneNumber);
-      print(chronicDisease);
       try {
         bool signUpSuccess = await signUp(
           username!,

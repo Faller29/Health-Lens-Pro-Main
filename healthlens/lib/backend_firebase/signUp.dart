@@ -122,6 +122,9 @@ Future<bool> signUp(
     currentUserDoc =
         FirebaseFirestore.instance.collection('user').doc(currentUser!.uid);
     await currentUserDoc?.set({
+      'firstName': fName,
+      'middleName': mName,
+      'lastName': lName,
       'bmi': bmi,
       'age': age,
       'chronicDisease': chronicDisease,
@@ -146,7 +149,9 @@ Future<bool> signUp(
     final data = currentUserInfo.data() as Map<String, dynamic>;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userName', currentUser?.displayName ?? 'No user');
-
+    await prefs.setString('firstName', data['firstName']);
+    await prefs.setString('middleName', data['middleName']);
+    await prefs.setString('lastName', data['lastName']);
     await prefs.setString('userFullName', data['name']);
     await prefs.setInt('age', data['age']);
     await prefs.setString('gender', data['sex']);
@@ -159,8 +164,11 @@ Future<bool> signUp(
     await prefs.setInt('gramFats', data['reqFats']);
     await prefs.setString('physicalActivity', data['lifestyle']);
     await prefs.setString('userBMI', data['bmi']);
-    saveData();
+    await prefs.setString('userBMI', data['bmi']);
+    await prefs.setStringList(
+        'chronicDisease', data['chronicDisease'].cast<String>());
     // Sign up successful
+    saveData();
     return true;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
