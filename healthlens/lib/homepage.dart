@@ -2,8 +2,10 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_popup/flutter_popup.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/food_data_history.dart';
 import 'package:healthlens/graph_data.dart';
@@ -45,6 +47,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   final List<Item> _data = generateItems(1);
+  bool isVisible = false, inverseVisible = true;
 
   @override
   @override
@@ -215,143 +218,263 @@ class _HomePage extends State<HomePage> {
                     ),
                     onTap: () {
                       // Show modal on tap
-                      showModalBottomSheet(
+                      showCupertinoModalPopup(
                         context: context,
                         builder: (BuildContext context) {
-                          return Container(
-                            height: 500,
-                            color: Colors.white,
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(8),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      padding:
-                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                      child: Text(
-                                        'Health Assesment',
-                                        style: GoogleFonts.readexPro(
-                                          fontSize: 20.0,
-                                          textStyle: const TextStyle(
-                                            color: Color.fromARGB(255, 0, 0, 0),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      height: 200,
-                                      child: SfCartesianChart(
-                                        zoomPanBehavior: ZoomPanBehavior(
-                                          enablePinching: true,
-                                          zoomMode: ZoomMode.x,
-                                          enablePanning: true,
-                                        ),
-                                        primaryXAxis: CategoryAxis(),
-                                        primaryYAxis: CategoryAxis(),
-                                        legend: Legend(isVisible: true),
-                                        series: <CartesianSeries>[
-                                          StackedColumnSeries<ChartData,
-                                                  String>(
-                                              color: Color(0xff4b39ef),
-                                              dataLabelSettings:
-                                                  DataLabelSettings(
-                                                isVisible: true,
-                                                showZeroValue: true,
-                                                labelPosition:
-                                                    ChartDataLabelPosition
-                                                        .inside,
-                                                textStyle: TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                                labelAlignment:
-                                                    ChartDataLabelAlignment
-                                                        .middle,
-                                                alignment:
-                                                    ChartAlignment.center,
+                          return StatefulBuilder(builder:
+                              (BuildContext context, StateSetter setState) {
+                            return Center(
+                              child: Card(
+                                color: Colors.white,
+                                elevation: 0,
+                                margin:
+                                    const EdgeInsets.fromLTRB(10, 150, 10, 150),
+                                child: Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          padding:
+                                              EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                          child: Text(
+                                            'Health Information',
+                                            style: GoogleFonts.readexPro(
+                                              fontSize: 20.0,
+                                              textStyle: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 0, 0, 0),
                                               ),
-                                              name: 'Weight',
-                                              dataSource: weight,
-                                              xValueMapper:
-                                                  (ChartData data, _) => data.x,
-                                              yValueMapper:
-                                                  (ChartData data, _) =>
-                                                      data.y1,
-                                              pointColorMapper:
-                                                  (ChartData data, _) =>
-                                                      Color(0xff4b39ef)),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        'Update Weight: ',
-                                        style: GoogleFonts.readexPro(
-                                          fontSize: 18.0,
-                                          textStyle: const TextStyle(
-                                            color: Color.fromARGB(255, 0, 0, 0),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.fromLTRB(10, 0, 10, 10),
-                                      child: TextFormField(
-                                        keyboardType: TextInputType.number,
-                                        decoration: InputDecoration(
-                                          labelText: 'Enter Weight [kg]',
-                                          labelStyle: GoogleFonts.outfit(
-                                            fontSize: 15.0,
-                                          ),
-                                          enabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color(0xffe0e3e7),
-                                              width: 2.0,
+                                        Container(
+                                          height: 200,
+                                          child: SfCartesianChart(
+                                            enableSideBySideSeriesPlacement:
+                                                false,
+                                            zoomPanBehavior: ZoomPanBehavior(
+                                              enablePinching: true,
+                                              zoomMode: ZoomMode.x,
+                                              enablePanning: true,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                          focusedBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color(0xff4b39ef),
-                                              width: 2.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                          errorBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.black,
-                                              width: 2.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                          focusedErrorBorder:
-                                              UnderlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.black,
-                                              width: 2.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
+                                            primaryXAxis: CategoryAxis(),
+                                            primaryYAxis: CategoryAxis(),
+                                            legend: Legend(isVisible: true),
+                                            series: <CartesianSeries>[
+                                              StackedColumnSeries<ChartData,
+                                                      String>(
+                                                  color: Color(0xff4b39ef),
+                                                  dataLabelSettings:
+                                                      DataLabelSettings(
+                                                    isVisible: true,
+                                                    showZeroValue: true,
+                                                    labelPosition:
+                                                        ChartDataLabelPosition
+                                                            .inside,
+                                                    textStyle: TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                    labelAlignment:
+                                                        ChartDataLabelAlignment
+                                                            .middle,
+                                                    alignment:
+                                                        ChartAlignment.center,
+                                                  ),
+                                                  name: 'Weight',
+                                                  dataSource: weight,
+                                                  xValueMapper:
+                                                      (ChartData data, _) =>
+                                                          data.x,
+                                                  yValueMapper:
+                                                      (ChartData data, _) =>
+                                                          data.y1,
+                                                  pointColorMapper:
+                                                      (ChartData data, _) =>
+                                                          Color(0xff4b39ef)),
+                                            ],
                                           ),
                                         ),
-                                        style: GoogleFonts.outfit(
-                                          fontSize: 14.0,
+                                        Visibility(
+                                          visible: inverseVisible,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                isVisible = !isVisible;
+                                                inverseVisible =
+                                                    !inverseVisible;
+                                                print(isVisible);
+                                              });
+                                            },
+                                            child: Text('Update Weight'),
+                                          ),
                                         ),
-                                      ),
+                                        Visibility(
+                                          visible: isVisible,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    10, 0, 10, 0),
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  'Update Weight: ',
+                                                  style: GoogleFonts.readexPro(
+                                                    fontSize: 18.0,
+                                                    textStyle: const TextStyle(
+                                                      color: Color.fromARGB(
+                                                          255, 0, 0, 0),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    10, 0, 10, 10),
+                                                child: TextFormField(
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  decoration: InputDecoration(
+                                                    labelText:
+                                                        'Enter Weight [kg]',
+                                                    labelStyle:
+                                                        GoogleFonts.outfit(
+                                                      fontSize: 15.0,
+                                                    ),
+                                                    enabledBorder:
+                                                        UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        color:
+                                                            Color(0xffe0e3e7),
+                                                        width: 2.0,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0),
+                                                    ),
+                                                    focusedBorder:
+                                                        UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        color:
+                                                            Color(0xff4b39ef),
+                                                        width: 2.0,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0),
+                                                    ),
+                                                    errorBorder:
+                                                        UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        color: Colors.black,
+                                                        width: 2.0,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0),
+                                                    ),
+                                                    focusedErrorBorder:
+                                                        UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        color: Colors.black,
+                                                        width: 2.0,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0),
+                                                    ),
+                                                  ),
+                                                  style: GoogleFonts.outfit(
+                                                    fontSize: 14.0,
+                                                  ),
+                                                ),
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        isVisible = !isVisible;
+                                                        inverseVisible =
+                                                            !inverseVisible;
+                                                        print(isVisible);
+                                                      });
+                                                    },
+                                                    child: Text('Update'),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 20,
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        isVisible = !isVisible;
+                                                        inverseVisible =
+                                                            !inverseVisible;
+                                                        print(isVisible);
+                                                      });
+                                                    },
+                                                    child: Text('Cancel'),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.fromLTRB(
+                                              10, 10, 10, 10),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'Chronic Disease:',
+                                                style: GoogleFonts.readexPro(
+                                                  color: Color(0xFF57636C),
+                                                  fontSize: 12.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                              Column(
+                                                children: chronicDisease!
+                                                    .map((e) => Text(e))
+                                                    .toList(),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.fromLTRB(
+                                              10, 10, 10, 10),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'Chronic Disease:',
+                                                style: GoogleFonts.readexPro(
+                                                  color: Color(0xFF57636C),
+                                                  fontSize: 12.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                              Column(
+                                                children: chronicDisease!
+                                                    .map((e) => Text(e))
+                                                    .toList(),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
+                            );
+                          });
                         },
                       );
                     },
