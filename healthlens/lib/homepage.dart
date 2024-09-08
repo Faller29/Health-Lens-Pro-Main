@@ -15,7 +15,7 @@ import 'package:iconly/iconly.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'main.dart' hide weight;
+import 'main.dart';
 
 const double contWidth = 100;
 const double contHeight = 140;
@@ -283,7 +283,7 @@ class _HomePage extends State<HomePage> {
                                                         ChartAlignment.center,
                                                   ),
                                                   name: 'Weight',
-                                                  dataSource: weight,
+                                                  dataSource: weightData,
                                                   xValueMapper:
                                                       (ChartData data, _) =>
                                                           data.x,
@@ -430,17 +430,116 @@ class _HomePage extends State<HomePage> {
                                           child: Row(
                                             children: [
                                               Text(
-                                                'Chronic Disease:',
+                                                'Weight: ',
                                                 style: GoogleFonts.readexPro(
                                                   color: Color(0xFF57636C),
-                                                  fontSize: 12.0,
+                                                  fontSize: 14.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                              Column(children: [
+                                                Text(
+                                                  weight.toString(),
+                                                  style: GoogleFonts.readexPro(
+                                                    color: Color(0xFF57636C),
+                                                    fontSize: 14.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                ),
+                                              ]),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.fromLTRB(
+                                              10, 10, 10, 10),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'Height: ',
+                                                style: GoogleFonts.readexPro(
+                                                  color: Color(0xFF57636C),
+                                                  fontSize: 14.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                              Column(children: [
+                                                Text(
+                                                  height.toString(),
+                                                  style: GoogleFonts.readexPro(
+                                                    color: Color(0xFF57636C),
+                                                    fontSize: 14.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                ),
+                                              ]),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.fromLTRB(
+                                              10, 10, 10, 10),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'BMI: ',
+                                                style: GoogleFonts.readexPro(
+                                                  color: Color(0xFF57636C),
+                                                  fontSize: 14.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                              Column(children: [
+                                                Text(
+                                                  userBMI!,
+                                                  style: GoogleFonts.readexPro(
+                                                    color: Color(0xFF57636C),
+                                                    fontSize: 14.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                ),
+                                              ]),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.fromLTRB(
+                                              10, 10, 10, 10),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'Chronic Disease: ',
+                                                style: GoogleFonts.readexPro(
+                                                  color: Color(0xFF57636C),
+                                                  fontSize: 14.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.normal,
                                                 ),
                                               ),
                                               Column(
                                                 children: chronicDisease!
-                                                    .map((e) => Text(e))
+                                                    .map((e) => Text(
+                                                          e,
+                                                          style: GoogleFonts
+                                                              .readexPro(
+                                                            color: Color(
+                                                                0xFF57636C),
+                                                            fontSize: 14.0,
+                                                            letterSpacing: 0.0,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                          ),
+                                                        ))
                                                     .toList(),
                                               ),
                                             ],
@@ -452,19 +551,26 @@ class _HomePage extends State<HomePage> {
                                           child: Row(
                                             children: [
                                               Text(
-                                                'Chronic Disease:',
+                                                'Lifestyle: ',
                                                 style: GoogleFonts.readexPro(
                                                   color: Color(0xFF57636C),
-                                                  fontSize: 12.0,
+                                                  fontSize: 14.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.normal,
                                                 ),
                                               ),
-                                              Column(
-                                                children: chronicDisease!
-                                                    .map((e) => Text(e))
-                                                    .toList(),
-                                              ),
+                                              Column(children: [
+                                                Text(
+                                                  lifestyle!,
+                                                  style: GoogleFonts.readexPro(
+                                                    color: Color(0xFF57636C),
+                                                    fontSize: 14.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                ),
+                                              ]),
                                             ],
                                           ),
                                         )

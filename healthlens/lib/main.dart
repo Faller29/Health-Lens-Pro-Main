@@ -24,7 +24,7 @@ String? lifestyle;
 double? height;
 double? weight;
 int? phoneNumber;
-List<dynamic>? chronicDisease;
+List<String>? chronicDisease = [];
 int? gramCarbs;
 int? gramProtein;
 int? gramFats;

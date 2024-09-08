@@ -55,7 +55,7 @@ List<AverageData> barChart2 = [
   AverageData('Ave. 30 days', 24, 22, 19),
 ];
 
-final List<ChartData> weight = [
+final List<ChartData> weightData = [
   ChartData('1', 76, 16, 14),
   ChartData('2', 76, 12, 18),
   ChartData('3', 76, 23, 15),

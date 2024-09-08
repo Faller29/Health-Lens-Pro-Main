@@ -72,8 +72,10 @@ class Auth {
     await prefs.setInt('gramFats', data['reqFats']);
     await prefs.setString('physicalActivity', data['lifestyle']);
     await prefs.setString('userBMI', data['bmi']);
-
-    chronicDisease = data['chronicDisease'];
+    await prefs.setStringList(
+        'chronicDisease', data['chronicDisease'].cast<String>());
+    chronicDisease = prefs.getStringList('chronicDisease');
+    print(chronicDisease);
     saveData();
     print('saved Locally');
     print(userName);
