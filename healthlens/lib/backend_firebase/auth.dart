@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:healthlens/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +26,10 @@ class Auth {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('currentUser', currentUser!.uid.toString());
       userUid = prefs.getString('currentUser')!;
+
+      await prefs.setString('currentUserEmail', email);
+      await prefs.setString('currentUserPincode', pincode);
+
       if (currentUser != null) {
         await _saveUserDetails(
             currentUser?.displayName ?? 'Unknown User', email);
@@ -46,6 +51,12 @@ class Auth {
     await _auth.signOut();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('userEmail');
+    await prefs.remove('currentUserEmail');
+
+    await prefs.remove('currentUserPincode');
+
+    currentUserEmail = '';
+    currentUserPincode = '';
     print('signedOut');
   }
 
@@ -57,10 +68,13 @@ class Auth {
 
     final currentUserInfo =
         await db.collection("user").doc(currentUser?.uid).get();
+    final userId = currentUser!.uid;
+
     final data = currentUserInfo.data() as Map<String, dynamic>;
 
     await prefs.setString('firstName', data['firstName']);
     await prefs.setString('middleName', data['middleName']);
+    await prefs.setString('middleInitial', data['middleInitial']);
     await prefs.setString('lastName', data['lastName']);
     await prefs.setString('userFullName', data['name']);
     await prefs.setInt('age', data['age']);
@@ -76,7 +90,19 @@ class Auth {
     await prefs.setString('userBMI', data['bmi']);
     await prefs.setStringList(
         'chronicDisease', data['chronicDisease'].cast<String>());
+    //await prefs.setString('profileImageUrl', data['profileImageUrl']);
+    //profileImageUrl = data['profileImageUrl'];
     chronicDisease = prefs.getStringList('chronicDisease');
+
+    try {
+      final userRef =
+          FirebaseStorage.instance.ref().child('users/$userUid/profile.jpg');
+      url = await userRef.getDownloadURL();
+    } catch (e) {
+      // If the download URL is not found or any error occurs, set url to an empty string
+      url = null;
+    }
+
     print(chronicDisease);
     saveData();
     print('saved Locally');

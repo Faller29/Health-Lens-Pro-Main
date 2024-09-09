@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/login_page.dart';
@@ -33,6 +34,30 @@ class _ProfilePageState extends State<ProfilePage> {
   late ProfilePage _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchImageUrl(); // Fetch the image URL when the widget is created
+  }
+
+  Future<void> fetchImageUrl() async {
+    try {
+      final userRef =
+          FirebaseStorage.instance.ref().child('users/$userUid/profile.jpg');
+      String updatedUrl = await userRef.getDownloadURL();
+
+      // Append a timestamp or random string to the URL to break the cache
+      setState(() {
+        url = '$updatedUrl?${DateTime.now().millisecondsSinceEpoch}';
+      });
+    } catch (e) {
+      // Set a fallback if the image isn't available
+      setState(() {
+        url = '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,16 +107,23 @@ class _ProfilePageState extends State<ProfilePage> {
                             padding: EdgeInsets.all(2.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(50.0),
-                              child: CachedNetworkImage(
-                                imageUrl: 'https://picsum.photos/seed/529/600',
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                                fit: BoxFit.cover,
-                                height: 60.0,
-                                width: 60.0,
-                              ),
+                              child: url != null
+                                  ? CachedNetworkImage(
+                                      key: ValueKey(url),
+                                      imageUrl: url,
+                                      placeholder: (context, url) =>
+                                          CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                      fit: BoxFit.cover,
+                                      width: 60,
+                                      height: 60,
+                                    )
+                                  : Icon(
+                                      Icons.account_circle,
+                                      size: 60,
+                                      color: Colors.grey,
+                                    ),
                             ),
                           ),
                         ),
@@ -103,7 +135,12 @@ class _ProfilePageState extends State<ProfilePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                userFullName,
+                                firstName! +
+                                    ' ' +
+                                    middleInitial! +
+                                    '.' +
+                                    ' ' +
+                                    lastName!,
                                 style: GoogleFonts.readexPro(
                                   color: Color(0xFF14181B),
                                   fontSize: MediaQuery.of(context)

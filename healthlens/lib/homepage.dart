@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,29 @@ class _HomePage extends State<HomePage> {
   bool isVisible = false, inverseVisible = true;
 
   @override
+  void initState() {
+    super.initState();
+    fetchImageUrl();
+  }
+
+  Future<void> fetchImageUrl() async {
+    try {
+      final userRef =
+          FirebaseStorage.instance.ref().child('users/$userUid/profile.jpg');
+      String updatedUrl = await userRef.getDownloadURL();
+
+      // Append a timestamp or random string to the URL to break the cache
+      setState(() {
+        url = '$updatedUrl?${DateTime.now().millisecondsSinceEpoch}';
+      });
+    } catch (e) {
+      // Set a fallback if the image isn't available
+      setState(() {
+        url = '';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,14 +115,22 @@ class _HomePage extends State<HomePage> {
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                             ),
-                            child: CachedNetworkImage(
-                              imageUrl: 'https://picsum.photos/seed/529/600',
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
-                              fit: BoxFit.cover,
-                            ),
+                            child: url != null
+                                ? CachedNetworkImage(
+                                    imageUrl: url,
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error),
+                                    fit: BoxFit.cover,
+                                    width: 70,
+                                    height: 70,
+                                  )
+                                : Icon(
+                                    Icons.account_circle,
+                                    size: 70,
+                                    color: Colors.grey,
+                                  ),
                           ),
                         ),
                         Padding(

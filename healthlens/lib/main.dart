@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:healthlens/backend_firebase/firestore_provider.dart';
 import 'package:healthlens/calendar_history.dart';
@@ -11,10 +14,10 @@ import 'setup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'backend_firebase/auth.dart'; // Import your combined Auth class
+import 'backend_firebase/auth.dart';
 
 User? currentUser;
-String userUid = '';
+String? userUid;
 DocumentReference? currentUserDoc;
 final db = FirebaseFirestore.instance;
 String userFullName = '';
@@ -36,6 +39,11 @@ Timestamp timestamp = Timestamp.now();
 String? firstName;
 String? middleName;
 String? lastName;
+String? middleInitial;
+File? profileImageUrl;
+String? currentUserEmail;
+String? currentUserPincode;
+var url;
 
 void saveData() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -57,6 +65,10 @@ void saveData() async {
   firstName = prefs.getString('firstName') ?? '';
   middleName = prefs.getString('middleName') ?? '';
   lastName = prefs.getString('lastName') ?? '';
+  middleInitial = prefs.getString('middleInitial') ?? '';
+  //profileImageUrl = prefs.getString('profileImageUrl') ?? '';
+  currentUserEmail = prefs.getString('currentUserEmail') ?? '';
+  currentUserPincode = prefs.getString('currentUserPincode') ?? '';
 }
 
 void main() async {
@@ -65,7 +77,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   db.settings = const Settings(persistenceEnabled: true);
-  saveData();
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  currentUserEmail = prefs.getString('currentUserEmail') ?? '';
+  currentUserPincode = prefs.getString('currentUserPincode') ?? '';
+
+  runApp(MyApp());
+
   // Enable offline persistence
 
   // Connect to the Authentication emulator
@@ -80,8 +99,6 @@ void main() async {
   } catch (e) {
     print('Error adding data: $e');
   }**/
-
-  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -131,6 +148,7 @@ class MyApp extends StatelessWidget {
     } else {
       if (await _auth.isLoggedIn()) {
         // User is logged in, navigate to EntryPoint
+
         return EntryPoint();
       } else {
         // User has signed up before but is not logged in, navigate to LoginPage
@@ -157,7 +175,66 @@ class Auth {
   Future<bool> isLoggedIn() async {
     // Implement your logic to check if the user is logged in
     // For example, you might check the Firebase authentication state
-    final user = FirebaseAuth.instance.currentUser;
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      final theUser = await db.collection("user").doc(user?.uid).get();
+      final thisUserUid = user.uid;
+      final data = theUser.data() as Map<String, dynamic>;
+
+      await prefs.setString('firstName', data['firstName']);
+      await prefs.setString('middleName', data['middleName']);
+      await prefs.setString('middleInitial', data['middleInitial']);
+      await prefs.setString('lastName', data['lastName']);
+      await prefs.setString('userFullName', data['name']);
+      await prefs.setInt('age', data['age']);
+      await prefs.setString('gender', data['sex']);
+      await prefs.setInt('TER', data['TER']);
+      await prefs.setDouble('height', data['height']);
+      await prefs.setDouble('weight', data['weight']);
+      await prefs.setInt('phoneNumber', data['phoneNumber']);
+      await prefs.setInt('gramCarbs', data['reqCarbs']);
+      await prefs.setInt('gramProtein', data['reqProtein']);
+      await prefs.setInt('gramFats', data['reqFats']);
+      await prefs.setString('physicalActivity', data['lifestyle']);
+      await prefs.setString('userBMI', data['bmi']);
+      await prefs.setStringList(
+          'chronicDisease', data['chronicDisease'].cast<String>());
+
+      try {
+        final userRef =
+            FirebaseStorage.instance.ref().child('users/$userUid/profile.jpg');
+        url = await userRef.getDownloadURL();
+      } catch (e) {
+        // If the download URL is not found or any error occurs, set url to an empty string
+        url = null;
+      }
+
+      chronicDisease = prefs.getStringList('chronicDisease');
+      userFullName = prefs.getString('userFullName') ?? '';
+      age = prefs.getInt('age') ?? 0;
+      gender = prefs.getString('gender') ?? '';
+      email = prefs.getString('userEmail') ?? '';
+      TER = prefs.getInt('TER') ?? 0;
+      lifestyle = prefs.getString('lifestyle') ?? '';
+      height = prefs.getDouble('height') ?? 0.0;
+      weight = prefs.getDouble('weight') ?? 0.0;
+      phoneNumber = prefs.getInt('phoneNumber') ?? 0;
+      gramCarbs = prefs.getInt('gramCarbs') ?? 0;
+      gramProtein = prefs.getInt('gramProtein') ?? 0;
+      gramFats = prefs.getInt('gramFats') ?? 0;
+      physicalActivity = prefs.getString('physicalActivity') ?? '';
+      userBMI = prefs.getString('userBMI') ?? '';
+      chronicDisease = prefs.getStringList('chronicDisease');
+      firstName = prefs.getString('firstName') ?? '';
+      middleName = prefs.getString('middleName') ?? '';
+      lastName = prefs.getString('lastName') ?? '';
+      middleInitial = prefs.getString('middleInitial') ?? '';
+      //profileImageUrl = prefs.getString('profileImageUrl') ?? '';
+      currentUserEmail = prefs.getString('currentUserEmail') ?? '';
+      currentUserPincode = prefs.getString('currentUserPincode') ?? '';
+    }
     return user != null;
   }
 }

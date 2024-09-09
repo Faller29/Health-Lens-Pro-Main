@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:healthlens/entry_point.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -17,40 +20,49 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  String _profileImageUrl = 'https://picsum.photos/seed/529/600';
+  // Initial profile image URL
+  String _profileImageUrl = '';
+  File? _profileImage;
+  final ImagePicker _picker = ImagePicker();
 
+  // Controllers for the form fields
   final TextEditingController _fNameController = TextEditingController();
   final TextEditingController _mNameController = TextEditingController();
   final TextEditingController _lNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  File? _profileImage;
-  final ImagePicker _picker = ImagePicker();
 
-  Future<String> _uploadProfilePicture(File imageFile) async {
-    print(_profileImage);
-    print('try upload');
+  @override
+  void initState() {
+    super.initState();
+    _fNameController.text = firstName!;
+    _mNameController.text = middleName!;
+    _lNameController.text = lastName!;
+    _ageController.text = age.toString();
+
+    _loadProfilePicture();
+  }
+
+  Future<void> _loadProfilePicture() async {
     try {
-      print('try upload1');
+      final String userId = userUid!;
+      final ref = _storage.ref().child('users/$userId/profile.jpg');
+      final profileImageUrl = await ref.getDownloadURL();
 
-      final String userId = userUid;
-      final userRef = _storage.ref().child('users/$userId/profile.jpg');
-      print('try upload2');
-
-      final uploadTask = userRef.putFile(imageFile);
-      print('try upload2.1');
-      print('File exists: ${imageFile.existsSync()}');
-      print('File size: ${imageFile.lengthSync()} bytes');
-      final snapshot = await uploadTask.whenComplete(() => null);
-      print('try upload2.2');
-
-      final downloadURL = await snapshot.ref.getDownloadURL();
-      print('try upload3');
-
-      return downloadURL;
+      setState(() {
+        _profileImageUrl = profileImageUrl;
+      });
     } catch (e) {
-      print('Error uploading image: $e');
-      rethrow; // Rethrow the error for proper handling
+      print('Error loading profile picture: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _fNameController.dispose();
+    _mNameController.dispose();
+    _lNameController.dispose();
+    _ageController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickImage() async {
@@ -63,22 +75,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _fNameController.text = firstName!;
-    _mNameController.text = middleName!;
-    _lNameController.text = lastName!;
-    _ageController.text = age.toString();
-  }
+  Future<String> _uploadProfilePicture(File imageFile) async {
+    try {
+      final String userId = userUid!;
+      final userRef = _storage.ref().child('users/$userId/profile.jpg');
 
-  @override
-  void dispose() {
-    _fNameController.dispose();
-    _mNameController.dispose();
-    _lNameController.dispose();
-    _ageController.dispose();
-    super.dispose();
+      final uploadTask = userRef.putFile(imageFile);
+
+      final snapshot = await uploadTask.whenComplete(() => null);
+
+      final downloadURL = await snapshot.ref.getDownloadURL();
+      print('Upload successful, download URL: $downloadURL');
+
+      return downloadURL;
+    } catch (e) {
+      print('Error uploading image: $e');
+      rethrow;
+    }
   }
 
   Future<void> _saveProfile() async {
@@ -87,25 +100,64 @@ class _UserProfilePageState extends State<UserProfilePage> {
         firstName = _fNameController.text;
         middleName = _mNameController.text;
         lastName = _lNameController.text;
-
         age = int.parse(_ageController.text);
       });
-      // Here, you can add logic to save updated information to Firebase or locally
+
       if (_profileImage != null) {
         try {
           final downloadURL = await _uploadProfilePicture(_profileImage!);
-          // Save downloadURL to your database or user profile
-          print(_profileImage);
-          _profileImageUrl = downloadURL;
+          setState(() {
+            _profileImageUrl = downloadURL;
+          });
+
+          print('Profile picture uploaded successfully!');
         } catch (e) {
-          // Handle upload errors
-          print('Error uploading profile picture: $e');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error uploading profile picture: $e')),
+          );
         }
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Profile updated successfully!')),
-      );
+      // Update Firestore with profile information
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        final String userId = userUid!;
+        String userFullname = _fNameController.text +
+            " " +
+            _mNameController.text +
+            " " +
+            _lNameController.text;
+        String initial = _mNameController.text[0].toUpperCase();
+
+        await FirebaseFirestore.instance.collection('user').doc(userId).update({
+          'fullName': userFullname,
+          'firstName': _fNameController.text,
+          'middleName': _mNameController.text,
+          'lastName': _lNameController.text,
+          'middleInitial': initial,
+          'age': int.parse(_ageController.text),
+          'profileImageUrl': _profileImageUrl,
+        });
+        await prefs.setString('userFullName', userFullname);
+        await prefs.setString('firstName', _fNameController.text);
+        await prefs.setString('middleName', _mNameController.text);
+        await prefs.setString('middleInitial', initial);
+
+        await prefs.setString('lastName', _lNameController.text);
+        await prefs.setInt('age', int.parse(_ageController.text));
+        await prefs.setString('profileImageUrl', _profileImageUrl);
+        saveData();
+
+        // Show success message for Firestore update
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Profile updated successfully in Firestore!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating profile in Firestore: $e')),
+        );
+      }
     }
   }
 
@@ -114,7 +166,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile', style: GoogleFonts.readexPro(fontSize: 18)),
-        backgroundColor: Color(0xFF39D2C0),
+        backgroundColor: Color(0xff4b39ef),
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -122,35 +175,57 @@ class _UserProfilePageState extends State<UserProfilePage> {
           key: _formKey,
           child: ListView(
             children: [
-              GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Color(0x4D39D2C0),
-                  child: _profileImage != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(50),
-                          child: Image.file(
-                            _profileImage!,
-                            width: 110,
-                            height: 110,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : CachedNetworkImage(
-                          imageUrl:
-                              'https://flutter.io/images/flutter-mark-square-100.png',
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                          fit: BoxFit.cover,
-                          width: 110,
-                          height: 110,
-                        ),
-                ),
+              Column(
+                children: [
+                  CircleAvatar(
+                    radius: 75,
+                    backgroundColor: Color(0xff4b39ef),
+                    child: _profileImage != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: Image.file(
+                              _profileImage!,
+                              width: 140,
+                              height: 140,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : _profileImageUrl.isNotEmpty
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: CachedNetworkImage(
+                                  imageUrl: _profileImageUrl,
+                                  placeholder: (context, url) =>
+                                      CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
+                                  fit: BoxFit.cover,
+                                  width: 140,
+                                  height: 140,
+                                ),
+                              )
+                            : Icon(
+                                Icons.account_circle,
+                                size: 110,
+                                color: Colors.grey,
+                              ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _pickImage,
+                    style: ElevatedButton.styleFrom(
+                      //padding: EdgeInsets.symmetric(vertical: 14.0),
+                      backgroundColor: Color(0xff4b39ef),
+                    ),
+                    child: Text(
+                      'Change Profile',
+                      style: GoogleFonts.readexPro(
+                        fontSize: 14.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-
               SizedBox(height: 20),
               TextFormField(
                 controller: _fNameController,
@@ -182,7 +257,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 },
               ),
               SizedBox(height: 20),
-              // Name Field
               TextFormField(
                 controller: _lNameController,
                 decoration: InputDecoration(
@@ -198,7 +272,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 },
               ),
               SizedBox(height: 20),
-              // Age Field
               TextFormField(
                 controller: _ageController,
                 keyboardType: TextInputType.number,
@@ -218,12 +291,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 },
               ),
               SizedBox(height: 30),
-              // Save Button
               ElevatedButton(
                 onPressed: _saveProfile,
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16.0),
-                  backgroundColor: Color(0xFF39D2C0),
+                  backgroundColor: Color(0xff4b39ef),
                 ),
                 child: Text(
                   'Save',

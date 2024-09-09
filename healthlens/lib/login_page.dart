@@ -27,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   String _userName = '';
   String _email = ''; // Add this to store the email
   bool _isChangingAccount = false;
+  bool _changeAccountPressed = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pincodeController = TextEditingController();
 
@@ -66,10 +67,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     _emailController.text = _email;
     String email = _emailController.text;
     String pincode = _pincodeController.text;
     User? user = await _authService.signInWithEmailAndPincode(email, pincode);
+
     print(_email);
     print('_email');
 
@@ -79,16 +83,16 @@ class _LoginPageState extends State<LoginPage> {
     print(_emailController.text);
     print('emailC');
     print(user);
+
     if (user != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('email', email); // Save the email locally
+      //await prefs.setString('email', email); // Save the email locally
       await prefs.setString(
-          'userName', user.displayName ?? ''); // Save the username locally
+          'userName', user.email ?? ''); // Save the username locally
 
       setState(() {
-        _userName = user.displayName ?? '';
         _isChangingAccount = false;
       });
+      await prefs.setString('currentEmail', email); // Save the email locally
 
       Navigator.pushReplacement(
         context,
@@ -163,48 +167,53 @@ class _LoginPageState extends State<LoginPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          TextButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                _isChangingAccount = !_isChangingAccount;
-                                if (!_isChangingAccount) {
-                                  _emailController.text = _email;
-                                } else {
-                                  _emailController.clear();
-                                }
-                                print(_email);
-                                print(_emailController.text);
-                              });
-                            },
-                            label: Text(
-                              'Change Account',
-                              style: GoogleFonts.urbanist(
-                                color: Colors.black,
-                                fontSize: 12.0,
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            icon: FaIcon(
-                              FontAwesomeIcons.exchangeAlt,
-                              color: Color(0xFF101213),
-                              size: 11.0,
-                            ),
-                            style: ButtonStyle(
-                              side: MaterialStatePropertyAll(
-                                BorderSide(
-                                  color: Color(0xFFE0E3E7),
-                                  width: 1.0,
+                          Visibility(
+                            visible: _changeAccountPressed,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _isChangingAccount = !_isChangingAccount;
+                                  _changeAccountPressed = false;
+                                  if (!_isChangingAccount) {
+                                    _emailController.text = _email;
+                                  } else {
+                                    _email = '';
+                                  }
+                                  print(_email);
+                                  print(_emailController.text);
+                                });
+                              },
+                              label: Text(
+                                'Change Account',
+                                style: GoogleFonts.urbanist(
+                                  color: Colors.black,
+                                  fontSize: 12.0,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              shape: MaterialStateProperty.all<OutlinedBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      50.0), // Set the desired border radius
-                                ),
+                              icon: FaIcon(
+                                FontAwesomeIcons.exchangeAlt,
+                                color: Color(0xFF101213),
+                                size: 11.0,
                               ),
-                              padding: MaterialStateProperty.all<EdgeInsets>(
-                                EdgeInsets.fromLTRB(15, 10, 15, 10),
+                              style: ButtonStyle(
+                                side: MaterialStatePropertyAll(
+                                  BorderSide(
+                                    color: Color(0xFFE0E3E7),
+                                    width: 1.0,
+                                  ),
+                                ),
+                                shape:
+                                    MaterialStateProperty.all<OutlinedBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        50.0), // Set the desired border radius
+                                  ),
+                                ),
+                                padding: MaterialStateProperty.all<EdgeInsets>(
+                                  EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                ),
                               ),
                             ),
                           ),

@@ -118,12 +118,14 @@ Future<bool> signUp(
     // Update the user's profile with the username
     await userCredential.user?.updateDisplayName(username);
 
+    String initial = mName[0].toUpperCase();
     currentUser = userCredential.user;
     currentUserDoc =
         FirebaseFirestore.instance.collection('user').doc(currentUser!.uid);
     await currentUserDoc?.set({
       'firstName': fName,
       'middleName': mName,
+      'middleInitial': initial,
       'lastName': lName,
       'bmi': bmi,
       'age': age,
@@ -150,6 +152,8 @@ Future<bool> signUp(
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userName', currentUser?.displayName ?? 'No user');
     await prefs.setString('firstName', data['firstName']);
+
+    await prefs.setString('middleInitial', initial);
     await prefs.setString('middleName', data['middleName']);
     await prefs.setString('lastName', data['lastName']);
     await prefs.setString('userFullName', data['name']);
