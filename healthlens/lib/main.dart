@@ -18,7 +18,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'backend_firebase/auth.dart';
 import 'healthProfile.dart';
 
-User? currentUser;
 User? thisUser;
 String? userUid;
 
@@ -48,6 +47,7 @@ File? profileImageUrl;
 String? currentUserEmail;
 String? currentUserPincode;
 double? desiredBodyWeight;
+
 var url;
 
 void saveData() async {
@@ -74,6 +74,7 @@ void saveData() async {
   //profileImageUrl = prefs.getString('profileImageUrl') ?? '';
   currentUserEmail = prefs.getString('currentUserEmail') ?? '';
   currentUserPincode = prefs.getString('currentUserPincode') ?? '';
+  desiredBodyWeight = prefs.getDouble('desiredBW') ?? 0.0;
 }
 
 void main() async {

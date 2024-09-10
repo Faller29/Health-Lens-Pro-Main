@@ -38,6 +38,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> fromSignOut(String email, String username) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    email = prefs.getString('email')!; // Load the saved email
+
     _email = email;
     _userName = username;
   }

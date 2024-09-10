@@ -54,6 +54,7 @@ class _HomePage extends State<HomePage> {
   void initState() {
     super.initState();
     fetchImageUrl();
+    print(thisUser!.uid);
   }
 
   Future<void> fetchImageUrl() async {
@@ -102,7 +103,7 @@ class _HomePage extends State<HomePage> {
                 ],
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.max,
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
@@ -111,15 +112,11 @@ class _HomePage extends State<HomePage> {
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               14.0, 0.0, 14.0, 0.0),
-                          child: Container(
-                            width: 70.0,
-                            height: 70.0,
-                            clipBehavior: Clip.antiAlias,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(50.0),
                             child: url != null
                                 ? CachedNetworkImage(
+                                    key: ValueKey(url),
                                     imageUrl: url,
                                     placeholder: (context, url) =>
                                         CircularProgressIndicator(),
@@ -131,7 +128,7 @@ class _HomePage extends State<HomePage> {
                                   )
                                 : Icon(
                                     Icons.account_circle,
-                                    size: 70,
+                                    size: 60,
                                     color: Colors.grey,
                                   ),
                           ),
@@ -144,13 +141,19 @@ class _HomePage extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                userFullName.split(" ").first,
-                                style: GoogleFonts.readexPro(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: MediaQuery.of(context)
-                                      .textScaler
-                                      .scale(20),
+                              Container(
+                                width:
+                                    (0.35 * MediaQuery.sizeOf(context).width),
+                                child: Text(
+                                  userFullName.split(" ").first,
+
+                                  style: GoogleFonts.readexPro(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: MediaQuery.of(context)
+                                        .textScaler
+                                        .scale(20),
+                                  ),
+                                  //textScaler: TextScaler.linear(1),
                                 ),
                               ),
                               Text(

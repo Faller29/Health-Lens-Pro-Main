@@ -78,7 +78,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<String> _uploadProfilePicture(File imageFile) async {
     try {
-      final String userId = userUid!;
+      final String userId = thisUser!.uid;
       final userRef = _storage.ref().child('users/$userId/profile.jpg');
 
       final uploadTask = userRef.putFile(imageFile);
@@ -87,7 +87,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
       final downloadURL = await snapshot.ref.getDownloadURL();
       print('Upload successful, download URL: $downloadURL');
-
+      print(userId);
       return downloadURL;
     } catch (e) {
       print('Error uploading image: $e');

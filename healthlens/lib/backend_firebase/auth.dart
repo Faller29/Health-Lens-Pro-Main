@@ -22,20 +22,48 @@ class Auth {
         password: pincode,
       );
 
-      currentUser = userCredential.user;
+      thisUser = userCredential.user;
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('currentUser', currentUser!.uid.toString());
+      await prefs.setString('currentUser', thisUser!.uid.toString());
       userUid = prefs.getString('currentUser')!;
 
       await prefs.setString('currentUserEmail', email);
       await prefs.setString('currentUserPincode', pincode);
 
-      if (currentUser != null) {
-        await _saveUserDetails(
-            currentUser?.displayName ?? 'Unknown User', email);
+      if (thisUser != null) {
+        await _saveUserDetails(thisUser?.displayName ?? 'Unknown User', email);
       }
+
+      final currentUserInfo =
+          await db.collection("user").doc(thisUser?.uid).get();
+      final data = currentUserInfo.data() as Map<String, dynamic>;
+      await prefs.setString('userName', thisUser?.displayName ?? 'No user');
+      await prefs.setString('firstName', data['firstName']);
+      await prefs.setString('middleInitial', data['middleInitial']);
+      await prefs.setString('middleName', data['middleName']);
+      await prefs.setString('lastName', data['lastName']);
+      await prefs.setString('userFullName', data['name']);
+      await prefs.setInt('age', data['age']);
+      await prefs.setString('gender', data['sex']);
+      await prefs.setInt('TER', data['TER']);
+      await prefs.setDouble('height', data['height']);
+      await prefs.setDouble('weight', data['weight']);
+      await prefs.setInt('phoneNumber', data['phoneNumber']);
+      await prefs.setInt('gramCarbs', data['reqCarbs']);
+      await prefs.setInt('gramProtein', data['reqProtein']);
+      await prefs.setInt('gramFats', data['reqFats']);
+      await prefs.setString('physicalActivity', data['lifestyle']);
+      await prefs.setString('userBMI', data['bmi']);
+      await prefs.setStringList(
+          'chronicDisease', data['chronicDisease'].cast<String>());
+      await prefs.setString('email', email);
+      await prefs.setDouble('desiredBW', data['desiredBodyWeight']);
+      await prefs.setString('lifestyle', data['lifestyle']);
+
+      // Sign up successful
+      saveData();
       print('success Log in');
-      return currentUser;
+      return thisUser;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
@@ -54,7 +82,7 @@ class Auth {
     await prefs.remove('currentUserEmail');
 
     await prefs.remove('currentUserPincode');
-
+    thisUser = null;
     currentUserEmail = '';
     currentUserPincode = '';
     print('signedOut');
@@ -67,11 +95,10 @@ class Auth {
     await prefs.setString('userEmail', email);
 
     final currentUserInfo =
-        await db.collection("user").doc(currentUser?.uid).get();
-    final userId = currentUser!.uid;
+        await db.collection("user").doc(thisUser?.uid).get();
+    final userId = thisUser!.uid;
 
     final data = currentUserInfo.data() as Map<String, dynamic>;
-
     await prefs.setString('firstName', data['firstName']);
     await prefs.setString('middleName', data['middleName']);
     await prefs.setString('middleInitial', data['middleInitial']);
@@ -93,6 +120,7 @@ class Auth {
     //await prefs.setString('profileImageUrl', data['profileImageUrl']);
     //profileImageUrl = data['profileImageUrl'];
     chronicDisease = prefs.getStringList('chronicDisease');
+    await prefs.setString('lifestyle', data['lifestyle']);
 
     try {
       final userRef =

@@ -10,23 +10,27 @@ class EmailAlreadyInUseException implements Exception {}
 
 //roundUp to the nearest 50 and hundreds for calorie
 int roundUp50s(int number) {
-  if (number % 50 == 0) {
-    return number; // Already divisible by 50, return the number itself.
-  } else if (number % 100 > 50) {
-    return (number ~/ 100 + 1) * 100; // Round up to the nearest 100.
+  int remainder = number % 50;
+
+  if (remainder == 0) {
+    return number; // Already a multiple of 50, return the number itself.
+  } else if (remainder < 25) {
+    return number - remainder; // Round down to the nearest multiple of 50.
   } else {
-    return (number ~/ 50 + 1) * 50; // Round up to the nearest 50.
+    return number + (50 - remainder); // Round up to the nearest multiple of 50.
   }
 }
 
 //roundUp to the nearest 5 and hundreds for macronutrients
 int roundUp5s(int number) {
-  if (number % 5 == 0) {
-    return number; // Already divisible by 5, return the number itself.
-  } else if (number % 10 > 5) {
-    return (number ~/ 10 + 1) * 10; // Round up to the nearest 10.
+  int remainder = number % 5;
+
+  if (remainder == 0) {
+    return number; // Already a multiple of 5, return the number itself.
+  } else if (remainder < 3) {
+    return number - remainder; // Round down to the nearest multiple of 5.
   } else {
-    return (number ~/ 5 + 1) * 5; // Round up to the nearest 5.
+    return number + (5 - remainder); // Round up to the nearest multiple of 5.
   }
 }
 
@@ -111,18 +115,24 @@ Future<bool> signUp(
   double doubleCarbs = 0, doubleProtein = 0, doubleFats = 0;
 
   //required TER per chronic disease
-  for (String chronic in chronicDisease) {
-    if (chronic == 'Diabetes [Type 1 & 2]' || chronic == 'Obesity') {
-      carbs = (TER! * 0.55).round();
-      protein = (TER! * 0.20).round();
-      fats = (TER! * 0.25).round();
-    } else if (chronic == 'Hypertension') {
-      carbs = (TER! * 0.60).round();
-      protein = (TER! * 0.15).round();
-      fats = (TER! * 0.25).round();
-    } else {
-      print('Error determining');
-    }
+  if (chronicDisease.length == 1 && chronicDisease.contains('Hypertension')) {
+    carbs = (TER! * 0.60).round();
+    protein = (TER! * 0.15).round();
+    fats = (TER! * 0.25).round();
+  } else if (chronicDisease.length == 2 &&
+      chronicDisease.contains('Obesity') &&
+      chronicDisease.contains('Hypertension')) {
+    carbs = (TER! * 0.60).round();
+    protein = (TER! * 0.15).round();
+    fats = (TER! * 0.25).round();
+  } else if (chronicDisease.length == 0) {
+    carbs = (TER! * 0.60).round();
+    protein = (TER! * 0.15).round();
+    fats = (TER! * 0.25).round();
+  } else {
+    carbs = (TER! * 0.55).round();
+    protein = (TER! * 0.20).round();
+    fats = (TER! * 0.25).round();
   }
 
   //required daily grams of macronutrients
@@ -151,9 +161,9 @@ Future<bool> signUp(
     await userCredential.user?.updateDisplayName(username);
 
     String initial = mName[0].toUpperCase();
-    currentUser = userCredential.user;
+    thisUser = userCredential.user;
     currentUserDoc =
-        FirebaseFirestore.instance.collection('user').doc(currentUser!.uid);
+        FirebaseFirestore.instance.collection('user').doc(thisUser!.uid);
     await currentUserDoc?.set({
       'fullName': fullName,
       'firstName': fName,
@@ -177,13 +187,14 @@ Future<bool> signUp(
       'gramCarbs': gCarbs,
       'gramProtein': gProtein,
       'gramFats': gFats,
+      'desiredBodyWeight': desiredBodyWeight,
     });
 
     final currentUserInfo =
-        await db.collection("user").doc(currentUser?.uid).get();
+        await db.collection("user").doc(thisUser?.uid).get();
     final data = currentUserInfo.data() as Map<String, dynamic>;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userName', currentUser?.displayName ?? 'No user');
+    await prefs.setString('userName', thisUser?.displayName ?? 'No user');
     await prefs.setString('firstName', data['firstName']);
 
     await prefs.setString('middleInitial', initial);
@@ -201,10 +212,10 @@ Future<bool> signUp(
     await prefs.setInt('gramFats', data['reqFats']);
     await prefs.setString('physicalActivity', data['lifestyle']);
     await prefs.setString('userBMI', data['bmi']);
-    await prefs.setString('userBMI', data['bmi']);
     await prefs.setStringList(
         'chronicDisease', data['chronicDisease'].cast<String>());
     await prefs.setString('email', email);
+    await prefs.setDouble('desiredBW', data['desiredBodyWeight']);
 
     // Sign up successful
     saveData();

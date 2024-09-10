@@ -39,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     fetchImageUrl(); // Fetch the image URL when the widget is created
+    print(thisUser!.uid);
   }
 
   Future<void> fetchImageUrl() async {
@@ -147,10 +148,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: Color(0xFF14181B),
                                   fontSize: MediaQuery.of(context)
                                       .textScaler
-                                      .scale(20),
+                                      .scale(15),
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.w500,
                                 ),
+                                //textScaler: TextScaler.linear(1.3),
                               ),
                               Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
