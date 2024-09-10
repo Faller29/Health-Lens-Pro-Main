@@ -7,6 +7,7 @@ import 'package:healthlens/backend_firebase/firestore_provider.dart';
 import 'package:healthlens/calendar_history.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/firebase_options.dart';
+import 'package:healthlens/healthProfile.dart';
 import 'package:healthlens/userProfile.dart';
 import 'package:provider/provider.dart';
 import 'login_page.dart';
@@ -15,9 +16,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'backend_firebase/auth.dart';
+import 'healthProfile.dart';
 
 User? currentUser;
+User? thisUser;
 String? userUid;
+
 DocumentReference? currentUserDoc;
 final db = FirebaseFirestore.instance;
 String userFullName = '';
@@ -43,6 +47,7 @@ String? middleInitial;
 File? profileImageUrl;
 String? currentUserEmail;
 String? currentUserPincode;
+double? desiredBodyWeight;
 var url;
 
 void saveData() async {
@@ -82,7 +87,6 @@ void main() async {
 
   currentUserEmail = prefs.getString('currentUserEmail') ?? '';
   currentUserPincode = prefs.getString('currentUserPincode') ?? '';
-
   runApp(MyApp());
 
   // Enable offline persistence
@@ -134,6 +138,7 @@ class MyApp extends StatelessWidget {
             EntryPoint(pageController: PageController()),
         '/calendar': (context) => CalendarScreen(),
         '/editUser': (context) => UserProfilePage(),
+        '/editHealth': (context) => healthProfile(),
       },
     );
   }
@@ -170,70 +175,86 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Assuming your Auth class is defined in a separate file
 class Auth {
   Future<bool> isLoggedIn() async {
-    // Implement your logic to check if the user is logged in
-    // For example, you might check the Firebase authentication state
     User? user = FirebaseAuth.instance.currentUser;
+
     if (user != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      thisUser = user;
 
-      final theUser = await db.collection("user").doc(user?.uid).get();
-      final thisUserUid = user.uid;
-      final data = theUser.data() as Map<String, dynamic>;
+      print(thisUser);
+      print(thisUser?.uid);
+    }
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+        if (user != null) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      await prefs.setString('firstName', data['firstName']);
-      await prefs.setString('middleName', data['middleName']);
-      await prefs.setString('middleInitial', data['middleInitial']);
-      await prefs.setString('lastName', data['lastName']);
-      await prefs.setString('userFullName', data['name']);
-      await prefs.setInt('age', data['age']);
-      await prefs.setString('gender', data['sex']);
-      await prefs.setInt('TER', data['TER']);
-      await prefs.setDouble('height', data['height']);
-      await prefs.setDouble('weight', data['weight']);
-      await prefs.setInt('phoneNumber', data['phoneNumber']);
-      await prefs.setInt('gramCarbs', data['reqCarbs']);
-      await prefs.setInt('gramProtein', data['reqProtein']);
-      await prefs.setInt('gramFats', data['reqFats']);
-      await prefs.setString('physicalActivity', data['lifestyle']);
-      await prefs.setString('userBMI', data['bmi']);
-      await prefs.setStringList(
-          'chronicDisease', data['chronicDisease'].cast<String>());
+          final theUser = await db.collection("user").doc(user?.uid).get();
+          final thisUserUid = user.uid;
+          final data = theUser.data() as Map<String, dynamic>;
 
-      try {
-        final userRef =
-            FirebaseStorage.instance.ref().child('users/$userUid/profile.jpg');
-        url = await userRef.getDownloadURL();
-      } catch (e) {
-        // If the download URL is not found or any error occurs, set url to an empty string
-        url = null;
+          await prefs.setString('firstName', data['firstName']);
+          await prefs.setString('middleName', data['middleName']);
+          await prefs.setString('middleInitial', data['middleInitial']);
+          await prefs.setString('lastName', data['lastName']);
+          await prefs.setString('userFullName', data['name']);
+          await prefs.setInt('age', data['age']);
+          await prefs.setString('gender', data['sex']);
+          await prefs.setInt('TER', data['TER']);
+          await prefs.setDouble('height', data['height']);
+          await prefs.setDouble('weight', data['weight']);
+          await prefs.setInt('phoneNumber', data['phoneNumber']);
+          await prefs.setInt('gramCarbs', data['reqCarbs']);
+          await prefs.setInt('gramProtein', data['reqProtein']);
+          await prefs.setInt('gramFats', data['reqFats']);
+          await prefs.setString('physicalActivity', data['lifestyle']);
+          await prefs.setString('userBMI', data['bmi']);
+          await prefs.setStringList(
+              'chronicDisease', data['chronicDisease'].cast<String>());
+
+          try {
+            final userRef = FirebaseStorage.instance
+                .ref()
+                .child('users/$thisUserUid/profile.jpg');
+            url = await userRef.getDownloadURL();
+            print(thisUserUid);
+          } catch (e) {
+            // If the download URL is not found or any error occurs, set url to an empty string
+            url = null;
+          }
+          print(url);
+
+          chronicDisease = prefs.getStringList('chronicDisease');
+          userFullName = prefs.getString('userFullName') ?? '';
+          age = prefs.getInt('age') ?? 0;
+          gender = prefs.getString('gender') ?? '';
+          email = prefs.getString('userEmail') ?? '';
+          TER = prefs.getInt('TER') ?? 0;
+          lifestyle = prefs.getString('lifestyle') ?? '';
+          height = prefs.getDouble('height') ?? 0.0;
+          weight = prefs.getDouble('weight') ?? 0.0;
+          phoneNumber = prefs.getInt('phoneNumber') ?? 0;
+          gramCarbs = prefs.getInt('gramCarbs') ?? 0;
+          gramProtein = prefs.getInt('gramProtein') ?? 0;
+          gramFats = prefs.getInt('gramFats') ?? 0;
+          physicalActivity = prefs.getString('physicalActivity') ?? '';
+          userBMI = prefs.getString('userBMI') ?? '';
+          chronicDisease = prefs.getStringList('chronicDisease');
+          firstName = prefs.getString('firstName') ?? '';
+          middleName = prefs.getString('middleName') ?? '';
+          lastName = prefs.getString('lastName') ?? '';
+          middleInitial = prefs.getString('middleInitial') ?? '';
+          //profileImageUrl = prefs.getString('profileImageUrl') ?? '';
+          currentUserEmail = prefs.getString('currentUserEmail') ?? '';
+          currentUserPincode = prefs.getString('currentUserPincode') ?? '';
+        }
       }
-
-      chronicDisease = prefs.getStringList('chronicDisease');
-      userFullName = prefs.getString('userFullName') ?? '';
-      age = prefs.getInt('age') ?? 0;
-      gender = prefs.getString('gender') ?? '';
-      email = prefs.getString('userEmail') ?? '';
-      TER = prefs.getInt('TER') ?? 0;
-      lifestyle = prefs.getString('lifestyle') ?? '';
-      height = prefs.getDouble('height') ?? 0.0;
-      weight = prefs.getDouble('weight') ?? 0.0;
-      phoneNumber = prefs.getInt('phoneNumber') ?? 0;
-      gramCarbs = prefs.getInt('gramCarbs') ?? 0;
-      gramProtein = prefs.getInt('gramProtein') ?? 0;
-      gramFats = prefs.getInt('gramFats') ?? 0;
-      physicalActivity = prefs.getString('physicalActivity') ?? '';
-      userBMI = prefs.getString('userBMI') ?? '';
-      chronicDisease = prefs.getStringList('chronicDisease');
-      firstName = prefs.getString('firstName') ?? '';
-      middleName = prefs.getString('middleName') ?? '';
-      lastName = prefs.getString('lastName') ?? '';
-      middleInitial = prefs.getString('middleInitial') ?? '';
-      //profileImageUrl = prefs.getString('profileImageUrl') ?? '';
-      currentUserEmail = prefs.getString('currentUserEmail') ?? '';
-      currentUserPincode = prefs.getString('currentUserPincode') ?? '';
+    } on SocketException catch (_) {
+      print('not connected');
+      saveData();
     }
     return user != null;
   }

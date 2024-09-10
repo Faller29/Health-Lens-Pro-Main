@@ -57,9 +57,12 @@ class _HomePage extends State<HomePage> {
   }
 
   Future<void> fetchImageUrl() async {
+    final thisUserUid = thisUser?.uid;
+
     try {
-      final userRef =
-          FirebaseStorage.instance.ref().child('users/$userUid/profile.jpg');
+      final userRef = FirebaseStorage.instance
+          .ref()
+          .child('users/$thisUserUid/profile.jpg');
       String updatedUrl = await userRef.getDownloadURL();
 
       // Append a timestamp or random string to the URL to break the cache

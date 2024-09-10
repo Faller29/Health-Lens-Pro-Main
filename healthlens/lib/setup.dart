@@ -134,6 +134,7 @@ class _SetupPageState extends State<SetupPage> {
       print(_currentPageIndex);
     } else if (_currentPageIndex == 4) {
       try {
+        print('try to sign up');
         bool signUpSuccess = await signUp(
           username!,
           email!,
@@ -149,6 +150,7 @@ class _SetupPageState extends State<SetupPage> {
           phoneNumber,
           chronicDisease,
         );
+        print('try to sign up1');
         if (signUpSuccess) {
           Navigator.pushAndRemoveUntil(
             context,

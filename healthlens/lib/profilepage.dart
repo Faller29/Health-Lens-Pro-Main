@@ -42,9 +42,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> fetchImageUrl() async {
+    final thisUserUid = thisUser?.uid;
     try {
-      final userRef =
-          FirebaseStorage.instance.ref().child('users/$userUid/profile.jpg');
+      final userRef = FirebaseStorage.instance
+          .ref()
+          .child('users/$thisUserUid/profile.jpg');
       String updatedUrl = await userRef.getDownloadURL();
 
       // Append a timestamp or random string to the URL to break the cache
@@ -281,40 +283,43 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.circular(12.0),
                     shape: BoxShape.rectangle,
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Icon(
-                          Icons.health_and_safety_outlined,
-                          color: Color(0xFF57636C),
-                          size: 24.0,
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                12.0, 0.0, 0.0, 0.0),
-                            child: Text(
-                              'Edit Health Profile',
-                              style: GoogleFonts.readexPro(
-                                color: Color(0xFF14181B),
-                                fontSize: 16.0,
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.normal,
+                  child: GestureDetector(
+                    onTap: () => {Navigator.pushNamed(context, '/editHealth')},
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Icon(
+                            Icons.health_and_safety_outlined,
+                            color: Color(0xFF57636C),
+                            size: 24.0,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  12.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                'Edit Health Profile',
+                                style: GoogleFonts.readexPro(
+                                  color: Color(0xFF14181B),
+                                  fontSize: 16.0,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Align(
-                          alignment: AlignmentDirectional(0.9, 0.0),
-                          child: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Color(0xFF57636C),
-                            size: 18.0,
+                          Align(
+                            alignment: AlignmentDirectional(0.9, 0.0),
+                            child: Icon(
+                              Icons.arrow_forward_ios,
+                              color: Color(0xFF57636C),
+                              size: 18.0,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

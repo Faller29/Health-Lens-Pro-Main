@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crea_radio_button/crea_radio_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:healthlens/entry_point.dart';
@@ -9,28 +11,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({super.key});
+class healthProfile extends StatefulWidget {
+  const healthProfile({super.key});
 
   @override
-  State<UserProfilePage> createState() => _UserProfilePageState();
+  State<healthProfile> createState() => _healthProfile();
 }
 
-class _UserProfilePageState extends State<UserProfilePage> {
+class _healthProfile extends State<healthProfile> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseStorage _storage = FirebaseStorage.instance;
-
-  // Initial profile image URL
-  String _profileImageUrl = '';
-  File? _profileImage;
-  final ImagePicker _picker = ImagePicker();
 
   // Controllers for the form fields
   final TextEditingController _fNameController = TextEditingController();
   final TextEditingController _mNameController = TextEditingController();
   final TextEditingController _lNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-
+  String? lifeStyle;
+  List<String> chronicDisease = [];
+  List<Map> categories = [
+    {"name": "Diabetes [Type 1 & 2]", "isChecked": false},
+    {"name": "Hypertension", "isChecked": false},
+    {"name": "Obesity", "isChecked": false},
+  ];
   @override
   void initState() {
     super.initState();
@@ -38,23 +41,78 @@ class _UserProfilePageState extends State<UserProfilePage> {
     _mNameController.text = middleName!;
     _lNameController.text = lastName!;
     _ageController.text = age.toString();
-
-    _loadProfilePicture();
+    _loadChronicDiseasesFromFirestore();
+    fetchPhysicalLifestyle();
   }
 
-  Future<void> _loadProfilePicture() async {
-    final thisUserUid = thisUser?.uid;
+  int getPreSelectedIndex(String lifeStyle) {
+    switch (lifeStyle) {
+      case "Sedentary":
+        print('0S');
+        return 0;
+      case "Light":
+        print('1S');
+
+        return 1;
+      case "Moderate":
+        print('2S');
+
+        return 2;
+      case "Vigorous":
+        print('3S');
+
+        return 3;
+      default:
+        print('0');
+
+        return 0; // Default to first option if not found
+    }
+  }
+
+  Future<void> fetchPhysicalLifestyle() async {
+    String userId = thisUser!.uid;
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection('user').doc(userId).get();
+
+    if (userDoc.exists) {
+      setState(() {
+        lifeStyle = userDoc['lifestyle'];
+        print('this' + lifeStyle!);
+      });
+    }
+  }
+
+  Future<void> _loadChronicDiseasesFromFirestore() async {
+    String userId = thisUser!.uid;
 
     try {
-      final ref = _storage.ref().child('users/$thisUserUid/profile.jpg');
-      final profileImageUrl = await ref.getDownloadURL();
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('user').doc(userId).get();
+
+      // Assume the chronic diseases are stored as a list in Firestore
+      List<dynamic> fetchedDiseases = userDoc.get('chronicDisease');
 
       setState(() {
-        _profileImageUrl = profileImageUrl;
+        chronicDisease = List<String>.from(fetchedDiseases);
+
+        // Update the checkbox list based on the fetched data
+        for (var category in categories) {
+          if (chronicDisease.contains(category['name'])) {
+            category['isChecked'] = true;
+          }
+        }
       });
     } catch (e) {
-      print('Error loading profile picture: $e');
+      print('Error fetching chronic diseases: $e');
     }
+  }
+
+  void getCheckedDiseases() {
+    chronicDisease = categories
+        .where((disease) => disease['isChecked'] == true)
+        .map((disease) => disease['name'].toString())
+        .toList();
+    // Save the updated diseases list to Firestore if needed
   }
 
   @override
@@ -66,35 +124,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<String> _uploadProfilePicture(File imageFile) async {
-    try {
-      final String userId = userUid!;
-      final userRef = _storage.ref().child('users/$userId/profile.jpg');
-
-      final uploadTask = userRef.putFile(imageFile);
-
-      final snapshot = await uploadTask.whenComplete(() => null);
-
-      final downloadURL = await snapshot.ref.getDownloadURL();
-      print('Upload successful, download URL: $downloadURL');
-
-      return downloadURL;
-    } catch (e) {
-      print('Error uploading image: $e');
-      rethrow;
-    }
-  }
-
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -103,21 +132,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
         lastName = _lNameController.text;
         age = int.parse(_ageController.text);
       });
-
-      if (_profileImage != null) {
-        try {
-          final downloadURL = await _uploadProfilePicture(_profileImage!);
-          setState(() {
-            _profileImageUrl = downloadURL;
-          });
-
-          print('Profile picture uploaded successfully!');
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error uploading profile picture: $e')),
-          );
-        }
-      }
 
       // Update Firestore with profile information
       try {
@@ -138,16 +152,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
           'lastName': _lNameController.text,
           'middleInitial': initial,
           'age': int.parse(_ageController.text),
-          'profileImageUrl': _profileImageUrl,
+          'chronicDisease': chronicDisease,
         });
+
         await prefs.setString('userFullName', userFullname);
         await prefs.setString('firstName', _fNameController.text);
         await prefs.setString('middleName', _mNameController.text);
         await prefs.setString('middleInitial', initial);
-
         await prefs.setString('lastName', _lNameController.text);
         await prefs.setInt('age', int.parse(_ageController.text));
-        await prefs.setString('profileImageUrl', _profileImageUrl);
+
         saveData();
 
         // Show success message for Firestore update
@@ -170,64 +184,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(0),
         child: Form(
           key: _formKey,
           child: ListView(
+            padding: EdgeInsets.all(16),
             children: [
-              Column(
-                children: [
-                  CircleAvatar(
-                    radius: 75,
-                    backgroundColor: Color(0xff4b39ef),
-                    child: _profileImage != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: Image.file(
-                              _profileImage!,
-                              width: 140,
-                              height: 140,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                        : _profileImageUrl.isNotEmpty
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(100),
-                                child: CachedNetworkImage(
-                                  imageUrl: _profileImageUrl,
-                                  placeholder: (context, url) =>
-                                      CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      Icon(Icons.error),
-                                  fit: BoxFit.cover,
-                                  width: 140,
-                                  height: 140,
-                                ),
-                              )
-                            : Icon(
-                                Icons.account_circle,
-                                size: 110,
-                                color: Colors.grey,
-                              ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _pickImage,
-                    style: ElevatedButton.styleFrom(
-                      //padding: EdgeInsets.symmetric(vertical: 14.0),
-                      backgroundColor: Color(0xff4b39ef),
-                    ),
-                    child: Text(
-                      'Change Profile',
-                      style: GoogleFonts.readexPro(
-                        fontSize: 14.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
               TextFormField(
                 controller: _fNameController,
                 decoration: InputDecoration(
@@ -290,6 +254,99 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   }
                   return null;
                 },
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Material(
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(color: Colors.black, width: 1),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Chronic Disease:',
+                          style: GoogleFonts.readexPro(
+                              fontSize: 18.0, fontWeight: FontWeight.bold),
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: categories.map((disease) {
+                            return CheckboxListTile(
+                              title: Text(disease['name']),
+                              checkboxShape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              value: disease['isChecked'],
+                              onChanged: (val) {
+                                setState(() {
+                                  disease['isChecked'] = val;
+                                  getCheckedDiseases();
+                                  print(
+                                      '${disease['name']} isChecked: ${disease['isChecked']}');
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              Material(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Colors.black, width: 1),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      child: Text(
+                        'Physical Lifestyle: ',
+                        style: GoogleFonts.readexPro(
+                            fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    RadioButtonGroup(
+                        multilineNumber: 2,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        spaceBetween: 1,
+                        betweenMultiLines: 10,
+                        buttonHeight: 30,
+                        buttonWidth: 115,
+                        circular: true,
+                        textStyle: TextStyle(fontSize: 14, color: Colors.white),
+                        mainColor: Colors.grey,
+                        selectedColor: Color(0xff4b39ef),
+                        selectedBorderSide:
+                            BorderSide(width: 1, color: Color(0xff4b39ef)),
+                        preSelectedIdx: lifeStyle != null
+                            ? getPreSelectedIndex(lifeStyle!)
+                            : 2,
+                        options: [
+                          RadioOption("SEDENTARY", "Sedentary"),
+                          RadioOption("LIGHT", "Light"),
+                          RadioOption("MODERATE", "Moderate"),
+                          RadioOption("VIGOROUS", "Vigorous"),
+                        ],
+                        callback: (RadioOption val) {
+                          setState(() {
+                            lifeStyle = val.label;
+                            print(lifeStyle);
+                          });
+                        }),
+                    SizedBox(height: 10),
+                  ],
+                ),
               ),
               SizedBox(height: 30),
               ElevatedButton(

@@ -8,13 +8,32 @@ class WeakPasswordException implements Exception {}
 
 class EmailAlreadyInUseException implements Exception {}
 
-int roundToNearest50(int number) {
-  int remainder = number % 50;
-  if (remainder >= 25) {
-    return number + (50 - remainder);
+//roundUp to the nearest 50 and hundreds for calorie
+int roundUp50s(int number) {
+  if (number % 50 == 0) {
+    return number; // Already divisible by 50, return the number itself.
+  } else if (number % 100 > 50) {
+    return (number ~/ 100 + 1) * 100; // Round up to the nearest 100.
   } else {
-    return number - remainder;
+    return (number ~/ 50 + 1) * 50; // Round up to the nearest 50.
   }
+}
+
+//roundUp to the nearest 5 and hundreds for macronutrients
+int roundUp5s(int number) {
+  if (number % 5 == 0) {
+    return number; // Already divisible by 5, return the number itself.
+  } else if (number % 10 > 5) {
+    return (number ~/ 10 + 1) * 10; // Round up to the nearest 10.
+  } else {
+    return (number ~/ 5 + 1) * 5; // Round up to the nearest 5.
+  }
+}
+
+//getting desired body weight
+double desiredBW(double height) {
+  double dbWeight = (height - 100) - (.10 * (height - 100));
+  return dbWeight;
 }
 
 Future<bool> signUp(
@@ -35,6 +54,9 @@ Future<bool> signUp(
   //concatenating name
   String fullName = fName + " " + mName + " " + lName;
   print(fullName);
+
+  desiredBodyWeight = desiredBW(height);
+
   String strWeight = doubleWeight.toStringAsFixed(0);
   int weight = int.parse(strWeight);
 
@@ -76,21 +98,28 @@ Future<bool> signUp(
     default:
       PA = 0;
   }
+  print('object');
+  double thisTER = (desiredBodyWeight! * PA);
+  print(thisTER);
 
-  int TER = weight * PA;
+  String strThisTER = thisTER.toStringAsFixed(0);
+  int intTER = int.parse(strThisTER);
+  TER = roundUp50s(intTER);
+  print(TER);
+
   int carbs = 0, protein = 0, fats = 0;
   double doubleCarbs = 0, doubleProtein = 0, doubleFats = 0;
 
   //required TER per chronic disease
   for (String chronic in chronicDisease) {
     if (chronic == 'Diabetes [Type 1 & 2]' || chronic == 'Obesity') {
-      carbs = (TER * 0.55).round();
-      protein = (TER * 0.20).round();
-      fats = (TER * 0.25).round();
+      carbs = (TER! * 0.55).round();
+      protein = (TER! * 0.20).round();
+      fats = (TER! * 0.25).round();
     } else if (chronic == 'Hypertension') {
-      carbs = (TER * 0.60).round();
-      protein = (TER * 0.15).round();
-      fats = (TER * 0.25).round();
+      carbs = (TER! * 0.60).round();
+      protein = (TER! * 0.15).round();
+      fats = (TER! * 0.25).round();
     } else {
       print('Error determining');
     }
@@ -109,6 +138,9 @@ Future<bool> signUp(
   int gCarbs = int.parse(strCarbs);
   int gFats = int.parse(strFats);
   int gProtein = int.parse(strProtein);
+  gCarbs = roundUp5s(gCarbs);
+  gProtein = roundUp5s(gProtein);
+  gFats = roundUp5s(gFats);
 
   try {
     // Create a new user with email and password
@@ -123,6 +155,7 @@ Future<bool> signUp(
     currentUserDoc =
         FirebaseFirestore.instance.collection('user').doc(currentUser!.uid);
     await currentUserDoc?.set({
+      'fullName': fullName,
       'firstName': fName,
       'middleName': mName,
       'middleInitial': initial,
@@ -171,6 +204,8 @@ Future<bool> signUp(
     await prefs.setString('userBMI', data['bmi']);
     await prefs.setStringList(
         'chronicDisease', data['chronicDisease'].cast<String>());
+    await prefs.setString('email', email);
+
     // Sign up successful
     saveData();
     return true;
