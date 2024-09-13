@@ -50,23 +50,14 @@ class _healthProfile extends State<healthProfile> {
   int getPreSelectedIndex(String lifestyle) {
     switch (lifestyle) {
       case "Sedentary":
-        print('0S');
         return 0;
       case "Light":
-        print('1S');
-
         return 1;
       case "Moderate":
-        print('2S');
-
         return 2;
       case "Vigorous":
-        print('3S');
-
         return 3;
       default:
-        print('0');
-
         return 0; // Default to first option if not found
     }
   }
@@ -256,21 +247,30 @@ class _healthProfile extends State<healthProfile> {
         await prefs.setInt('gramCarbs', gCarbs);
         await prefs.setInt('gramProtein', gProtein);
         await prefs.setInt('gramFats', gFats);
-        await prefs.setString('physicalActivity', lifestyle!);
+        await prefs.setString('lifestyle', lifestyle!);
         await prefs.setString('userBMI', bmi);
         await prefs.setInt('TER', TER!);
         await prefs.setDouble('height', double.parse(_heightController.text));
         await prefs.setDouble('weight', double.parse(_weightController.text));
 
         saveData();
+        Navigator.of(context).pop();
 
         // Show success message for Firestore update
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated successfully in Firestore!')),
+          SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
+              content: Text('Profile updated successfully in Firestore!')),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating profile in Firestore: $e')),
+          SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
+              content: Text('Error updating profile in Firestore: $e')),
         );
       }
     }
@@ -417,7 +417,7 @@ class _healthProfile extends State<healthProfile> {
                         ],
                         callback: (RadioOption val) {
                           setState(() {
-                            // lifestyle = val.label;
+                            lifestyle = val.label;
                             print(val.label);
                             print(lifestyle);
                           });

@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:healthlens/camerapage.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/homepage.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 
 class FoodServing extends StatefulWidget {
@@ -10,23 +11,49 @@ class FoodServing extends StatefulWidget {
 }
 
 class _FoodServingState extends State<FoodServing> {
-  List<Map<String, dynamic>> foodItems = [
-    {'item': 'Item 1', 'quantity': 10},
-    {'item': 'Item 2', 'quantity': 3},
-    {'item': 'Item 2', 'quantity': 3},
+  List<Map<String, dynamic>> foodItems = [];
+  List<Map<String, dynamic>> _detectedItems = [];
 
-    {'item': 'Item 2', 'quantity': 3},
+  @override
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    {'item': 'Item 2', 'quantity': 3},
+    // Retrieve the detected items passed from CameraPage
+    final args = ModalRoute.of(context)?.settings.arguments
+        as List<Map<String, dynamic>>?;
+    if (args != null) {
+      setState(() {
+        _detectedItems = args;
+        // Process detected items to add them to foodItems
+        _processDetectedItems();
+      });
+    }
+  }
 
-    {'item': 'Item 2', 'quantity': 3},
+  void _processDetectedItems() {
+    final itemMap = <String, int>{};
 
-    {'item': 'Item 2', 'quantity': 3},
+    for (var item in _detectedItems) {
+      final label = item['tag'];
+      // Safely cast quantity to int
+      final quantity = (item['quantity'] is int)
+          ? item['quantity'] as int
+          : (item['quantity'] as num).toInt();
 
-    {'item': 'Item 2', 'quantity': 3},
+      if (itemMap.containsKey(label)) {
+        itemMap[label] = itemMap[label]! + quantity;
+      } else {
+        itemMap[label] = quantity;
+      }
+    }
 
-    // Add more items with desired quantities
-  ];
+    setState(() {
+      foodItems = itemMap.entries
+          .map((entry) => {'item': entry.key, 'quantity': entry.value})
+          .toList();
+    });
+  }
 
   void removeItem(int index) {
     setState(() {
@@ -52,95 +79,80 @@ class _FoodServingState extends State<FoodServing> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        color: Colors.white,
-        elevation: 50,
-        margin: const EdgeInsets.fromLTRB(20, 150, 20, 150),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Food Serving',
-                style: TextStyle(
-                  fontSize: 22.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Divider(
-                color: Colors.black,
-                indent: 50,
-                endIndent: 50,
-              ),
-              Expanded(
-                child: ListView.builder(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                  itemCount: foodItems.length,
-                  itemBuilder: (context, index) {
-                    final item = foodItems[index];
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 5, 10,
-                          5), // Adjust the vertical padding as needed
-                      child: Material(
-                        color: Colors.transparent,
-                        child: ListTile(
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.black, width: 1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          isThreeLine: true,
-                          leading: Icon(Icons.restaurant_menu_outlined),
-                          title: Text(item['item']),
-                          subtitle: Column(
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  IconButton(
-                                    icon:
-                                        const Icon(Icons.remove_circle_outline),
-                                    onPressed: () => decreaseQuantity(index),
-                                  ),
-                                  Text('${item['quantity']}'),
-                                  IconButton(
-                                    icon: const Icon(Icons.add_circle_outline),
-                                    onPressed: () => increaseQuantity(index),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(IconlyLight.delete),
-                                    onPressed: () => removeItem(index),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Food Serving', style: GoogleFonts.readexPro(fontSize: 18)),
+        backgroundColor: Color(0xff4b39ef),
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                itemCount: foodItems.length,
+                itemBuilder: (context, index) {
+                  final item = foodItems[index];
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(color: Colors.black, width: 1),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        isThreeLine: true,
+                        leading: Icon(Icons.restaurant_menu_outlined),
+                        title: Text(item['item']),
+                        subtitle: Column(
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  onPressed: () => decreaseQuantity(index),
+                                ),
+                                Text('${item['quantity']}'),
+                                IconButton(
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  onPressed: () => increaseQuantity(index),
+                                ),
+                                IconButton(
+                                  icon: const Icon(IconlyLight.delete),
+                                  onPressed: () => removeItem(index),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 5.0), // Add a SizedBox at the bottom for spacing
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: Color(0xff4b39ef),
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  // Handle confirmation here
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => EntryPoint()),
+                    ),
                   );
                 },
-                child: Text('Confirm'),
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: 5.0),
+            ElevatedButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Color(0xff4b39ef),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                // Handle confirmation here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EntryPoint()),
+                );
+              },
+              child: Text('Confirm'),
+            ),
+          ],
         ),
       ),
     );

@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'dart:ui';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_vision/flutter_vision.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconly/iconly.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'foodServing.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -16,402 +13,313 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
-  CameraController? _cameraController;
-  List<CameraDescription>? _cameras;
-  bool _isCameraInitialized = false;
-  bool _isPermissionGranted = false;
-  Color detectionColor = Color(0xff4b39ef);
-  String detectionTitle = 'Start Detecting';
-  // Aspect ratio variable
-  late double _aspectRatio;
-  bool _isCameraStreaming = false;
+  late CameraController _cameraController;
+  late FlutterVision _flutterVision;
+  List<Map<String, dynamic>> _detections = [];
+  CameraImage? _cameraImage;
+  bool _isInitialized = false;
+  bool _isDetecting = false;
 
-  void _toggleCameraState() {
-    if (_cameraController != null && _cameraController!.value.isInitialized) {
-      setState(() {
-        _isCameraStreaming = !_isCameraStreaming; // Toggle the camera state
-      });
-
-      if (_isCameraStreaming) {
-        _cameraController!.startImageStream((CameraImage image) {
-          // Process the camera image here
-        });
-      } else {
-        // Check for streaming state before stopping
-        if (_isCameraStreaming) {
-          _cameraController!.stopImageStream();
-        }
-      }
-    }
-  }
+  // Track the detected objects with their counts
+  Map<String, int> _detectedObjectCounts = {};
 
   @override
   void initState() {
     super.initState();
-    _checkPermissionsAndInitializeCamera();
+    _flutterVision = FlutterVision();
+    _initializeCameraAndModel();
   }
 
-  Future<void> _checkPermissionsAndInitializeCamera() async {
-    // Check for camera permissions
-    PermissionStatus cameraStatus = await Permission.camera.status;
-    if (!cameraStatus.isGranted) {
-      cameraStatus = await Permission.camera.request();
-    }
+  Future<void> _initializeCameraAndModel() async {
+    final cameras = await availableCameras();
+    _cameraController = CameraController(cameras[0], ResolutionPreset.medium);
 
-    if (cameraStatus.isGranted) {
-      _isPermissionGranted = true;
-      await _initializeCamera();
-    } else {
-      // Handle the case when the user denies the permission
-      setState(() {
-        _isPermissionGranted = false;
-      });
-    }
-  }
+    await _cameraController.initialize();
+    await _flutterVision.loadYoloModel(
+      labels: 'assets/labels.txt',
+      modelPath: 'assets/model.tflite',
+      modelVersion: 'yolov8',
+      numThreads: 1,
+      useGpu: false,
+    );
 
-  Future<void> _initializeCamera() async {
-    _cameras = await availableCameras();
-    if (_cameras != null && _cameras!.isNotEmpty) {
-      _cameraController =
-          CameraController(_cameras![0], ResolutionPreset.ultraHigh);
-      await _cameraController!.initialize();
-      setState(() {
-        _isCameraInitialized = true;
-        final size = MediaQuery.of(context).size;
-        _aspectRatio = size.width / size.height;
-      });
-    }
+    setState(() {
+      _isInitialized = true;
+    });
   }
 
   @override
   void dispose() {
-    _cameraController
-        ?.stopImageStream(); // Stop the camera stream when disposing the widget
-    _cameraController?.dispose();
+    _cameraController.dispose();
+    _flutterVision.closeYoloModel();
     super.dispose();
+  }
+
+  void _toggleDetection() {
+    if (_isDetecting) {
+      _stopDetection();
+    } else {
+      _startDetection();
+    }
+  }
+
+  Future<void> _startDetection() async {
+    setState(() {
+      _isDetecting = true;
+    });
+
+    _cameraController.startImageStream((image) async {
+      if (_isDetecting) {
+        _cameraImage = image;
+        final results = await _flutterVision.yoloOnFrame(
+          bytesList: image.planes.map((plane) => plane.bytes).toList(),
+          imageHeight: image.height,
+          imageWidth: image.width,
+          iouThreshold: 0.4,
+          confThreshold: 0.4,
+          classThreshold: 0.5,
+        );
+
+        if (results.isNotEmpty) {
+          _updateDetectedObjectCounts(results);
+          setState(() {
+            _detections = results;
+          });
+        }
+      }
+    });
+  }
+
+  Future<void> _stopDetection() async {
+    setState(() {
+      _isDetecting = false;
+      _detections.clear();
+    });
+
+    await _cameraController.stopImageStream();
+  }
+
+  void _clearIngredients() {
+    setState(() {
+      _detectedObjectCounts.clear();
+      _detections.clear();
+    });
+  }
+
+  void _updateDetectedObjectCounts(List<Map<String, dynamic>> results) {
+    final newDetectedObjectCounts = <String, int>{};
+
+    for (var result in results) {
+      final label = result['tag'];
+      if (newDetectedObjectCounts.containsKey(label)) {
+        newDetectedObjectCounts[label] = newDetectedObjectCounts[label]! + 1;
+      } else {
+        newDetectedObjectCounts[label] = 1;
+      }
+    }
+
+    setState(() {
+      _detectedObjectCounts.addAll(newDetectedObjectCounts);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      Positioned.fill(
-        child: _isPermissionGranted
-            ? _isCameraInitialized
-                ? Center(
-                    child: AspectRatio(
-                      aspectRatio: _aspectRatio,
-                      child: CameraPreview(_cameraController!),
-                    ),
-                  )
-                : Center(
-                    child: CircularProgressIndicator(),
-                  )
-            : Center(
-                child: Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: Text(
-                  'Camera permission denied. To use this feature, Turn on Camera Permission',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.outfit(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              )),
-      ),
-      Positioned(
-        top: 110,
-        right: 0,
-        child: _isPermissionGranted
-            ? _isCameraInitialized
-                ? Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(
-                      14.0,
-                      0.0,
-                      14.0,
-                      0.0,
+    return Scaffold(
+      body: Stack(
+        children: [
+          if (_isInitialized)
+            Positioned.fill(
+              child: CameraPreview(_cameraController),
+            )
+          else
+            Center(child: CircularProgressIndicator()),
+          ..._displayDetectionResults(),
+          Positioned(
+            top: 110,
+            right: 0,
+            child: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(
+                14.0,
+                0.0,
+                14.0,
+                0.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 150.0,
+                    height: 300.0, // Adjust the height if needed
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1,
+                      ),
+                      shape: BoxShape.rectangle,
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 150.0,
-                          height: 300.0,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.4),
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1,
-                            ),
-                            shape: BoxShape.rectangle,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(8.0, 14.0, 8.0, 14.0),
-                                child: Text(
-                                  "Ingredients Detected",
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Padding(
-                                  padding:
-                                      EdgeInsets.fromLTRB(8.0, 14.0, 8.0, 14.0),
-                                  child: Column(
-                                    children: [
-                                      // Padding(
-                                      //   padding: EdgeInsets.all(8),
-                                      //   child: Row(
-                                      //     mainAxisAlignment:
-                                      //         MainAxisAlignment.spaceBetween,
-                                      //     crossAxisAlignment:
-                                      //         CrossAxisAlignment.start,
-                                      //     children: [
-                                      //       Text(
-                                      //         "Mango",
-                                      //         style: GoogleFonts.outfit(
-                                      //           fontSize: 12.0,
-                                      //           fontWeight: FontWeight.bold,
-                                      //           color: Colors.white,
-                                      //         ),
-                                      //         textAlign: TextAlign.center,
-                                      //       ),
-                                      //       Column(
-                                      //         crossAxisAlignment:
-                                      //             CrossAxisAlignment.end,
-                                      //         children: [
-                                      //           Row(
-                                      //             children: [
-                                      //               Text(
-                                      //                 "Protein",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //               Text(
-                                      //                 " - ",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //               Text(
-                                      //                 "3g",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //             ],
-                                      //           ),
-                                      //           Row(
-                                      //             children: [
-                                      //               Text(
-                                      //                 "Carbs",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //               Text(
-                                      //                 " - ",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //               Text(
-                                      //                 "50g",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //             ],
-                                      //           ),
-                                      //           Row(
-                                      //             children: [
-                                      //               Text(
-                                      //                 "Fats",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //               Text(
-                                      //                 " - ",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //               Text(
-                                      //                 "1g",
-                                      //                 style: GoogleFonts.outfit(
-                                      //                   fontSize: 12.0,
-                                      //                   fontWeight:
-                                      //                       FontWeight.bold,
-                                      //                   color: Colors.white,
-                                      //                 ),
-                                      //                 textAlign:
-                                      //                     TextAlign.center,
-                                      //               ),
-                                      //             ],
-                                      //           ),
-                                      //         ],
-                                      //       ),
-                                      //     ],
-                                      //   ),
-                                      // ),
-                                      // Divider(
-                                      //   height: 1,
-                                      // )
-                                    ],
-                                  )),
-                            ],
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => foodServing(),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(8.0, 14.0, 8.0, 0.0),
                           child: Text(
-                            'Eat Food',
+                            "Ingredients Detected",
                             style: GoogleFonts.outfit(
                               fontSize: 14.0,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.black.withOpacity(0.4),
-                            side: BorderSide(
-                              width: 1,
-                              color: Colors.white,
-                            ),
+                        ),
+                        Expanded(
+                          child: ListView(
+                            padding: EdgeInsets.zero,
+                            children: _detectedObjectCounts.entries
+                                .map((entry) => ListTile(
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 8.0),
+                                      title: Text(
+                                        '${entry.key}: ${entry.value}',
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
                           ),
                         ),
                       ],
                     ),
-                  )
-                : Center(
-                    child: CircularProgressIndicator(),
-                  )
-            : Center(
-                child: Text(''),
-              ),
-      ),
-      Positioned(
-        width: MediaQuery.of(context).size.width,
-        bottom: 100,
-        child: _isPermissionGranted
-            ? _isCameraInitialized
-                ? Padding(
-                    padding: EdgeInsets.fromLTRB(14.0, 0, 14.0, 0),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () => setState(() {
-                              detectionColor =
-                                  detectionColor == Color(0xff4b39ef)
-                                      ? Color.fromARGB(255, 239, 57, 57)
-                                      : Color(0xff4b39ef);
-                              detectionTitle =
-                                  detectionTitle == 'Start Detecting'
-                                      ? 'Stop Detecting'
-                                      : 'Start Detecting';
-                            }),
-                            child: Text(
-                              detectionTitle,
-                              style: GoogleFonts.outfit(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            style: TextButton.styleFrom(
-                              backgroundColor: detectionColor,
-                              foregroundColor: Colors.white,
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: Text(
-                              'Clear Ingredients',
-                              style: GoogleFonts.outfit(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            style: TextButton.styleFrom(
-                              backgroundColor: Color.fromARGB(255, 239, 57, 57),
-                            ),
-                          ),
-                        ],
+                  ),
+                  SizedBox(
+                      height: 8.0), // Space between detected items and button
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/foodServing',
+                        arguments: _detectedObjectCounts.entries
+                            .map((entry) => {
+                                  'tag': entry.key,
+                                  'quantity': entry.value,
+                                })
+                            .toList(), // Convert to list of maps with quantity
+                      );
+                      print(
+                          'Passing data to FoodServing: ${_detectedObjectCounts.entries.map((entry) => {
+                                'tag': entry.key,
+                                'quantity': entry.value,
+                              }).toList()}');
+                    },
+                    child: Text(
+                      'Eat Food',
+                      style: GoogleFonts.outfit(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                  )
-                : Center(
-                    child: CircularProgressIndicator(),
-                  )
-            : Center(
-                child: Text(''),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black.withOpacity(0.4),
+                      side: BorderSide(
+                        width: 1,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+            ),
+          ),
+          Positioned(
+            bottom: 100,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _toggleDetection,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isDetecting
+                        ? Colors.red
+                        : Colors.green, // Color based on state
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  child: Text(
+                    _isDetecting ? 'Stop Detection' : 'Start Detection',
+                    style: GoogleFonts.outfit(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: _clearIngredients,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.red, // Custom color for the clear button
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  child: Text(
+                    'Clear Ingredients',
+                    style: GoogleFonts.outfit(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    ]);
+    );
   }
 
-  // ... other code
+  List<Widget> _displayDetectionResults() {
+    if (_detections.isEmpty || _cameraImage == null) return [];
 
-  Future<dynamic> foodServing() {
-    return showCupertinoModalPopup(
-      barrierColor: Color.fromARGB(144, 0, 0, 0),
-      context: context,
-      builder: (BuildContext context) => FoodServing(),
-    );
+    final Size screenSize = MediaQuery.of(context).size;
+    final double factorX = screenSize.width / (_cameraImage?.height ?? 1);
+    final double factorY = screenSize.height / (_cameraImage?.width ?? 1);
+
+    return _detections.map((result) {
+      final rect = Rect.fromLTRB(
+        result['box'][0].toDouble() * factorX,
+        result['box'][1].toDouble() * factorY,
+        result['box'][2].toDouble() * factorX,
+        result['box'][3].toDouble() * factorY,
+      );
+
+      return Positioned(
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            border: Border.all(color: Colors.pink, width: 2.0),
+          ),
+          child: Text(
+            result['tag'],
+            style: TextStyle(
+              backgroundColor: Colors.pink,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    }).toList();
   }
 }

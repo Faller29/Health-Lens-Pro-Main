@@ -114,7 +114,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
           print('Profile picture uploaded successfully!');
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error uploading profile picture: $e')),
+            SnackBar(
+                behavior: SnackBarBehavior.floating,
+                elevation: 3,
+                duration: const Duration(seconds: 2),
+                content: Text('Error uploading profile picture: $e')),
           );
         }
       }
@@ -123,14 +127,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
       try {
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        final String userId = userUid!;
+        final String userId = thisUser!.uid;
+
+        print(_fNameController.text);
+        print(_lNameController.text);
         String userFullname = _fNameController.text +
             " " +
             _mNameController.text +
             " " +
             _lNameController.text;
-        String initial = _mNameController.text[0].toUpperCase();
 
+        print(userFullname);
+        String initial = _mNameController.text[0].toUpperCase();
         await FirebaseFirestore.instance.collection('user').doc(userId).update({
           'fullName': userFullname,
           'firstName': _fNameController.text,
@@ -152,11 +160,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
         // Show success message for Firestore update
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated successfully in Firestore!')),
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            elevation: 3,
+            duration: const Duration(seconds: 2),
+            content: Text('Profile updated successfully in Firestore!'),
+          ),
         );
+        Navigator.of(context).pop();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating profile in Firestore: $e')),
+          SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
+              content: Text('Error updating profile in Firestore: $e')),
         );
       }
     }

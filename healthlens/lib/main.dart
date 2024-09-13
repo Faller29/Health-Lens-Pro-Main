@@ -7,6 +7,7 @@ import 'package:healthlens/backend_firebase/firestore_provider.dart';
 import 'package:healthlens/calendar_history.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/firebase_options.dart';
+import 'package:healthlens/foodServing.dart';
 import 'package:healthlens/healthProfile.dart';
 import 'package:healthlens/userProfile.dart';
 import 'package:provider/provider.dart';
@@ -140,6 +141,7 @@ class MyApp extends StatelessWidget {
         '/calendar': (context) => CalendarScreen(),
         '/editUser': (context) => UserProfilePage(),
         '/editHealth': (context) => healthProfile(),
+        '/foodServing': (context) => FoodServing(),
       },
     );
   }
