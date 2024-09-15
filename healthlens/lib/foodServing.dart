@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add this for Firestore
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/main.dart';
@@ -14,6 +15,11 @@ class FoodServing extends StatefulWidget {
 class _FoodServingState extends State<FoodServing> {
   List<Map<String, dynamic>> foodItems = [];
   List<Map<String, dynamic>> _detectedItems = [];
+  int idNum = 1;
+  int _generateUniqueId() {
+    idNum++;
+    return idNum; // Use timestamp as a simple unique key
+  }
 
   // Store selected parts for each item
   Map<String, String?> selectedParts = {};
@@ -33,6 +39,10 @@ class _FoodServingState extends State<FoodServing> {
     }
   };
 
+  String removeId(String tag) {
+    return tag.replaceAll(RegExp(r'\s?\d+'), '');
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -43,6 +53,7 @@ class _FoodServingState extends State<FoodServing> {
     if (args != null) {
       setState(() {
         _detectedItems = args;
+
         // Process detected items to add them to foodItems
         _processDetectedItems();
       });
@@ -75,18 +86,21 @@ class _FoodServingState extends State<FoodServing> {
   void removeItem(int index) {
     setState(() {
       if (index >= 0 && index < foodItems.length) {
-        // Remove the selected part for this item before removing the item itself
+        // Remove the item from the selectedParts map before removing the item itself
         final itemToRemove = foodItems[index]['item'];
-        selectedParts.remove(itemToRemove);
+        selectedParts
+            .remove(itemToRemove); // Ensure selectedParts are cleaned up
 
         // Now remove the item from the foodItems list
         foodItems.removeAt(index);
+        _detectedItems.removeAt(index);
       }
     });
   }
 
   void increaseQuantity(int index) {
     setState(() {
+      _detectedItems[index]['quantity']++;
       foodItems[index]['quantity']++;
     });
   }
@@ -95,13 +109,20 @@ class _FoodServingState extends State<FoodServing> {
     setState(() {
       if (foodItems[index]['quantity'] > 0) {
         foodItems[index]['quantity']--;
+        _detectedItems[index]['quantity']--;
       }
     });
   }
 
   // Build item options with parts and display macronutrients
   Widget _buildItemOptions(String item) {
-    final parts = itemMacronutrients[item.toLowerCase()]?.keys.toList() ?? [];
+    print('item: $item');
+
+    String itemRemovedId = '';
+    itemRemovedId = removeId(item);
+    print(itemRemovedId);
+    final parts =
+        itemMacronutrients[itemRemovedId.toLowerCase()]?.keys.toList() ?? [];
 
     if (parts.isEmpty) return SizedBox.shrink();
 
@@ -119,10 +140,11 @@ class _FoodServingState extends State<FoodServing> {
           onChanged: (String? selectedPart) {
             setState(() {
               selectedParts[item] = selectedPart;
+              print('part: $selectedPart');
             });
           },
         ),
-        if (selectedParts[item] != null)
+        if (selectedParts[itemRemovedId] != null)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -131,13 +153,13 @@ class _FoodServingState extends State<FoodServing> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'Fats: ${itemMacronutrients[item.toLowerCase()]?[selectedParts[item]]?['fats']}g',
+                'Fats: ${itemMacronutrients[itemRemovedId.toLowerCase()]?[selectedParts[itemRemovedId]]?['fats']}g',
               ),
               Text(
-                'Carbs: ${itemMacronutrients[item.toLowerCase()]?[selectedParts[item]]?['carbs']}g',
+                'Carbs: ${itemMacronutrients[itemRemovedId.toLowerCase()]?[selectedParts[itemRemovedId]]?['carbs']}g',
               ),
               Text(
-                'Proteins: ${itemMacronutrients[item.toLowerCase()]?[selectedParts[item]]?['proteins']}g',
+                'Proteins: ${itemMacronutrients[itemRemovedId.toLowerCase()]?[selectedParts[itemRemovedId]]?['proteins']}g',
               ),
             ],
           )
@@ -148,7 +170,14 @@ class _FoodServingState extends State<FoodServing> {
   // Function to wrap the data for Firebase submission
   // Function to wrap the data for Firebase submission
   Map<String, dynamic> _wrapDataForFirebase() {
-    List<Map<String, dynamic>> wrappedItems = foodItems.map((item) {
+    List<Map<String, dynamic>> foodItemsRemovedId;
+    foodItemsRemovedId = foodItems;
+    foodItemsRemovedId.forEach((foodItemsRemovedId) {
+      foodItemsRemovedId['item'] =
+          removeId(foodItemsRemovedId['item'] as String);
+      print(foodItemsRemovedId['item']);
+    });
+    List<Map<String, dynamic>> wrappedItems = foodItemsRemovedId.map((item) {
       final selectedPart = selectedParts[item['item']];
       final macronutrients =
           itemMacronutrients[item['item'].toLowerCase()]?[selectedPart] ?? {};
@@ -156,6 +185,10 @@ class _FoodServingState extends State<FoodServing> {
       print(macronutrients['carbs']);
       print(macronutrients['proteins']);
       print(macronutrients['fats']);
+
+      print(macronutrients['carbs'].runtimeType);
+      print(macronutrients['proteins'].runtimeType);
+      print(macronutrients['fats'].runtimeType);
       return {
         'item': item['item'],
         'quantity': item['quantity'],
@@ -200,7 +233,7 @@ class _FoodServingState extends State<FoodServing> {
       print(wrappedData['fats']);
       // Get the current date in 'yyyy-MM-dd' format
       final String currentDate = DateTime.now().toIso8601String().split('T')[0];
-
+      print(currentDate);
       // Get the current time in 'hh:mm' format
       final String currentTime =
           "${DateTime.now().hour}:${DateTime.now().minute}";
@@ -276,7 +309,7 @@ class _FoodServingState extends State<FoodServing> {
       final currentCarbs = _parseInt(currentMacros?['carbs']);
       final currentProteins = _parseInt(currentMacros?['proteins']);
       final currentFats = _parseInt(currentMacros?['fats']);
-
+      print(currentMacros);
       int totalCarbs = currentCarbs;
       int totalProteins = currentProteins;
       int totalFats = currentFats;
@@ -350,6 +383,36 @@ class _FoodServingState extends State<FoodServing> {
     }
   }
 
+  void separateItem(int index) {
+    setState(() {
+      final originalItem = _detectedItems[index];
+      final newQuantity = 1; // Default quantity for the separated part
+
+      int id = _generateUniqueId();
+      // Create a new entry for the separated item
+      final separatedItem = {
+        'tag': "${originalItem['tag']} ${id.toString()}",
+        'quantity': newQuantity,
+      };
+
+      final separatedFoodItem = {
+        'item': "${originalItem['tag']} ${id.toString()}",
+        'quantity': newQuantity,
+      };
+      // Add the separated item to the detected items list
+      try {
+        _detectedItems.add(separatedItem);
+      } catch (e) {
+        print('error: $e');
+      }
+      try {
+        foodItems.add(separatedFoodItem);
+      } catch (e) {
+        print('error: $e');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -402,6 +465,10 @@ class _FoodServingState extends State<FoodServing> {
                                   icon: const Icon(IconlyLight.delete),
                                   onPressed: () => removeItem(index),
                                 ),
+                                TextButton(
+                                  onPressed: () => separateItem(index),
+                                  child: Text('separate'),
+                                )
                               ],
                             ),
                           ],
@@ -412,17 +479,79 @@ class _FoodServingState extends State<FoodServing> {
                 },
               ),
             ),
-            SizedBox(height: 5.0),
-            ElevatedButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Color(0xff4b39ef),
-                foregroundColor: Colors.white,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Color(0xff4b39ef),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      _confirmAndSendToFirebase();
+                    },
+                    child: Text('Confirm'),
+                  ),
+                  ElevatedButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 57, 239, 81),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text('Add'),
+                    onPressed: () {
+                      showCupertinoModalPopup(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return CupertinoActionSheet(
+                            title: Text('Select an item to add'),
+                            actions: itemMacronutrients.keys.map((item) {
+                              return CupertinoActionSheetAction(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  setState(() {
+                                    // Check if item already exists in _detectedItems
+
+                                    final existingItemIndex =
+                                        _detectedItems.indexWhere(
+                                      (element) => element['tag'] == item,
+                                    );
+
+                                    if (existingItemIndex != -1) {
+                                      // If item already exists, increment the quantity
+                                      _detectedItems[existingItemIndex]
+                                              ['quantity'] =
+                                          (_detectedItems[existingItemIndex]
+                                                  ['quantity'] as int) +
+                                              1;
+                                    } else {
+                                      // If item doesn't exist, add it with quantity 1
+                                      _detectedItems.add({
+                                        'tag': item,
+                                        'quantity': 1,
+                                      } as Map<String, dynamic>);
+                                    }
+                                  });
+                                },
+                                child: Text(item),
+                              );
+                            }).toList(),
+                            cancelButton: CupertinoActionSheetAction(
+                              isDefaultAction: true,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancel'),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  )
+                ],
               ),
-              onPressed: () {
-                _confirmAndSendToFirebase();
-              },
-              child: Text('Confirm'),
-            ),
+            )
           ],
         ),
       ),
