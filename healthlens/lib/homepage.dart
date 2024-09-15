@@ -687,9 +687,9 @@ class _HomePage extends State<HomePage> {
                                 radius: 40.0,
                                 lineWidth: 14.0,
                                 animation: true,
-                                percent: 49 / (gramCarbs ?? 0),
+                                percent: (dailyCarbs ?? 0) / (gramCarbs ?? 0),
                                 center: Text(
-                                  '${(49 / (gramCarbs ?? 0) * 100).toStringAsFixed(0)}%',
+                                  '${((dailyCarbs ?? 0) / (gramCarbs ?? 0) * 100).toStringAsFixed(0)}%',
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -704,7 +704,7 @@ class _HomePage extends State<HomePage> {
                             ],
                           ),
                           Text(
-                            '${49}/${gramCarbs}',
+                            '${(dailyCarbs ?? 0)}/${gramCarbs}',
                             style: GoogleFonts.readexPro(
                               fontSize: 12.0,
                               fontWeight: FontWeight.bold,
@@ -742,9 +742,10 @@ class _HomePage extends State<HomePage> {
                                 radius: 40.0,
                                 lineWidth: 14.0,
                                 animation: true,
-                                percent: 49 / (gramProtein ?? 0),
+                                percent:
+                                    (dailyProtein ?? 0) / (gramProtein ?? 0),
                                 center: Text(
-                                  '${(49 / (gramProtein ?? 0) * 100).toStringAsFixed(0)}%',
+                                  '${((dailyProtein ?? 0) / (gramProtein ?? 0) * 100).toStringAsFixed(0)}%',
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -757,7 +758,7 @@ class _HomePage extends State<HomePage> {
                                 progressColor: const Color(0xffff5963),
                               ),
                               Text(
-                                '${49}/${gramProtein}',
+                                '${(dailyProtein ?? 0)}/${gramProtein}',
                                 style: GoogleFonts.readexPro(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
@@ -797,9 +798,9 @@ class _HomePage extends State<HomePage> {
                                 radius: 40.0,
                                 lineWidth: 14.0,
                                 animation: true,
-                                percent: 49 / (gramFats ?? 0),
+                                percent: (dailyFats ?? 0) / (gramFats ?? 0),
                                 center: Text(
-                                  '${(49 / (gramFats ?? 0) * 100).toStringAsFixed(0)}%',
+                                  '${((dailyFats ?? 0) / (gramFats ?? 0) * 100).toStringAsFixed(0)}%',
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -812,7 +813,7 @@ class _HomePage extends State<HomePage> {
                                 progressColor: const Color(0xff249689),
                               ),
                               Text(
-                                '${49}/${gramFats}',
+                                '${(dailyFats ?? 0)}/${gramFats}',
                                 style: GoogleFonts.readexPro(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,

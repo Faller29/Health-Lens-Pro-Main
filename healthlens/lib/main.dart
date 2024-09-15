@@ -48,6 +48,9 @@ File? profileImageUrl;
 String? currentUserEmail;
 String? currentUserPincode;
 double? desiredBodyWeight;
+int? dailyCarbs;
+int? dailyProtein;
+int? dailyFats;
 
 var url;
 
@@ -76,6 +79,9 @@ void saveData() async {
   currentUserEmail = prefs.getString('currentUserEmail') ?? '';
   currentUserPincode = prefs.getString('currentUserPincode') ?? '';
   desiredBodyWeight = prefs.getDouble('desiredBW') ?? 0.0;
+  dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
+  dailyProtein = prefs.getInt('dailyProtein') ?? 0;
+  dailyFats = prefs.getInt('dailyFats') ?? 0;
 }
 
 void main() async {
@@ -194,9 +200,13 @@ class Auth {
         print('connected');
         if (user != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
-
-          final theUser = await db.collection("user").doc(user?.uid).get();
           final thisUserUid = user.uid;
+
+          final userMacros =
+              await db.collection("userMacros").doc(thisUserUid).get();
+          final theUser = await db.collection("user").doc(thisUserUid).get();
+
+          final macros = userMacros.data() as Map<String, dynamic>;
           final data = theUser.data() as Map<String, dynamic>;
 
           await prefs.setString('firstName', data['firstName']);
@@ -218,6 +228,9 @@ class Auth {
           await prefs.setStringList(
               'chronicDisease', data['chronicDisease'].cast<String>());
 
+          await prefs.setInt('dailyCarbs', macros['carbs']);
+          await prefs.setInt('dailyProtein', macros['fats']);
+          await prefs.setInt('dailyFats', macros['proteins']);
           try {
             final userRef = FirebaseStorage.instance
                 .ref()
@@ -253,6 +266,9 @@ class Auth {
           //profileImageUrl = prefs.getString('profileImageUrl') ?? '';
           currentUserEmail = prefs.getString('currentUserEmail') ?? '';
           currentUserPincode = prefs.getString('currentUserPincode') ?? '';
+          dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
+          dailyProtein = prefs.getInt('dailyProtein') ?? 0;
+          dailyFats = prefs.getInt('dailyFats') ?? 0;
         }
       }
     } on SocketException catch (_) {

@@ -190,6 +190,25 @@ Future<bool> signUp(
       'desiredBodyWeight': desiredBodyWeight,
     });
 
+    final userMacrosDocRef =
+        FirebaseFirestore.instance.collection('userMacros').doc(thisUser?.uid);
+
+    // Retrieve the user's current macronutrients
+    final userMacrosDoc = await userMacrosDocRef.get();
+
+    if (!userMacrosDoc.exists) {
+      // Document does not exist, create it with default values
+      print(
+          'userMacros document does not exist. Creating with default values.');
+
+      await userMacrosDocRef.set({
+        'carbs': 0,
+        'proteins': 0,
+        'fats': 0,
+      });
+    }
+    final macros = userMacrosDoc.data() as Map<String, dynamic>;
+    ;
     final currentUserInfo =
         await db.collection("user").doc(thisUser?.uid).get();
     final data = currentUserInfo.data() as Map<String, dynamic>;
@@ -217,6 +236,9 @@ Future<bool> signUp(
     await prefs.setString('email', email);
     await prefs.setDouble('desiredBW', data['desiredBodyWeight']);
 
+    await prefs.setInt('dailyCarbs', macros['carbs']);
+    await prefs.setInt('dailyProtein', macros['fats']);
+    await prefs.setInt('dailyFats', macros['proteins']);
     // Sign up successful
     saveData();
     return true;

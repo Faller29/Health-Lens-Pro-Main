@@ -1,9 +1,10 @@
-import 'package:healthlens/camerapage.dart';
-import 'package:healthlens/entry_point.dart';
-import 'package:healthlens/homepage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Add this for Firestore
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/main.dart';
 import 'package:iconly/iconly.dart';
+import 'package:healthlens/entry_point.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FoodServing extends StatefulWidget {
   @override
@@ -14,7 +15,24 @@ class _FoodServingState extends State<FoodServing> {
   List<Map<String, dynamic>> foodItems = [];
   List<Map<String, dynamic>> _detectedItems = [];
 
-  @override
+  // Store selected parts for each item
+  Map<String, String?> selectedParts = {};
+
+  // Macronutrient data based on the part selected for each item
+  final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
+    'spoon': {
+      'Leg': {'fats': 5, 'carbs': 5, 'proteins': 5},
+      'Wing': {'fats': 5, 'carbs': 5, 'proteins': 5},
+      'Breast': {'fats': 5, 'carbs': 5, 'proteins': 5},
+      'Thigh': {'fats': 5, 'carbs': 5, 'proteins': 5},
+    },
+    'fork': {
+      'Head': {'fats': 5, 'carbs': 5, 'proteins': 5},
+      'Body': {'fats': 5, 'carbs': 5, 'proteins': 5},
+      'Tail': {'fats': 5, 'carbs': 5, 'proteins': 5},
+    }
+  };
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -36,7 +54,6 @@ class _FoodServingState extends State<FoodServing> {
 
     for (var item in _detectedItems) {
       final label = item['tag'];
-      // Safely cast quantity to int
       final quantity = (item['quantity'] is int)
           ? item['quantity'] as int
           : (item['quantity'] as num).toInt();
@@ -58,6 +75,11 @@ class _FoodServingState extends State<FoodServing> {
   void removeItem(int index) {
     setState(() {
       if (index >= 0 && index < foodItems.length) {
+        // Remove the selected part for this item before removing the item itself
+        final itemToRemove = foodItems[index]['item'];
+        selectedParts.remove(itemToRemove);
+
+        // Now remove the item from the foodItems list
         foodItems.removeAt(index);
       }
     });
@@ -75,6 +97,257 @@ class _FoodServingState extends State<FoodServing> {
         foodItems[index]['quantity']--;
       }
     });
+  }
+
+  // Build item options with parts and display macronutrients
+  Widget _buildItemOptions(String item) {
+    final parts = itemMacronutrients[item.toLowerCase()]?.keys.toList() ?? [];
+
+    if (parts.isEmpty) return SizedBox.shrink();
+
+    return Column(
+      children: [
+        Text('Select part:'),
+        DropdownButton<String>(
+          value: selectedParts[item],
+          items: parts.map((part) {
+            return DropdownMenuItem<String>(
+              value: part,
+              child: Text(part),
+            );
+          }).toList(),
+          onChanged: (String? selectedPart) {
+            setState(() {
+              selectedParts[item] = selectedPart;
+            });
+          },
+        ),
+        if (selectedParts[item] != null)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Macronutrients:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Fats: ${itemMacronutrients[item.toLowerCase()]?[selectedParts[item]]?['fats']}g',
+              ),
+              Text(
+                'Carbs: ${itemMacronutrients[item.toLowerCase()]?[selectedParts[item]]?['carbs']}g',
+              ),
+              Text(
+                'Proteins: ${itemMacronutrients[item.toLowerCase()]?[selectedParts[item]]?['proteins']}g',
+              ),
+            ],
+          )
+      ],
+    );
+  }
+
+  // Function to wrap the data for Firebase submission
+  // Function to wrap the data for Firebase submission
+  Map<String, dynamic> _wrapDataForFirebase() {
+    List<Map<String, dynamic>> wrappedItems = foodItems.map((item) {
+      final selectedPart = selectedParts[item['item']];
+      final macronutrients =
+          itemMacronutrients[item['item'].toLowerCase()]?[selectedPart] ?? {};
+
+      print(macronutrients['carbs']);
+      print(macronutrients['proteins']);
+      print(macronutrients['fats']);
+      return {
+        'item': item['item'],
+        'quantity': item['quantity'],
+        'part': selectedPart,
+        'fats': _parseInt(macronutrients['fats']),
+        'carbs': _parseInt(macronutrients['carbs']),
+        'proteins': _parseInt(macronutrients['proteins']),
+      };
+    }).toList();
+
+    return {
+      'timestamp': DateTime.now().toIso8601String(),
+      'items': wrappedItems,
+      'userId': thisUser?.uid, // Associate the data with the current user
+    };
+  }
+
+// Function to safely parse integer values, defaulting to 0 if parsing fails
+  int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        return 0; // Default to 0 if parsing fails
+      }
+    }
+    return 0;
+  }
+
+  Future<void> _confirmAndSendToFirebase() async {
+    try {
+      // Wrap the data into a map that will be sent to Firebase
+      final wrappedData = _wrapDataForFirebase();
+
+      print('start');
+      print(wrappedData);
+
+      print(wrappedData['carbs']);
+      print(wrappedData['proteins']);
+      print(wrappedData['fats']);
+      // Get the current date in 'yyyy-MM-dd' format
+      final String currentDate = DateTime.now().toIso8601String().split('T')[0];
+
+      // Get the current time in 'hh:mm' format
+      final String currentTime =
+          "${DateTime.now().hour}:${DateTime.now().minute}";
+      print('checking');
+      // Check if adding the current food serving will exceed the user's max intake
+      print(thisUser?.uid);
+// Check the data structure of wrappedData
+      print('Wrapped Data: $wrappedData');
+
+// Adjust according to the actual structure
+      final bool canAdd = await _checkIfWithinMaxLimits(wrappedData['items']);
+
+      print('proceeding to add');
+      if (canAdd) {
+        // Save the food serving data in 'food_history'
+        await FirebaseFirestore.instance
+            .collection('food_history')
+            .doc(thisUser?.uid)
+            .collection(currentDate)
+            .doc(currentTime)
+            .set(wrappedData); // Store the data
+
+        // Now accumulate the macronutrients
+        await _updateUserMacros(wrappedData['items']);
+
+        // Navigate to the EntryPoint page after confirming
+        /* Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => EntryPoint()),
+        ); */
+      } else {
+        // Notify user that the food exceeds their daily max intake
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('This food exceeds your daily macronutrient limits!')),
+        );
+      }
+    } catch (e) {
+      print("Error submitting data to Firebase: $e");
+    }
+  }
+
+  Future<bool> _checkIfWithinMaxLimits(
+      List<Map<String, dynamic>> newMacrosList) async {
+    try {
+      // Retrieve the user's maximum macronutrient limits
+      final userMaxDoc = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(thisUser?.uid)
+          .get();
+
+      if (!userMaxDoc.exists || userMaxDoc.data() == null) {
+        print('Error: No max limits found for user or data is null.');
+        return false;
+      }
+
+      final userMaxData = userMaxDoc.data()!;
+      final maxCarbs = _parseInt(userMaxData['gramCarbs']);
+      final maxProteins = _parseInt(userMaxData['gramProtein']);
+      final maxFats = _parseInt(userMaxData['gramFats']);
+
+      // Retrieve the user's current macronutrients
+      final userMacrosDoc = await FirebaseFirestore.instance
+          .collection('userMacros')
+          .doc(thisUser?.uid)
+          .get();
+
+      final currentMacros = userMacrosDoc.exists
+          ? userMacrosDoc.data()! as Map<String, dynamic>?
+          : {'carbs': 0, 'proteins': 0, 'fats': 0};
+
+      final currentCarbs = _parseInt(currentMacros?['carbs']);
+      final currentProteins = _parseInt(currentMacros?['proteins']);
+      final currentFats = _parseInt(currentMacros?['fats']);
+
+      int totalCarbs = currentCarbs;
+      int totalProteins = currentProteins;
+      int totalFats = currentFats;
+
+      // Sum up macronutrients from the newMacrosList, taking quantity into account
+      for (var item in newMacrosList) {
+        final quantity = _parseInt(item['quantity']); // Get the item quantity
+        totalCarbs += _parseInt(item['carbs']) * quantity;
+        totalProteins += _parseInt(item['proteins']) * quantity;
+        totalFats += _parseInt(item['fats']) * quantity;
+      }
+
+      // Check if adding the new macronutrients exceeds the user's max daily limits
+      return totalCarbs <= maxCarbs &&
+          totalProteins <= maxProteins &&
+          totalFats <= maxFats;
+    } catch (e) {
+      print("Error checking macronutrient limits: $e");
+      return false;
+    }
+  }
+
+  Future<void> _updateUserMacros(
+      List<Map<String, dynamic>> newMacrosList) async {
+    try {
+      // Retrieve the user's current macronutrients
+      final userMacrosDoc = await FirebaseFirestore.instance
+          .collection('userMacros')
+          .doc(thisUser?.uid)
+          .get();
+
+      final currentMacros = userMacrosDoc.exists
+          ? userMacrosDoc.data()! as Map<String, dynamic>?
+          : {'carbs': 0, 'proteins': 0, 'fats': 0};
+
+      int totalCarbs = _parseInt(currentMacros?['carbs']);
+      int totalProteins = _parseInt(currentMacros?['proteins']);
+      int totalFats = _parseInt(currentMacros?['fats']);
+
+      // Sum up macronutrients from the newMacrosList, considering quantity
+      for (var item in newMacrosList) {
+        final quantity = _parseInt(item['quantity']); // Get the item quantity
+        totalCarbs += _parseInt(item['carbs']) * quantity;
+        totalProteins += _parseInt(item['proteins']) * quantity;
+        totalFats += _parseInt(item['fats']) * quantity;
+      }
+
+      // Update user macros document in Firebase
+      await FirebaseFirestore.instance
+          .collection('userMacros')
+          .doc(thisUser?.uid)
+          .set({
+        'carbs': totalCarbs,
+        'proteins': totalProteins,
+        'fats': totalFats,
+      }, SetOptions(merge: true));
+
+      // Update SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('dailyCarbs', totalCarbs);
+      await prefs.setInt('dailyProtein', totalProteins);
+      await prefs.setInt('dailyFats', totalFats);
+
+      dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
+      dailyProtein = prefs.getInt('dailyProtein') ?? 0;
+      dailyFats = prefs.getInt('dailyFats') ?? 0;
+
+      print('User macros updated successfully.');
+    } catch (e) {
+      print('Error updating user macros: $e');
+    }
   }
 
   @override
@@ -95,7 +368,7 @@ class _FoodServingState extends State<FoodServing> {
                 padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                 itemCount: foodItems.length,
                 itemBuilder: (context, index) {
-                  final item = foodItems[index];
+                  final item = foodItems[index]['item'];
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                     child: Material(
@@ -107,9 +380,11 @@ class _FoodServingState extends State<FoodServing> {
                         ),
                         isThreeLine: true,
                         leading: Icon(Icons.restaurant_menu_outlined),
-                        title: Text(item['item']),
+                        title: Text(item),
                         subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            _buildItemOptions(item),
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -118,7 +393,7 @@ class _FoodServingState extends State<FoodServing> {
                                   icon: const Icon(Icons.remove_circle_outline),
                                   onPressed: () => decreaseQuantity(index),
                                 ),
-                                Text('${item['quantity']}'),
+                                Text('${foodItems[index]['quantity']}'),
                                 IconButton(
                                   icon: const Icon(Icons.add_circle_outline),
                                   onPressed: () => increaseQuantity(index),
@@ -144,11 +419,7 @@ class _FoodServingState extends State<FoodServing> {
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
-                // Handle confirmation here
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EntryPoint()),
-                );
+                _confirmAndSendToFirebase();
               },
               child: Text('Confirm'),
             ),

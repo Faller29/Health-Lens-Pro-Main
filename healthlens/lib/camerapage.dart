@@ -309,13 +309,13 @@ class _CameraPageState extends State<CameraPage> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: Colors.pink, width: 2.0),
+            border: Border.all(color: Colors.greenAccent, width: 1.0),
           ),
           child: Text(
             result['tag'],
             style: TextStyle(
-              backgroundColor: Colors.pink,
-              color: Colors.white,
+              backgroundColor: Colors.greenAccent,
+              color: Colors.black,
             ),
           ),
         ),
