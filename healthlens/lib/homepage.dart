@@ -694,9 +694,7 @@ class _HomePage extends State<HomePage> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 header: const Padding(
-                                  padding: EdgeInsets.only(
-                                      bottom:
-                                          10.0), // Adjust bottom padding as needed
+                                  padding: EdgeInsets.only(bottom: 10.0),
                                 ),
                                 circularStrokeCap: CircularStrokeCap.round,
                                 progressColor: const Color(0xff4b39ef),

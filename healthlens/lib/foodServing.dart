@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add this for Firestore
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/main.dart';
 import 'package:iconly/iconly.dart';
@@ -16,6 +17,8 @@ class _FoodServingState extends State<FoodServing> {
   List<Map<String, dynamic>> foodItems = [];
   List<Map<String, dynamic>> _detectedItems = [];
   int idNum = 1;
+  bool _isLoading = false;
+
   int _generateUniqueId() {
     idNum++;
     return idNum; // Use timestamp as a simple unique key
@@ -240,10 +243,10 @@ class _FoodServingState extends State<FoodServing> {
       print('checking');
       // Check if adding the current food serving will exceed the user's max intake
       print(thisUser?.uid);
-// Check the data structure of wrappedData
+      // Check the data structure of wrappedData
       print('Wrapped Data: $wrappedData');
 
-// Adjust according to the actual structure
+      // Adjust according to the actual structure
       final bool canAdd = await _checkIfWithinMaxLimits(wrappedData['items']);
 
       print('proceeding to add');
@@ -260,10 +263,10 @@ class _FoodServingState extends State<FoodServing> {
         await _updateUserMacros(wrappedData['items']);
 
         // Navigate to the EntryPoint page after confirming
-        /* Navigator.push(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => EntryPoint()),
-        ); */
+        );
       } else {
         // Notify user that the food exceeds their daily max intake
         ScaffoldMessenger.of(context).showSnackBar(
@@ -377,6 +380,19 @@ class _FoodServingState extends State<FoodServing> {
       dailyProtein = prefs.getInt('dailyProtein') ?? 0;
       dailyFats = prefs.getInt('dailyFats') ?? 0;
 
+      final thisUserUid = thisUser?.uid;
+      final String currentDate = DateTime.now().toIso8601String().split('T')[0];
+      final dailyUserMacros = db
+          .collection("userMacros")
+          .doc(thisUserUid)
+          .collection('MacrosIntakeHistory')
+          .doc(currentDate);
+      await dailyUserMacros.set({
+        'carbs': dailyCarbs,
+        'fats': dailyFats,
+        'proteins': dailyProtein,
+      });
+
       print('User macros updated successfully.');
     } catch (e) {
       print('Error updating user macros: $e');
@@ -421,139 +437,165 @@ class _FoodServingState extends State<FoodServing> {
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                itemCount: foodItems.length,
-                itemBuilder: (context, index) {
-                  final item = foodItems[index]['item'];
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: ListTile(
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(color: Colors.black, width: 1),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        isThreeLine: true,
-                        leading: Icon(Icons.restaurant_menu_outlined),
-                        title: Text(item),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildItemOptions(item),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    itemCount: foodItems.length,
+                    itemBuilder: (context, index) {
+                      final item = foodItems[index]['item'];
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black, width: 1),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            isThreeLine: true,
+                            leading: Icon(Icons.restaurant_menu_outlined),
+                            title: Text(item),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  onPressed: () => decreaseQuantity(index),
+                                _buildItemOptions(item),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                          Icons.remove_circle_outline),
+                                      onPressed: () => decreaseQuantity(index),
+                                    ),
+                                    Text('${foodItems[index]['quantity']}'),
+                                    IconButton(
+                                      icon:
+                                          const Icon(Icons.add_circle_outline),
+                                      onPressed: () => increaseQuantity(index),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(IconlyLight.delete),
+                                      onPressed: () => removeItem(index),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => separateItem(index),
+                                      child: Text('separate'),
+                                    )
+                                  ],
                                 ),
-                                Text('${foodItems[index]['quantity']}'),
-                                IconButton(
-                                  icon: const Icon(Icons.add_circle_outline),
-                                  onPressed: () => increaseQuantity(index),
-                                ),
-                                IconButton(
-                                  icon: const Icon(IconlyLight.delete),
-                                  onPressed: () => removeItem(index),
-                                ),
-                                TextButton(
-                                  onPressed: () => separateItem(index),
-                                  child: Text('separate'),
-                                )
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Color(0xff4b39ef),
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      _confirmAndSendToFirebase();
-                    },
-                    child: Text('Confirm'),
-                  ),
-                  ElevatedButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 57, 239, 81),
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('Add'),
-                    onPressed: () {
-                      showCupertinoModalPopup(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return CupertinoActionSheet(
-                            title: Text('Select an item to add'),
-                            actions: itemMacronutrients.keys.map((item) {
-                              return CupertinoActionSheetAction(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  setState(() {
-                                    // Check if item already exists in _detectedItems
-
-                                    final existingItemIndex =
-                                        _detectedItems.indexWhere(
-                                      (element) => element['tag'] == item,
-                                    );
-
-                                    if (existingItemIndex != -1) {
-                                      // If item already exists, increment the quantity
-                                      _detectedItems[existingItemIndex]
-                                              ['quantity'] =
-                                          (_detectedItems[existingItemIndex]
-                                                  ['quantity'] as int) +
-                                              1;
-                                    } else {
-                                      // If item doesn't exist, add it with quantity 1
-                                      _detectedItems.add({
-                                        'tag': item,
-                                        'quantity': 1,
-                                      } as Map<String, dynamic>);
-                                    }
-                                  });
-                                },
-                                child: Text(item),
-                              );
-                            }).toList(),
-                            cancelButton: CupertinoActionSheetAction(
-                              isDefaultAction: true,
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text('Cancel'),
-                            ),
-                          );
-                        },
                       );
                     },
-                  )
-                ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color(0xff4b39ef),
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                await _confirmAndSendToFirebase();
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              },
+                        child: Text('Confirm'),
+                      ),
+                      ElevatedButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 57, 239, 81),
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text('Add'),
+                        onPressed: () {
+                          showCupertinoModalPopup(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return CupertinoActionSheet(
+                                title: Text('Select an item to add'),
+                                actions: itemMacronutrients.keys.map((item) {
+                                  return CupertinoActionSheetAction(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      setState(() {
+                                        // Check if item already exists in _detectedItems
+
+                                        final existingItemIndex =
+                                            _detectedItems.indexWhere(
+                                          (element) => element['tag'] == item,
+                                        );
+
+                                        if (existingItemIndex != -1) {
+                                          // If item already exists, increment the quantity
+                                          _detectedItems[existingItemIndex]
+                                                  ['quantity'] =
+                                              (_detectedItems[existingItemIndex]
+                                                      ['quantity'] as int) +
+                                                  1;
+                                        } else {
+                                          // If item doesn't exist, add it with quantity 1
+                                          _detectedItems.add({
+                                            'tag': item,
+                                            'quantity': 1,
+                                          } as Map<String, dynamic>);
+                                        }
+                                      });
+                                    },
+                                    child: Text(item),
+                                  );
+                                }).toList(),
+                                cancelButton: CupertinoActionSheetAction(
+                                  isDefaultAction: true,
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          if (_isLoading)
+            Material(
+              color: Color.fromARGB(92, 37, 37, 37),
+              child: Container(
+                height: MediaQuery.sizeOf(context).height,
+                width: MediaQuery.sizeOf(context).width,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
-            )
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

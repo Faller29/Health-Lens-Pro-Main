@@ -200,10 +200,23 @@ class Auth {
         print('connected');
         if (user != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
+          final String currentDate =
+              DateTime.now().toIso8601String().split('T')[0];
+
           final thisUserUid = user.uid;
 
+          //get user Macros History
+          final dailyUserMacros = db
+              .collection("userMacros")
+              .doc(thisUserUid)
+              .collection('MacrosIntakeHistory')
+              .doc(currentDate);
+
+          //get uuser daily macros
           final userMacros =
               await db.collection("userMacros").doc(thisUserUid).get();
+
+          //get user data
           final theUser = await db.collection("user").doc(thisUserUid).get();
 
           final macros = userMacros.data() as Map<String, dynamic>;
@@ -220,9 +233,9 @@ class Auth {
           await prefs.setDouble('height', data['height']);
           await prefs.setDouble('weight', data['weight']);
           await prefs.setInt('phoneNumber', data['phoneNumber']);
-          await prefs.setInt('gramCarbs', data['reqCarbs']);
-          await prefs.setInt('gramProtein', data['reqProtein']);
-          await prefs.setInt('gramFats', data['reqFats']);
+          await prefs.setInt('gramCarbs', data['gramCarbs']);
+          await prefs.setInt('gramProtein', data['gramProtein']);
+          await prefs.setInt('gramFats', data['gramFats']);
           await prefs.setString('physicalActivity', data['lifestyle']);
           await prefs.setString('userBMI', data['bmi']);
           await prefs.setStringList(
@@ -231,6 +244,7 @@ class Auth {
           await prefs.setInt('dailyCarbs', macros['carbs']);
           await prefs.setInt('dailyProtein', macros['fats']);
           await prefs.setInt('dailyFats', macros['proteins']);
+
           try {
             final userRef = FirebaseStorage.instance
                 .ref()
@@ -269,6 +283,12 @@ class Auth {
           dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
           dailyProtein = prefs.getInt('dailyProtein') ?? 0;
           dailyFats = prefs.getInt('dailyFats') ?? 0;
+
+          await dailyUserMacros.set({
+            'carbs': dailyCarbs,
+            'fats': dailyFats,
+            'proteins': dailyProtein,
+          });
         }
       }
     } on SocketException catch (_) {
