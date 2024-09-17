@@ -76,7 +76,7 @@ class _CameraPageState extends State<CameraPage> {
           imageHeight: image.height,
           imageWidth: image.width,
           iouThreshold: 0.4,
-          confThreshold: 0.4,
+          confThreshold: 0.5,
           classThreshold: 0.5,
         );
 
@@ -201,6 +201,7 @@ class _CameraPageState extends State<CameraPage> {
                       height: 8.0), // Space between detected items and button
                   ElevatedButton(
                     onPressed: () {
+                      _stopDetection();
                       Navigator.pushNamed(
                         context,
                         '/foodServing',

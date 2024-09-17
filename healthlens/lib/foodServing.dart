@@ -7,6 +7,7 @@ import 'package:healthlens/main.dart';
 import 'package:iconly/iconly.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'backend_firebase/foodExchange.dart';
 
 class FoodServing extends StatefulWidget {
   @override
@@ -28,22 +29,9 @@ class _FoodServingState extends State<FoodServing> {
   Map<String, String?> selectedParts = {};
 
   // Macronutrient data based on the part selected for each item
-  final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
-    'spoon': {
-      'Leg': {'fats': 5, 'carbs': 5, 'proteins': 5},
-      'Wing': {'fats': 5, 'carbs': 5, 'proteins': 5},
-      'Breast': {'fats': 5, 'carbs': 5, 'proteins': 5},
-      'Thigh': {'fats': 5, 'carbs': 5, 'proteins': 5},
-    },
-    'fork': {
-      'Head': {'fats': 5, 'carbs': 5, 'proteins': 5},
-      'Body': {'fats': 5, 'carbs': 5, 'proteins': 5},
-      'Tail': {'fats': 5, 'carbs': 5, 'proteins': 5},
-    }
-  };
 
   String removeId(String tag) {
-    return tag.replaceAll(RegExp(r'\s?\d+'), '');
+    return tag.replaceAll(RegExp(r'\d+'), '');
   }
 
   @override
@@ -124,28 +112,44 @@ class _FoodServingState extends State<FoodServing> {
     String itemRemovedId = '';
     itemRemovedId = removeId(item);
     print(itemRemovedId);
-    final parts =
-        itemMacronutrients[itemRemovedId.toLowerCase()]?.keys.toList() ?? [];
+    final parts = itemMacronutrients[itemRemovedId]?.keys.toList() ?? [];
 
     if (parts.isEmpty) return SizedBox.shrink();
-
     return Column(
       children: [
-        Text('Select part:'),
-        DropdownButton<String>(
-          value: selectedParts[item],
-          items: parts.map((part) {
-            return DropdownMenuItem<String>(
-              value: part,
-              child: Text(part),
-            );
-          }).toList(),
-          onChanged: (String? selectedPart) {
-            setState(() {
-              selectedParts[item] = selectedPart;
-              print('part: $selectedPart');
-            });
-          },
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Builder(
+              builder: (context) {
+                if (itemRemovedId.contains('Egg')) {
+                  return Text('Type:');
+                } else if (itemRemovedId.contains('Rice')) {
+                  return Text('Serving Size:');
+                } else {
+                  return Text('Select part:');
+                }
+              },
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            DropdownButton<String>(
+              value: selectedParts[item] ?? parts.first,
+              items: parts.map((part) {
+                return DropdownMenuItem<String>(
+                  value: part,
+                  child: Text(part),
+                );
+              }).toList(),
+              onChanged: (String? selectedPart) {
+                setState(() {
+                  selectedParts[item] = selectedPart;
+                  print('part: $selectedPart');
+                });
+              },
+            ),
+          ],
         ),
         if (selectedParts[itemRemovedId] != null)
           Column(
@@ -156,13 +160,13 @@ class _FoodServingState extends State<FoodServing> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'Fats: ${itemMacronutrients[itemRemovedId.toLowerCase()]?[selectedParts[itemRemovedId]]?['fats']}g',
+                'Fats: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['fats']}g',
               ),
               Text(
-                'Carbs: ${itemMacronutrients[itemRemovedId.toLowerCase()]?[selectedParts[itemRemovedId]]?['carbs']}g',
+                'Carbs: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['carbs']}g',
               ),
               Text(
-                'Proteins: ${itemMacronutrients[itemRemovedId.toLowerCase()]?[selectedParts[itemRemovedId]]?['proteins']}g',
+                'Proteins: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['proteins']}g',
               ),
             ],
           )
@@ -178,12 +182,12 @@ class _FoodServingState extends State<FoodServing> {
     foodItemsRemovedId.forEach((foodItemsRemovedId) {
       foodItemsRemovedId['item'] =
           removeId(foodItemsRemovedId['item'] as String);
-      print(foodItemsRemovedId['item']);
+      print("item removedId: $foodItemsRemovedId['item']");
     });
     List<Map<String, dynamic>> wrappedItems = foodItemsRemovedId.map((item) {
       final selectedPart = selectedParts[item['item']];
       final macronutrients =
-          itemMacronutrients[item['item'].toLowerCase()]?[selectedPart] ?? {};
+          itemMacronutrients[item['item']]?[selectedPart] ?? {};
 
       print(macronutrients['carbs']);
       print(macronutrients['proteins']);
@@ -307,7 +311,7 @@ class _FoodServingState extends State<FoodServing> {
 
       final currentMacros = userMacrosDoc.exists
           ? userMacrosDoc.data()! as Map<String, dynamic>?
-          : {'carbs': 0, 'proteins': 0, 'fats': 0};
+          : {'carbs': 0, 'proteins': 0, 'fats': 0, 'calories': 0};
 
       final currentCarbs = _parseInt(currentMacros?['carbs']);
       final currentProteins = _parseInt(currentMacros?['proteins']);
@@ -316,7 +320,6 @@ class _FoodServingState extends State<FoodServing> {
       int totalCarbs = currentCarbs;
       int totalProteins = currentProteins;
       int totalFats = currentFats;
-
       // Sum up macronutrients from the newMacrosList, taking quantity into account
       for (var item in newMacrosList) {
         final quantity = _parseInt(item['quantity']); // Get the item quantity
@@ -347,7 +350,7 @@ class _FoodServingState extends State<FoodServing> {
       final currentMacros = userMacrosDoc.exists
           ? userMacrosDoc.data()! as Map<String, dynamic>?
           : {'carbs': 0, 'proteins': 0, 'fats': 0};
-
+      int TotalDailyCalories = _parseInt(currentMacros?['calories']);
       int totalCarbs = _parseInt(currentMacros?['carbs']);
       int totalProteins = _parseInt(currentMacros?['proteins']);
       int totalFats = _parseInt(currentMacros?['fats']);
@@ -360,6 +363,9 @@ class _FoodServingState extends State<FoodServing> {
         totalFats += _parseInt(item['fats']) * quantity;
       }
 
+      TotalDailyCalories +=
+          ((totalCarbs * 4) + (totalFats * 9) + (totalProteins * 4));
+
       // Update user macros document in Firebase
       await FirebaseFirestore.instance
           .collection('userMacros')
@@ -368,6 +374,7 @@ class _FoodServingState extends State<FoodServing> {
         'carbs': totalCarbs,
         'proteins': totalProteins,
         'fats': totalFats,
+        'calories': TotalDailyCalories,
       }, SetOptions(merge: true));
 
       // Update SharedPreferences
@@ -375,10 +382,12 @@ class _FoodServingState extends State<FoodServing> {
       await prefs.setInt('dailyCarbs', totalCarbs);
       await prefs.setInt('dailyProtein', totalProteins);
       await prefs.setInt('dailyFats', totalFats);
+      await prefs.setInt('dailyCalories', TotalDailyCalories);
 
       dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
       dailyProtein = prefs.getInt('dailyProtein') ?? 0;
       dailyFats = prefs.getInt('dailyFats') ?? 0;
+      dailyCalories = prefs.getInt('dailyCalories') ?? 0;
 
       final thisUserUid = thisUser?.uid;
       final String currentDate = DateTime.now().toIso8601String().split('T')[0];
@@ -391,6 +400,7 @@ class _FoodServingState extends State<FoodServing> {
         'carbs': dailyCarbs,
         'fats': dailyFats,
         'proteins': dailyProtein,
+        'calories': TotalDailyCalories,
       });
 
       print('User macros updated successfully.');
@@ -407,14 +417,16 @@ class _FoodServingState extends State<FoodServing> {
       int id = _generateUniqueId();
       // Create a new entry for the separated item
       final separatedItem = {
-        'tag': "${originalItem['tag']} ${id.toString()}",
+        'tag': "${originalItem['tag']}${id.toString()}",
+        'quantity': newQuantity,
+      };
+      print('separataed item: $separatedItem');
+      final separatedFoodItem = {
+        'item': "${originalItem['tag']}${id.toString()}",
         'quantity': newQuantity,
       };
 
-      final separatedFoodItem = {
-        'item': "${originalItem['tag']} ${id.toString()}",
-        'quantity': newQuantity,
-      };
+      print('separataed item: $separatedFoodItem');
       // Add the separated item to the detected items list
       try {
         _detectedItems.add(separatedItem);
@@ -453,10 +465,14 @@ class _FoodServingState extends State<FoodServing> {
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         child: Material(
-                          color: Colors.transparent,
+                          elevation: 5,
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5),
                           child: ListTile(
                             shape: RoundedRectangleBorder(
-                              side: BorderSide(color: Colors.black, width: 1),
+                              side: BorderSide(
+                                  color: const Color.fromARGB(255, 95, 95, 95),
+                                  width: 1),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             isThreeLine: true,

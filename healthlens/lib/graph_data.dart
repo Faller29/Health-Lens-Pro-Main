@@ -1,9 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'main.dart';
+import 'package:intl/intl.dart';
+
+final _userId = thisUser?.uid;
+
 class ChartData {
   ChartData(this.x, this.y1, this.y2, this.y3);
-  final String x;
-  final double y1;
-  final double y2;
-  final double y3;
+  final String x; // Day as string (e.g., 'Mon', 'Tue')
+  final double y1; // Fats
+  final double y2; // Proteins
+  final double y3; // Carbs
 }
 
 class AverageData {
@@ -14,46 +20,13 @@ class AverageData {
   AverageData(this.x, this.y, this.y2, this.y3);
 }
 
-final List<ChartData> chartData = [
-  ChartData('7am', 12, 10, 14),
-  ChartData('8am', 14, 11, 18),
-  ChartData('9am', 14, 10, 15),
-  ChartData('10am', 14, 16, 18),
-  ChartData('11am', 13, 13, 18),
-  ChartData('12am', 16, 10, 14),
-];
+List<ChartData> chartData = []; // Data for today
+List<ChartData> chartData1 = []; // Last 7 days data
+List<ChartData> chartData2 = []; // Last 30 days data
 
-final List<ChartData> chartData1 = [
-  ChartData('Mon', 16, 13, 14),
-  ChartData('Tue', 14, 14, 16),
-  ChartData('Wed', 16, 11, 12),
-  ChartData('Thu', 19, 21, 11),
-  ChartData('Fri', 14, 12, 18),
-  ChartData('Sat', 17, 22, 23),
-  ChartData('Sun', 17, 16, 21),
-];
-
-final List<ChartData> chartData2 = [
-  ChartData('1', 16, 16, 14),
-  ChartData('2', 14, 12, 18),
-  ChartData('3', 16, 23, 15),
-  ChartData('4', 13, 16, 13),
-  ChartData('5', 21, 23, 18),
-  ChartData('6', 16, 11, 15),
-  ChartData('7', 16, 11, 25),
-  ChartData('8', 14, 23, 12),
-  ChartData('9', 11, 21, 23),
-];
-
-List<AverageData> barChart = [
-  AverageData('Ave. Today', 14, 13, 18),
-];
-List<AverageData> barChart1 = [
-  AverageData('Ave. 7 days', 16, 19, 18),
-];
-List<AverageData> barChart2 = [
-  AverageData('Ave. 30 days', 24, 22, 19),
-];
+List<AverageData> barChart = [];
+List<AverageData> barChart1 = [];
+List<AverageData> barChart2 = [];
 
 final List<ChartData> weightData = [
   ChartData('1', 76, 16, 14),
@@ -63,26 +36,194 @@ final List<ChartData> weightData = [
   ChartData('5', 75.1, 23, 18),
   ChartData('6', 75.4, 11, 15),
   ChartData('7', 75.8, 11, 25),
-  // ChartData('8', 76, 23, 12),
-  // ChartData('9', 76, 21, 23),
-  // ChartData('10', 76, 16, 14),
-  // ChartData('11', 76, 12, 18),
-  // ChartData('12', 76, 12, 18),
-  // ChartData('13', 76, 23, 15),
-  // ChartData('14', 75.5, 16, 13),
-  // ChartData('15', 75.1, 23, 18),
-  // ChartData('16', 75.4, 11, 15),
-  // ChartData('17', 75.8, 11, 25),
-  // ChartData('18', 76, 23, 12),
-  // ChartData('19', 76, 21, 23),
-  // ChartData('20', 76, 12, 18),
-  // ChartData('21', 76, 16, 14),
-  // ChartData('22', 76, 12, 18),
-  // ChartData('23', 76, 23, 15),
-  // ChartData('24', 75.5, 16, 13),
-  // ChartData('25', 75.1, 23, 18),
-  // ChartData('26', 75.4, 11, 15),
-  // ChartData('27', 75.8, 11, 25),
-  // ChartData('28', 76, 23, 12),
-  // ChartData('29', 76, 21, 23),
 ];
+
+Future<void> fetchMacrosData() async {
+  final firestore = FirebaseFirestore.instance;
+  final DateTime now = DateTime.now();
+  final DateTime sevenDaysAgo = now.subtract(Duration(days: 7));
+  final DateTime thirtyDaysAgo = now.subtract(Duration(days: 30));
+  final String todayDate = DateFormat('yyyy-MM-dd').format(now);
+
+  // Fetch data for today
+  QuerySnapshot<Map<String, dynamic>> todaySnapshot = await firestore
+      .collection('food_history')
+      .doc(_userId)
+      .collection(todayDate)
+      .get();
+  final Map<String, Map<String, double>> todayMap = {};
+
+  for (var doc in todaySnapshot.docs) {
+    final data = doc.data();
+    final List<dynamic> items = data['items'] ?? [];
+    final time = DateFormat('HH:mm').format(DateTime.parse(data['timestamp']));
+
+    if (!todayMap.containsKey(time)) {
+      todayMap[time] = {'fats': 0, 'proteins': 0, 'carbs': 0};
+    }
+
+    for (var item in items) {
+      todayMap[time]!['fats'] =
+          (todayMap[time]!['fats'] ?? 0) + (item['fats'] ?? 0);
+      todayMap[time]!['proteins'] =
+          (todayMap[time]!['proteins'] ?? 0) + (item['proteins'] ?? 0);
+      todayMap[time]!['carbs'] =
+          (todayMap[time]!['carbs'] ?? 0) + (item['carbs'] ?? 0);
+    }
+  }
+  chartData = todayMap.entries.map((entry) {
+    return ChartData(
+      entry.key, // Time in hh:mm
+      entry.value['fats']!.toDouble(),
+      entry.value['proteins']!.toDouble(),
+      entry.value['carbs']!.toDouble(),
+    );
+  }).toList();
+
+  // Fetch data for last 7 days
+  QuerySnapshot<Map<String, dynamic>> last7DaysSnapshot = await firestore
+      .collection('userMacros')
+      .doc(_userId)
+      .collection('MacrosIntakeHistory')
+      .where(FieldPath.documentId,
+          isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(sevenDaysAgo))
+      .where(FieldPath.documentId,
+          isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(now))
+      .get();
+
+  chartData1 = last7DaysSnapshot.docs.map((doc) {
+    final data = doc.data();
+    DateTime date = DateTime.parse(doc.id);
+    String displayDate =
+        getDayOfWeek(date.weekday); // Convert to 'Mon', 'Tue', etc.
+    return ChartData(
+      displayDate,
+      (data['fats'] ?? 0).toDouble(),
+      (data['proteins'] ?? 0).toDouble(),
+      (data['carbs'] ?? 0).toDouble(),
+    );
+  }).toList();
+
+  // Fetch data for last 30 days
+  QuerySnapshot<Map<String, dynamic>> last30DaysSnapshot = await firestore
+      .collection('userMacros')
+      .doc(_userId)
+      .collection('MacrosIntakeHistory')
+      .where(FieldPath.documentId,
+          isGreaterThanOrEqualTo:
+              DateFormat('yyyy-MM-dd').format(thirtyDaysAgo))
+      .where(FieldPath.documentId,
+          isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(now))
+      .get();
+
+  chartData2 = last30DaysSnapshot.docs.map((doc) {
+    final data = doc.data();
+    DateTime date = DateTime.parse(doc.id);
+    String displayDate = date.day.toString(); // Convert to day number
+    return ChartData(
+      displayDate,
+      (data['fats'] ?? 0).toDouble(),
+      (data['proteins'] ?? 0).toDouble(),
+      (data['carbs'] ?? 0).toDouble(),
+    );
+  }).toList();
+
+  updateAverageData();
+
+  // Optional: Calculate overall average for specific period or other metrics if needed
+}
+
+void updateAverageData() {
+  // Helper function to round a double to 2 decimal points
+  double decimalValue(double value) {
+    return double.parse(value.toStringAsFixed(2));
+  }
+
+  // Average for Today (barChart)
+  final todayFats = chartData.map((data) => data.y1).toList();
+  final todayProteins = chartData.map((data) => data.y2).toList();
+  final todayCarbs = chartData.map((data) => data.y3).toList();
+
+  barChart = [
+    AverageData(
+      'Ave. Today',
+      todayFats.isNotEmpty
+          ? decimalValue(todayFats.reduce((a, b) => a + b) / todayFats.length)
+          : 0,
+      todayProteins.isNotEmpty
+          ? decimalValue(
+              todayProteins.reduce((a, b) => a + b) / todayProteins.length)
+          : 0,
+      todayCarbs.isNotEmpty
+          ? decimalValue(todayCarbs.reduce((a, b) => a + b) / todayCarbs.length)
+          : 0,
+    ),
+  ];
+
+  // Average for Last 7 Days (barChart1)
+  final last7DaysFats = chartData1.map((data) => data.y1).toList();
+  final last7DaysProteins = chartData1.map((data) => data.y2).toList();
+  final last7DaysCarbs = chartData1.map((data) => data.y3).toList();
+
+  barChart1 = [
+    AverageData(
+      'Ave. 7 days',
+      last7DaysFats.isNotEmpty
+          ? decimalValue(
+              last7DaysFats.reduce((a, b) => a + b) / last7DaysFats.length)
+          : 0,
+      last7DaysProteins.isNotEmpty
+          ? decimalValue(last7DaysProteins.reduce((a, b) => a + b) /
+              last7DaysProteins.length)
+          : 0,
+      last7DaysCarbs.isNotEmpty
+          ? decimalValue(
+              last7DaysCarbs.reduce((a, b) => a + b) / last7DaysCarbs.length)
+          : 0,
+    ),
+  ];
+
+  // Average for Last 30 Days (barChart2)
+  final last30DaysFats = chartData2.map((data) => data.y1).toList();
+  final last30DaysProteins = chartData2.map((data) => data.y2).toList();
+  final last30DaysCarbs = chartData2.map((data) => data.y3).toList();
+
+  barChart2 = [
+    AverageData(
+      'Ave. 30 days',
+      last30DaysFats.isNotEmpty
+          ? decimalValue(
+              last30DaysFats.reduce((a, b) => a + b) / last30DaysFats.length)
+          : 0,
+      last30DaysProteins.isNotEmpty
+          ? decimalValue(last30DaysProteins.reduce((a, b) => a + b) /
+              last30DaysProteins.length)
+          : 0,
+      last30DaysCarbs.isNotEmpty
+          ? decimalValue(
+              last30DaysCarbs.reduce((a, b) => a + b) / last30DaysCarbs.length)
+          : 0,
+    ),
+  ];
+}
+
+String getDayOfWeek(int weekday) {
+  switch (weekday) {
+    case 1:
+      return 'Mon';
+    case 2:
+      return 'Tue';
+    case 3:
+      return 'Wed';
+    case 4:
+      return 'Thu';
+    case 5:
+      return 'Fri';
+    case 6:
+      return 'Sat';
+    case 7:
+      return 'Sun';
+    default:
+      return '';
+  }
+}

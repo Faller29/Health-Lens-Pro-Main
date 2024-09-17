@@ -15,10 +15,25 @@ class AnalyticsPage extends StatefulWidget {
 class _AnalyticsPageState extends State<AnalyticsPage> {
   int _selectedDayIndex = 0;
   PageController _pageController = PageController(initialPage: 0);
-  Color protein = Color(0xffff5963);
-  Color fats = Color(0xff249689);
-  Color carbs = Color(0xff4b39ef);
+  Color protein = const Color(0xffff5963);
+  Color fats = const Color(0xff249689);
+  Color carbs = const Color(0xff4b39ef);
   final List<Item> _data = generateItems(1);
+  bool _isDataLoaded = false; // For managing loading state
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAndLoadData();
+  }
+
+  Future<void> _fetchAndLoadData() async {
+    // Assuming `thisUser` is your global user object containing the userId
+    await fetchMacrosData();
+    setState(() {
+      _isDataLoaded = true; // Mark the data as loaded
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,19 +45,15 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
-                    color: Color(0xffffffff),
+                    color: const Color(0xffffffff),
                     boxShadow: [
-                      BoxShadow(
+                      const BoxShadow(
                         blurRadius: 4.0,
                         color: Color(0x33000000),
-                        offset: Offset(
-                          0.0,
-                          2.0,
-                        ),
                       )
                     ],
                     borderRadius: BorderRadius.circular(8.0),
@@ -51,7 +62,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: EdgeInsets.fromLTRB(0, 14, 0, 8),
+                        padding: const EdgeInsets.fromLTRB(0, 14, 0, 8),
                         child: Text(
                           'Macronutrients',
                           style: GoogleFonts.outfit(
@@ -61,14 +72,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         height: 45,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
                               child: IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.arrow_left,
                                   size: 35,
                                 ),
@@ -76,14 +87,15 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                   if (_selectedDayIndex > 0) {
                                     _selectedDayIndex--;
                                     _pageController.previousPage(
-                                      duration: Duration(milliseconds: 300),
+                                      duration:
+                                          const Duration(milliseconds: 300),
                                       curve: Curves.ease,
                                     );
                                   }
                                 },
                               ),
                             ),
-                            Container(
+                            SizedBox(
                               width: MediaQuery.of(context).size.width / 2,
                               child: Text(
                                 _selectedDayIndex == 0
@@ -100,7 +112,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                             ),
                             Container(
                               child: IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.arrow_right,
                                   size: 35,
                                 ),
@@ -108,7 +120,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                   if (_selectedDayIndex < 2) {
                                     _selectedDayIndex++;
                                     _pageController.nextPage(
-                                      duration: Duration(milliseconds: 300),
+                                      duration:
+                                          const Duration(milliseconds: 300),
                                       curve: Curves.ease,
                                     );
                                   }
@@ -119,9 +132,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.fromLTRB(10, 4, 10, 4),
+                        padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
                         child: SizedBox(
-                          height: 300,
+                          height: 400,
                           child: PageView(
                             controller: _pageController,
                             onPageChanged: (index) {
@@ -151,7 +164,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                 style: GoogleFonts.readexPro(
                                   fontSize: 14.0,
                                   fontWeight: FontWeight.bold,
-                                  textStyle: TextStyle(
+                                  textStyle: const TextStyle(
                                     color: Color(0xff4b39ef),
                                   ),
                                 ),
@@ -159,7 +172,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                               onPressed: () {
                                 Navigator.pushNamed(context, '/calendar');
                               },
-                              icon: Icon(
+                              icon: const Icon(
                                 IconlyBroken.calendar,
                                 color: Color(0xff4b39ef),
                                 size: 25,
@@ -173,19 +186,15 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(14),
+                padding: const EdgeInsets.all(14),
                 child: Container(
                   width: MediaQuery.sizeOf(context).width,
                   decoration: BoxDecoration(
-                    color: Color(0xffffffff),
+                    color: const Color(0xffffffff),
                     boxShadow: [
-                      BoxShadow(
+                      const BoxShadow(
                         blurRadius: 4.0,
                         color: Color(0x33000000),
-                        offset: Offset(
-                          0.0,
-                          2.0,
-                        ),
                       )
                     ],
                     borderRadius: BorderRadius.circular(8.0),
@@ -202,7 +211,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(10),
                               child: Text(
                                 "Food History",
                                 style: GoogleFonts.readexPro(
@@ -259,44 +268,49 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   Widget _buildStackedColumnChart() {
     return Column(
       children: [
-        Container(
-          height: 220,
+        SizedBox(
+          height: 320,
           width: MediaQuery.sizeOf(context).width,
           child: SfCartesianChart(
+            enableAxisAnimation: true,
             zoomPanBehavior: ZoomPanBehavior(
               enablePinching: true,
               zoomMode: ZoomMode.x,
               enablePanning: true,
             ),
-            primaryXAxis: CategoryAxis(),
-            primaryYAxis: CategoryAxis(
-              rangePadding: ChartRangePadding.none,
+            primaryXAxis: const CategoryAxis(
+              minimum: 0,
             ),
-            legend: Legend(
+            primaryYAxis: const CategoryAxis(
+              rangePadding: ChartRangePadding.none,
+              minimum: 0,
+            ),
+            legend: const Legend(
               isVisible: true,
             ),
             series: <CartesianSeries>[
               StackedLineSeries<ChartData, String>(
                   color: fats,
-                  dataLabelSettings: DataLabelSettings(
+                  dataLabelSettings: const DataLabelSettings(
                     isVisible: true,
-                    showZeroValue: true,
                     margin: EdgeInsets.all(3),
-                    labelPosition: ChartDataLabelPosition.inside,
+                    labelPosition: ChartDataLabelPosition.outside,
                     textStyle:
                         TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                     labelAlignment: ChartDataLabelAlignment.middle,
                     alignment: ChartAlignment.center,
                     useSeriesColor: true,
                   ),
+                  groupName: 'Fats',
                   name: 'Fats',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y1,
-                  pointColorMapper: (ChartData data, _) => Color(0xff249689)),
+                  pointColorMapper: (ChartData data, _) =>
+                      const Color(0xff249689)),
               StackedLineSeries<ChartData, String>(
                   color: protein,
-                  dataLabelSettings: DataLabelSettings(
+                  dataLabelSettings: const DataLabelSettings(
                     isVisible: true,
                     margin: EdgeInsets.all(3),
                     labelPosition: ChartDataLabelPosition.inside,
@@ -306,14 +320,16 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     alignment: ChartAlignment.center,
                     useSeriesColor: true,
                   ),
+                  groupName: 'Protein',
                   name: 'Protein',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y2,
-                  pointColorMapper: (ChartData data, _) => Color(0xffff5963)),
+                  pointColorMapper: (ChartData data, _) =>
+                      const Color(0xffff5963)),
               StackedLineSeries<ChartData, String>(
                   color: carbs,
-                  dataLabelSettings: DataLabelSettings(
+                  dataLabelSettings: const DataLabelSettings(
                     isVisible: true,
                     margin: EdgeInsets.all(3),
                     labelPosition: ChartDataLabelPosition.inside,
@@ -323,23 +339,27 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     labelAlignment: ChartDataLabelAlignment.middle,
                     alignment: ChartAlignment.center,
                   ),
+                  groupName: 'Carbohydrates',
                   name: 'Carbohydrates',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y3,
-                  pointColorMapper: (ChartData data, _) => Color(0xff4b39ef)),
+                  pointColorMapper: (ChartData data, _) =>
+                      const Color(0xff4b39ef)),
             ],
           ),
         ),
-        Container(
+        SizedBox(
             width: MediaQuery.sizeOf(context).width,
             height: 80,
             child: SfCartesianChart(
-                primaryXAxis: CategoryAxis(),
+                primaryXAxis: const CategoryAxis(
+                  minimum: 0,
+                ),
                 series: <CartesianSeries>[
                   StackedBarSeries<AverageData, String>(
                       color: fats,
-                      dataLabelSettings: DataLabelSettings(
+                      dataLabelSettings: const DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
                         textStyle: TextStyle(
@@ -352,10 +372,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       xValueMapper: (AverageData data, _) => data.x,
                       yValueMapper: (AverageData data, _) => data.y,
                       pointColorMapper: (AverageData data, _) =>
-                          Color(0xff249689)),
+                          const Color(0xff249689)),
                   StackedBarSeries<AverageData, String>(
                       color: protein,
-                      dataLabelSettings: DataLabelSettings(
+                      dataLabelSettings: const DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
                         textStyle: TextStyle(
@@ -368,10 +388,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       xValueMapper: (AverageData data, _) => data.x,
                       yValueMapper: (AverageData data, _) => data.y2,
                       pointColorMapper: (AverageData data, _) =>
-                          Color(0xffff5963)),
+                          const Color(0xffff5963)),
                   StackedBarSeries<AverageData, String>(
                     color: carbs,
-                    dataLabelSettings: DataLabelSettings(
+                    dataLabelSettings: const DataLabelSettings(
                       isVisible: true,
                       labelPosition: ChartDataLabelPosition.inside,
                       textStyle:
@@ -384,7 +404,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     xValueMapper: (AverageData data, _) => data.x,
                     yValueMapper: (AverageData data, _) => data.y3,
                     pointColorMapper: (AverageData data, _) =>
-                        Color(0xff4b39ef),
+                        const Color(0xff4b39ef),
                   )
                 ]))
       ],
@@ -394,76 +414,93 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   Widget _buildStackedColumnChart1() {
     return Column(
       children: [
-        Container(
-          height: 220,
+        SizedBox(
+          height: 320,
           width: MediaQuery.sizeOf(context).width,
           child: SfCartesianChart(
-            primaryXAxis: CategoryAxis(),
-            primaryYAxis: CategoryAxis(
-              rangePadding: ChartRangePadding.none,
+            zoomPanBehavior: ZoomPanBehavior(
+              enablePinching: true,
+              zoomMode: ZoomMode.x,
+              enablePanning: true,
             ),
-            legend: Legend(isVisible: true),
+            primaryXAxis: const CategoryAxis(),
+            primaryYAxis: const CategoryAxis(
+              rangePadding: ChartRangePadding.none,
+              minimum: 0,
+            ),
+            legend: const Legend(isVisible: true),
             series: <CartesianSeries>[
               StackedColumnSeries<ChartData, String>(
-                  color: fats,
-                  dataLabelSettings: DataLabelSettings(
-                    isVisible: false,
-                    labelPosition: ChartDataLabelPosition.inside,
-                    textStyle:
-                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                    labelAlignment: ChartDataLabelAlignment.middle,
-                    alignment: ChartAlignment.center,
-                  ),
-                  groupName: 'Fats',
-                  name: 'Fats',
-                  dataSource: chartData1,
-                  xValueMapper: (ChartData data, _) => data.x,
-                  yValueMapper: (ChartData data, _) => data.y1,
-                  pointColorMapper: (ChartData data, _) => Color(0xff249689)),
+                color: fats,
+                dataLabelSettings: const DataLabelSettings(
+                  showZeroValue: true,
+                  showCumulativeValues: true,
+                  isVisible: true,
+                  labelPosition: ChartDataLabelPosition.inside,
+                  textStyle:
+                      TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                  labelAlignment: ChartDataLabelAlignment.top,
+                  alignment: ChartAlignment.center,
+                ),
+                name: 'Fats',
+                dataSource: chartData1,
+                xValueMapper: (ChartData data, _) => data.x,
+                yValueMapper: (ChartData data, _) => data.y1,
+                pointColorMapper: (ChartData data, _) =>
+                    const Color(0xff249689),
+              ),
               StackedColumnSeries<ChartData, String>(
                   color: protein,
-                  dataLabelSettings: DataLabelSettings(
-                    isVisible: false,
+                  dataLabelSettings: const DataLabelSettings(
+                    showZeroValue: true,
+                    showCumulativeValues: true,
+                    isVisible: true,
                     labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
                         TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                     labelAlignment: ChartDataLabelAlignment.middle,
                     alignment: ChartAlignment.center,
                   ),
-                  groupName: 'Protein',
                   name: 'Protein',
                   dataSource: chartData1,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y2,
-                  pointColorMapper: (ChartData data, _) => Color(0xffff5963)),
+                  pointColorMapper: (ChartData data, _) =>
+                      const Color(0xffff5963)),
               StackedColumnSeries<ChartData, String>(
                   color: carbs,
-                  dataLabelSettings: DataLabelSettings(
-                    isVisible: false,
+                  dataLabelSettings: const DataLabelSettings(
+                    showZeroValue: true,
+                    showCumulativeValues: true,
+                    isVisible: true,
                     labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
                         TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                     labelAlignment: ChartDataLabelAlignment.middle,
                     alignment: ChartAlignment.center,
                   ),
-                  groupName: 'Carbohydrates',
                   name: 'Carbohydrates',
                   dataSource: chartData1,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y3,
-                  pointColorMapper: (ChartData data, _) => Color(0xff4b39ef)),
+                  pointColorMapper: (ChartData data, _) =>
+                      const Color(0xff4b39ef)),
             ],
           ),
         ),
-        Container(
+        SizedBox(
             width: MediaQuery.sizeOf(context).width,
             height: 80,
             child: SfCartesianChart(
-                primaryXAxis: CategoryAxis(),
+                primaryXAxis: const CategoryAxis(
+                  minimum: 0,
+                ),
                 series: <CartesianSeries>[
                   StackedBarSeries<AverageData, String>(
                       color: fats,
-                      dataLabelSettings: DataLabelSettings(
+                      dataLabelSettings: const DataLabelSettings(
+                        showZeroValue: true,
+                        showCumulativeValues: true,
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
                         textStyle: TextStyle(
@@ -476,10 +513,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       xValueMapper: (AverageData data, _) => data.x,
                       yValueMapper: (AverageData data, _) => data.y,
                       pointColorMapper: (AverageData data, _) =>
-                          Color(0xff249689)),
+                          const Color(0xff249689)),
                   StackedBarSeries<AverageData, String>(
                       color: protein,
-                      dataLabelSettings: DataLabelSettings(
+                      dataLabelSettings: const DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
                         textStyle: TextStyle(
@@ -492,10 +529,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       xValueMapper: (AverageData data, _) => data.x,
                       yValueMapper: (AverageData data, _) => data.y2,
                       pointColorMapper: (AverageData data, _) =>
-                          Color(0xffff5963)),
+                          const Color(0xffff5963)),
                   StackedBarSeries<AverageData, String>(
                     color: carbs,
-                    dataLabelSettings: DataLabelSettings(
+                    dataLabelSettings: const DataLabelSettings(
                       isVisible: true,
                       labelPosition: ChartDataLabelPosition.inside,
                       textStyle:
@@ -508,7 +545,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     xValueMapper: (AverageData data, _) => data.x,
                     yValueMapper: (AverageData data, _) => data.y3,
                     pointColorMapper: (AverageData data, _) =>
-                        Color(0xff4b39ef),
+                        const Color(0xff4b39ef),
                   )
                 ]))
       ],
@@ -518,19 +555,19 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   Widget _buildStackedColumnChart2() {
     return Column(
       children: [
-        Container(
-          height: 220,
+        SizedBox(
+          height: 320,
           width: MediaQuery.sizeOf(context).width,
           child: SfCartesianChart(
-            primaryXAxis: CategoryAxis(),
-            primaryYAxis: CategoryAxis(
+            primaryXAxis: const CategoryAxis(),
+            primaryYAxis: const CategoryAxis(
               rangePadding: ChartRangePadding.none,
             ),
-            legend: Legend(isVisible: true),
+            legend: const Legend(isVisible: true),
             series: <CartesianSeries>[
               StackedColumnSeries<ChartData, String>(
                   color: fats,
-                  dataLabelSettings: DataLabelSettings(
+                  dataLabelSettings: const DataLabelSettings(
                     isVisible: true,
                     labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
@@ -542,10 +579,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: chartData2,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y1,
-                  pointColorMapper: (ChartData data, _) => Color(0xff249689)),
+                  pointColorMapper: (ChartData data, _) =>
+                      const Color(0xff249689)),
               StackedColumnSeries<ChartData, String>(
                   color: protein,
-                  dataLabelSettings: DataLabelSettings(
+                  dataLabelSettings: const DataLabelSettings(
                     isVisible: true,
                     labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
@@ -557,10 +595,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: chartData2,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y2,
-                  pointColorMapper: (ChartData data, _) => Color(0xffff5963)),
+                  pointColorMapper: (ChartData data, _) =>
+                      const Color(0xffff5963)),
               StackedColumnSeries<ChartData, String>(
                   color: carbs,
-                  dataLabelSettings: DataLabelSettings(
+                  dataLabelSettings: const DataLabelSettings(
                     isVisible: true,
                     labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
@@ -572,18 +611,21 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: chartData2,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y3,
-                  pointColorMapper: (ChartData data, _) => Color(0xff4b39ef)),
+                  pointColorMapper: (ChartData data, _) =>
+                      const Color(0xff4b39ef)),
             ],
           ),
         ),
-        Container(
+        SizedBox(
             width: MediaQuery.sizeOf(context).width,
             height: 80,
             child: SfCartesianChart(
-                primaryXAxis: CategoryAxis(),
+                primaryXAxis: const CategoryAxis(
+                  minimum: 0,
+                ),
                 series: <CartesianSeries>[
                   StackedBarSeries<AverageData, String>(
-                      dataLabelSettings: DataLabelSettings(
+                      dataLabelSettings: const DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
                         textStyle: TextStyle(
@@ -596,9 +638,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       xValueMapper: (AverageData data, _) => data.x,
                       yValueMapper: (AverageData data, _) => data.y,
                       pointColorMapper: (AverageData data, _) =>
-                          Color(0xff249689)),
+                          const Color(0xff249689)),
                   StackedBarSeries<AverageData, String>(
-                      dataLabelSettings: DataLabelSettings(
+                      dataLabelSettings: const DataLabelSettings(
                         isVisible: true,
                         labelPosition: ChartDataLabelPosition.inside,
                         textStyle: TextStyle(
@@ -611,9 +653,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       xValueMapper: (AverageData data, _) => data.x,
                       yValueMapper: (AverageData data, _) => data.y2,
                       pointColorMapper: (AverageData data, _) =>
-                          Color(0xffff5963)),
+                          const Color(0xffff5963)),
                   StackedBarSeries<AverageData, String>(
-                    dataLabelSettings: DataLabelSettings(
+                    dataLabelSettings: const DataLabelSettings(
                       isVisible: true,
                       labelPosition: ChartDataLabelPosition.inside,
                       textStyle:
@@ -626,7 +668,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     xValueMapper: (AverageData data, _) => data.x,
                     yValueMapper: (AverageData data, _) => data.y3,
                     pointColorMapper: (AverageData data, _) =>
-                        Color(0xff4b39ef),
+                        const Color(0xff4b39ef),
                   )
                 ]))
       ],

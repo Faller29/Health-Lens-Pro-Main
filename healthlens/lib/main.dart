@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:healthlens/backend_firebase/firestore_provider.dart';
 import 'package:healthlens/calendar_history.dart';
 import 'package:healthlens/entry_point.dart';
+import 'package:healthlens/exercise_page.dart';
 import 'package:healthlens/firebase_options.dart';
 import 'package:healthlens/foodServing.dart';
+import 'package:healthlens/graph_data.dart';
 import 'package:healthlens/healthProfile.dart';
 import 'package:healthlens/userProfile.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +53,7 @@ double? desiredBodyWeight;
 int? dailyCarbs;
 int? dailyProtein;
 int? dailyFats;
+int? dailyCalories;
 
 var url;
 
@@ -82,6 +85,7 @@ void saveData() async {
   dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
   dailyProtein = prefs.getInt('dailyProtein') ?? 0;
   dailyFats = prefs.getInt('dailyFats') ?? 0;
+  dailyCalories = prefs.getInt('dailyCalories') ?? 0;
 }
 
 void main() async {
@@ -148,6 +152,7 @@ class MyApp extends StatelessWidget {
         '/editUser': (context) => UserProfilePage(),
         '/editHealth': (context) => healthProfile(),
         '/foodServing': (context) => FoodServing(),
+        '/exercise': (context) => ExercisePage(),
       },
     );
   }
@@ -242,8 +247,9 @@ class Auth {
               'chronicDisease', data['chronicDisease'].cast<String>());
 
           await prefs.setInt('dailyCarbs', macros['carbs']);
-          await prefs.setInt('dailyProtein', macros['fats']);
-          await prefs.setInt('dailyFats', macros['proteins']);
+          await prefs.setInt('dailyProtein', macros['proteins']);
+          await prefs.setInt('dailyFats', macros['fats']);
+          await prefs.setInt('dailyCalories', macros['calories']);
 
           try {
             final userRef = FirebaseStorage.instance
@@ -283,12 +289,26 @@ class Auth {
           dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
           dailyProtein = prefs.getInt('dailyProtein') ?? 0;
           dailyFats = prefs.getInt('dailyFats') ?? 0;
-
+          dailyCalories = prefs.getInt('dailyCalories') ?? 0;
           await dailyUserMacros.set({
             'carbs': dailyCarbs,
             'fats': dailyFats,
             'proteins': dailyProtein,
           });
+
+          print(dailyCarbs);
+          print(dailyFats);
+          print(dailyProtein);
+          print('cal: $dailyCalories');
+          print('carbs $gramCarbs');
+          print((dailyCarbs ?? 0) / (gramCarbs ?? 0));
+
+          print('carbs $gramFats');
+          print((dailyFats ?? 0) / (gramFats ?? 0));
+
+          print('carbs $gramProtein');
+          print((dailyProtein ?? 0) / (gramProtein ?? 0));
+          fetchMacrosData();
         }
       }
     } on SocketException catch (_) {

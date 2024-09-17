@@ -17,6 +17,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'main.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 const double contWidth = 100;
 const double contHeight = 140;
@@ -826,6 +827,63 @@ class _HomePage extends State<HomePage> {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
+                    child: SizedBox(
+                      child: SfLinearGauge(
+                        showLabels: false,
+                        minorTicksPerInterval: 4,
+                        useRangeColorForAxis: true,
+                        animateAxis: true,
+                        axisTrackStyle: LinearAxisTrackStyle(thickness: 1),
+                        ranges: <LinearGaugeRange>[
+                          //First range
+                          LinearGaugeRange(
+                              startValue: 0,
+                              endValue: ((dailyCalories! / TER!) * 100),
+                              color: Colors.green),
+                        ],
+                        markerPointers: [
+                          LinearShapePointer(
+                              elevation: 3,
+                              value: ((dailyCalories! / TER!) * 100)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 0, 10, 0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          Text(
+                            "Calories: ",
+                            style: GoogleFonts.readexPro(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              textStyle: const TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "${dailyCalories.toString()}/${TER}",
+                            style: GoogleFonts.readexPro(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              textStyle: const TextStyle(
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: TextButton.icon(
@@ -839,20 +897,21 @@ class _HomePage extends State<HomePage> {
                         ),
                         textAlign: TextAlign.end,
                       ),
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Container(
-                              height: 300,
-                              width: 500,
-                              child: const Center(
-                                child: Text("Exercises"),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                      onPressed: (((dailyCalories! / TER!) * 100) > 5)
+                          ? () {
+                              Navigator.pushNamed(context, '/exercise');
+                            }
+                          : () {
+                              showCupertinoModalPopup(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(builder:
+                                        (BuildContext context,
+                                            StateSetter setState) {
+                                      return Center();
+                                    });
+                                  });
+                            },
                       icon: const Icon(
                         Icons.fitness_center,
                         color: Color(0xff4b39ef),
