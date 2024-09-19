@@ -107,14 +107,42 @@ class _FoodServingState extends State<FoodServing> {
 
   // Build item options with parts and display macronutrients
   Widget _buildItemOptions(String item) {
-    print('item: $item');
+    List<int> chronicIndexList = [];
 
     String itemRemovedId = '';
     itemRemovedId = removeId(item);
-    print(itemRemovedId);
     final parts = itemMacronutrients[itemRemovedId]?.keys.toList() ?? [];
 
     if (parts.isEmpty) return SizedBox.shrink();
+
+    // Ensure selectedParts[itemRemovedId] is set to the first item if null
+    if (selectedParts[itemRemovedId] == null && parts.isNotEmpty) {
+      selectedParts[itemRemovedId] = parts.first;
+    }
+    if (chronicDisease!.contains('Obesity')) {
+      chronicIndexList.add(1);
+    } else if (chronicDisease!.contains('Hypertension')) {
+      chronicIndexList.add(2);
+    } else if (chronicDisease!.contains('Diabetes [Type 1 & 2]')) {
+      chronicIndexList.add(3);
+    } else {
+      chronicIndexList.add(4);
+    }
+
+    // Helper function to get the warning message based on the chronic index
+    String _getWarningMessage(int chronicIndex) {
+      switch (chronicIndex) {
+        case 1:
+          return 'This food is bad for your health if you have Obesity.';
+        case 2:
+          return 'This food is bad for your health if you have Hypertension.';
+        case 3:
+          return 'This food is bad for your health if you have Diabetes.';
+        default:
+          return 'This food is not healthy for you.';
+      }
+    }
+
     return Column(
       children: [
         Row(
@@ -123,11 +151,11 @@ class _FoodServingState extends State<FoodServing> {
             Builder(
               builder: (context) {
                 if (itemRemovedId.contains('Egg')) {
-                  return Text('Type:');
+                  return Text('Type:', style: GoogleFonts.readexPro());
                 } else if (itemRemovedId.contains('Rice')) {
-                  return Text('Serving Size:');
+                  return Text('Serving Size:', style: GoogleFonts.readexPro());
                 } else {
-                  return Text('Select part:');
+                  return Text('Select part:', style: GoogleFonts.readexPro());
                 }
               },
             ),
@@ -135,41 +163,91 @@ class _FoodServingState extends State<FoodServing> {
               width: 20,
             ),
             DropdownButton<String>(
-              value: selectedParts[item] ?? parts.first,
+              dropdownColor: Colors.white,
+              value: selectedParts[itemRemovedId],
               items: parts.map((part) {
                 return DropdownMenuItem<String>(
                   value: part,
-                  child: Text(part),
+                  child: Text(part, style: GoogleFonts.readexPro()),
                 );
               }).toList(),
               onChanged: (String? selectedPart) {
                 setState(() {
-                  selectedParts[item] = selectedPart;
-                  print('part: $selectedPart');
+                  selectedParts[itemRemovedId] = selectedPart;
                 });
               },
             ),
           ],
         ),
         if (selectedParts[itemRemovedId] != null)
-          Column(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Macronutrients:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: GoogleFonts.readexPro(),
+                textAlign: TextAlign.left,
               ),
-              Text(
-                'Fats: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['fats']}g',
+              SizedBox(
+                width: 20,
               ),
-              Text(
-                'Carbs: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['carbs']}g',
-              ),
-              Text(
-                'Proteins: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['proteins']}g',
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Fats: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['fats']}g',
+                    style: GoogleFonts.readexPro(
+                      textStyle: TextStyle(
+                        color: const Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Carbs: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['carbs']}g',
+                    style: GoogleFonts.readexPro(
+                      textStyle: TextStyle(
+                        color: const Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Proteins: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['proteins']}g',
+                    style: GoogleFonts.readexPro(
+                      textStyle: TextStyle(
+                        color: const Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  // Check for warnings based on chronicDisease
+                ],
               ),
             ],
-          )
+          ),
+        SizedBox(
+          height: 10,
+        ),
+        for (var chronicIndex in chronicIndexList)
+          if (itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]
+                  ?['warnings'] ==
+              chronicIndex)
+            Row(
+              children: [
+                Icon(Icons.warning, color: Colors.red),
+                SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    _getWarningMessage(chronicIndex),
+                    style: GoogleFonts.readexPro(
+                      fontSize: 12,
+                      textStyle: TextStyle(
+                        color: const Color.fromARGB(255, 177, 41, 31),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
       ],
     );
   }
@@ -182,20 +260,12 @@ class _FoodServingState extends State<FoodServing> {
     foodItemsRemovedId.forEach((foodItemsRemovedId) {
       foodItemsRemovedId['item'] =
           removeId(foodItemsRemovedId['item'] as String);
-      print("item removedId: $foodItemsRemovedId['item']");
     });
     List<Map<String, dynamic>> wrappedItems = foodItemsRemovedId.map((item) {
       final selectedPart = selectedParts[item['item']];
       final macronutrients =
           itemMacronutrients[item['item']]?[selectedPart] ?? {};
 
-      print(macronutrients['carbs']);
-      print(macronutrients['proteins']);
-      print(macronutrients['fats']);
-
-      print(macronutrients['carbs'].runtimeType);
-      print(macronutrients['proteins'].runtimeType);
-      print(macronutrients['fats'].runtimeType);
       return {
         'item': item['item'],
         'quantity': item['quantity'],
@@ -232,28 +302,17 @@ class _FoodServingState extends State<FoodServing> {
       // Wrap the data into a map that will be sent to Firebase
       final wrappedData = _wrapDataForFirebase();
 
-      print('start');
-      print(wrappedData);
-
-      print(wrappedData['carbs']);
-      print(wrappedData['proteins']);
-      print(wrappedData['fats']);
       // Get the current date in 'yyyy-MM-dd' format
       final String currentDate = DateTime.now().toIso8601String().split('T')[0];
-      print(currentDate);
       // Get the current time in 'hh:mm' format
       final String currentTime =
           "${DateTime.now().hour}:${DateTime.now().minute}";
-      print('checking');
       // Check if adding the current food serving will exceed the user's max intake
-      print(thisUser?.uid);
       // Check the data structure of wrappedData
-      print('Wrapped Data: $wrappedData');
 
       // Adjust according to the actual structure
       final bool canAdd = await _checkIfWithinMaxLimits(wrappedData['items']);
 
-      print('proceeding to add');
       if (canAdd) {
         // Save the food serving data in 'food_history'
         await FirebaseFirestore.instance
@@ -267,14 +326,14 @@ class _FoodServingState extends State<FoodServing> {
         await _updateUserMacros(wrappedData['items']);
 
         // Navigate to the EntryPoint page after confirming
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => EntryPoint()),
-        );
+        Navigator.of(context).pop();
       } else {
         // Notify user that the food exceeds their daily max intake
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
               content:
                   Text('This food exceeds your daily macronutrient limits!')),
         );
@@ -316,7 +375,6 @@ class _FoodServingState extends State<FoodServing> {
       final currentCarbs = _parseInt(currentMacros?['carbs']);
       final currentProteins = _parseInt(currentMacros?['proteins']);
       final currentFats = _parseInt(currentMacros?['fats']);
-      print(currentMacros);
       int totalCarbs = currentCarbs;
       int totalProteins = currentProteins;
       int totalFats = currentFats;
@@ -355,6 +413,13 @@ class _FoodServingState extends State<FoodServing> {
       int totalProteins = _parseInt(currentMacros?['proteins']);
       int totalFats = _parseInt(currentMacros?['fats']);
 
+      for (var items in newMacrosList) {
+        final quantity = _parseInt(items['quantity']);
+        TotalDailyCalories += (((_parseInt(items['carbs']) * quantity) * 4) +
+            ((_parseInt(items['fats']) * quantity) * 9) +
+            ((_parseInt(items['proteins']) * quantity) * 4));
+      }
+
       // Sum up macronutrients from the newMacrosList, considering quantity
       for (var item in newMacrosList) {
         final quantity = _parseInt(item['quantity']); // Get the item quantity
@@ -362,9 +427,6 @@ class _FoodServingState extends State<FoodServing> {
         totalProteins += _parseInt(item['proteins']) * quantity;
         totalFats += _parseInt(item['fats']) * quantity;
       }
-
-      TotalDailyCalories +=
-          ((totalCarbs * 4) + (totalFats * 9) + (totalProteins * 4));
 
       // Update user macros document in Firebase
       await FirebaseFirestore.instance
@@ -402,8 +464,6 @@ class _FoodServingState extends State<FoodServing> {
         'proteins': dailyProtein,
         'calories': TotalDailyCalories,
       });
-
-      print('User macros updated successfully.');
     } catch (e) {
       print('Error updating user macros: $e');
     }
@@ -420,13 +480,11 @@ class _FoodServingState extends State<FoodServing> {
         'tag': "${originalItem['tag']}${id.toString()}",
         'quantity': newQuantity,
       };
-      print('separataed item: $separatedItem');
       final separatedFoodItem = {
         'item': "${originalItem['tag']}${id.toString()}",
         'quantity': newQuantity,
       };
 
-      print('separataed item: $separatedFoodItem');
       // Add the separated item to the detected items list
       try {
         _detectedItems.add(separatedItem);
@@ -463,7 +521,7 @@ class _FoodServingState extends State<FoodServing> {
                     itemBuilder: (context, index) {
                       final item = foodItems[index]['item'];
                       return Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                         child: Material(
                           elevation: 5,
                           color: Colors.white,
@@ -477,13 +535,18 @@ class _FoodServingState extends State<FoodServing> {
                             ),
                             isThreeLine: true,
                             leading: Icon(Icons.restaurant_menu_outlined),
-                            title: Text(item),
+                            title: Text(
+                              item,
+                              style: GoogleFonts.readexPro(
+                                fontSize: 18,
+                              ),
+                            ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildItemOptions(item),
                                 Row(
-                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
@@ -499,12 +562,27 @@ class _FoodServingState extends State<FoodServing> {
                                       onPressed: () => increaseQuantity(index),
                                     ),
                                     IconButton(
-                                      icon: const Icon(IconlyLight.delete),
+                                      icon: const Icon(
+                                        IconlyLight.delete,
+                                        color: Colors.red,
+                                      ),
                                       onPressed: () => removeItem(index),
                                     ),
                                     TextButton(
                                       onPressed: () => separateItem(index),
-                                      child: Text('separate'),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_downward_outlined,
+                                            size: 15,
+                                          ),
+                                          Text(
+                                            'Separate',
+                                            style: GoogleFonts.readexPro(
+                                                fontSize: 13),
+                                          ),
+                                        ],
+                                      ),
                                     )
                                   ],
                                 ),
@@ -541,10 +619,10 @@ class _FoodServingState extends State<FoodServing> {
                       ),
                       ElevatedButton(
                         style: TextButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 57, 239, 81),
+                          backgroundColor: Color.fromARGB(255, 16, 150, 34),
                           foregroundColor: Colors.white,
                         ),
-                        child: Text('Add'),
+                        child: Text('Add', style: GoogleFonts.readexPro()),
                         onPressed: () {
                           showCupertinoModalPopup(
                             context: context,

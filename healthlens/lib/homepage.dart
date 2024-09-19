@@ -18,6 +18,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'main.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'weightPredition.dart';
 
 const double contWidth = 100;
 const double contHeight = 140;
@@ -47,6 +48,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePage();
 }
 
+List<WeightData>? dailyWeight;
+
 class _HomePage extends State<HomePage> {
   final List<Item> _data = generateItems(1);
   bool isVisible = false, inverseVisible = true;
@@ -56,6 +59,20 @@ class _HomePage extends State<HomePage> {
     super.initState();
     fetchImageUrl();
     print(thisUser!.uid);
+    _fetchWeightData();
+  }
+
+// Inside your fetch function, you can initialize it
+  Future<void> _fetchWeightData() async {
+    try {
+      final weightDataMap = await predictWeightChange();
+      setState(() {
+        dailyWeight = (weightDataMap['daily'] ?? [])
+            .cast<WeightData>(); // Ensure default is a non-null list
+      });
+    } catch (e) {
+      print("Error fetching weight data: $e");
+    }
   }
 
   Future<void> fetchImageUrl() async {
@@ -287,180 +304,84 @@ class _HomePage extends State<HomePage> {
                                             ),
                                           ),
                                         ),
-                                        Container(
-                                          height: 200,
-                                          child: SfCartesianChart(
-                                            enableSideBySideSeriesPlacement:
-                                                false,
-                                            zoomPanBehavior: ZoomPanBehavior(
-                                              enablePinching: true,
-                                              zoomMode: ZoomMode.x,
-                                              enablePanning: true,
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              8, 10, 8, 2),
+                                          child: SizedBox(
+                                            height: 300,
+                                            child: SfCartesianChart(
+                                              title: ChartTitle(
+                                                  text: 'Predicted Weight',
+                                                  textStyle:
+                                                      GoogleFonts.readexPro(
+                                                          color:
+                                                              Color(0xFF57636C),
+                                                          fontSize: 12),
+                                                  alignment:
+                                                      ChartAlignment.near),
+                                              zoomPanBehavior: ZoomPanBehavior(
+                                                enablePinching: true,
+                                                zoomMode: ZoomMode.x,
+                                                enablePanning: true,
+                                              ),
+                                              primaryXAxis: CategoryAxis(
+                                                initialVisibleMaximum: 5,
+                                              ),
+                                              primaryYAxis: NumericAxis(
+                                                  labelStyle:
+                                                      TextStyle(fontSize: 10),
+                                                  anchorRangeToVisiblePoints:
+                                                      true),
+                                              legend: Legend(
+                                                  itemPadding: 0,
+                                                  isVisible: true,
+                                                  position: LegendPosition.top,
+                                                  alignment:
+                                                      ChartAlignment.far),
+                                              series: <CartesianSeries>[
+                                                ColumnSeries<WeightData,
+                                                        String>(
+                                                    color: Color(0xff4b39ef),
+                                                    dataLabelSettings:
+                                                        DataLabelSettings(
+                                                      isVisible: true,
+                                                      showZeroValue: true,
+                                                      labelPosition:
+                                                          ChartDataLabelPosition
+                                                              .inside,
+                                                      textStyle: TextStyle(
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                      labelAlignment:
+                                                          ChartDataLabelAlignment
+                                                              .middle,
+                                                      alignment:
+                                                          ChartAlignment.center,
+                                                    ),
+                                                    name: 'Weight',
+                                                    dataSource: dailyWeight,
+                                                    xValueMapper:
+                                                        (WeightData data, _) =>
+                                                            data.x,
+                                                    yValueMapper:
+                                                        (WeightData data, _) =>
+                                                            data.y1,
+                                                    pointColorMapper:
+                                                        (WeightData data, _) =>
+                                                            Color(0xff4b39ef)),
+                                              ],
                                             ),
-                                            primaryXAxis: CategoryAxis(),
-                                            primaryYAxis: CategoryAxis(),
-                                            legend: Legend(isVisible: true),
-                                            series: <CartesianSeries>[
-                                              StackedColumnSeries<ChartData,
-                                                      String>(
-                                                  color: Color(0xff4b39ef),
-                                                  dataLabelSettings:
-                                                      DataLabelSettings(
-                                                    isVisible: true,
-                                                    showZeroValue: true,
-                                                    labelPosition:
-                                                        ChartDataLabelPosition
-                                                            .inside,
-                                                    textStyle: TextStyle(
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                    labelAlignment:
-                                                        ChartDataLabelAlignment
-                                                            .middle,
-                                                    alignment:
-                                                        ChartAlignment.center,
-                                                  ),
-                                                  name: 'Weight',
-                                                  dataSource: weightData,
-                                                  xValueMapper:
-                                                      (ChartData data, _) =>
-                                                          data.x,
-                                                  yValueMapper:
-                                                      (ChartData data, _) =>
-                                                          data.y1,
-                                                  pointColorMapper:
-                                                      (ChartData data, _) =>
-                                                          Color(0xff4b39ef)),
-                                            ],
                                           ),
                                         ),
                                         Visibility(
                                           visible: inverseVisible,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                isVisible = !isVisible;
-                                                inverseVisible =
-                                                    !inverseVisible;
-                                                print(isVisible);
-                                              });
+                                          child: TextButton(
+                                            onPressed: () => {
+                                              Navigator.pushNamed(
+                                                  context, '/editHealth')
                                             },
                                             child: Text('Update Weight'),
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible: isVisible,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    10, 0, 10, 0),
-                                                alignment: Alignment.centerLeft,
-                                                child: Text(
-                                                  'Update Weight: ',
-                                                  style: GoogleFonts.readexPro(
-                                                    fontSize: 18.0,
-                                                    textStyle: const TextStyle(
-                                                      color: Color.fromARGB(
-                                                          255, 0, 0, 0),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    10, 0, 10, 10),
-                                                child: TextFormField(
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  decoration: InputDecoration(
-                                                    labelText:
-                                                        'Enter Weight [kg]',
-                                                    labelStyle:
-                                                        GoogleFonts.outfit(
-                                                      fontSize: 15.0,
-                                                    ),
-                                                    enabledBorder:
-                                                        UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color:
-                                                            Color(0xffe0e3e7),
-                                                        width: 2.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                    ),
-                                                    focusedBorder:
-                                                        UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color:
-                                                            Color(0xff4b39ef),
-                                                        width: 2.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                    ),
-                                                    errorBorder:
-                                                        UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: Colors.black,
-                                                        width: 2.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                    ),
-                                                    focusedErrorBorder:
-                                                        UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: Colors.black,
-                                                        width: 2.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                    ),
-                                                  ),
-                                                  style: GoogleFonts.outfit(
-                                                    fontSize: 14.0,
-                                                  ),
-                                                ),
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        isVisible = !isVisible;
-                                                        inverseVisible =
-                                                            !inverseVisible;
-                                                        print(isVisible);
-                                                      });
-                                                    },
-                                                    child: Text('Update'),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        isVisible = !isVisible;
-                                                        inverseVisible =
-                                                            !inverseVisible;
-                                                        print(isVisible);
-                                                      });
-                                                    },
-                                                    child: Text('Cancel'),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
                                           ),
                                         ),
                                         Container(

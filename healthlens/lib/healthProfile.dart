@@ -64,14 +64,12 @@ class _healthProfile extends State<healthProfile> {
 
   Future<void> fetchPhysicalLifestyle() async {
     String userId = thisUser!.uid;
-    print(userId);
     DocumentSnapshot userDoc =
         await FirebaseFirestore.instance.collection('user').doc(userId).get();
 
     if (userDoc.exists) {
       setState(() {
         lifestyle = userDoc.get('lifestyle');
-        print('this' + lifestyle!);
       });
     }
   }
@@ -171,14 +169,11 @@ class _healthProfile extends State<healthProfile> {
           default:
             PA = 0;
         }
-        print('object');
         double thisTER = (desiredBodyWeight! * PA);
-        print(thisTER);
 
         String strThisTER = thisTER.toStringAsFixed(0);
         int intTER = int.parse(strThisTER);
         TER = roundUp50s(intTER);
-        print(TER);
 
         int carbs = 0, protein = 0, fats = 0;
         double doubleCarbs = 0, doubleProtein = 0, doubleFats = 0;
@@ -240,7 +235,6 @@ class _healthProfile extends State<healthProfile> {
           'weight': double.parse(_weightController.text),
           'chronicDisease': chronicDisease,
         });
-        print('lifestyle' + lifestyle!);
         await prefs.setStringList(
             'chronicDisease', chronicDisease.cast<String>());
         await prefs.setDouble('desiredBW', desiredBodyWeight!);
@@ -280,7 +274,8 @@ class _healthProfile extends State<healthProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile', style: GoogleFonts.readexPro(fontSize: 18)),
+        title: Text('Edit Health Profile',
+            style: GoogleFonts.readexPro(fontSize: 18)),
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
       ),
@@ -364,8 +359,6 @@ class _healthProfile extends State<healthProfile> {
                                 setState(() {
                                   disease['isChecked'] = val;
                                   getCheckedDiseases();
-                                  print(
-                                      '${disease['name']} isChecked: ${disease['isChecked']}');
                                 });
                               },
                             );
@@ -418,8 +411,6 @@ class _healthProfile extends State<healthProfile> {
                         callback: (RadioOption val) {
                           setState(() {
                             lifestyle = val.label;
-                            print(val.label);
-                            print(lifestyle);
                           });
                         }),
                     SizedBox(height: 10),

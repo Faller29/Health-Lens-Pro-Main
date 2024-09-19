@@ -10,7 +10,6 @@ class FirestoreProvider extends ChangeNotifier {
   String get username => _username;
 
   Future<void> getUsername() async {
-    print('Fetching username...');
     try {
       final currentUserInfo = await _firestore
           .collection("user")
@@ -20,7 +19,6 @@ class FirestoreProvider extends ChangeNotifier {
         final data = currentUserInfo.data() as Map<String, dynamic>;
         _username = data['name'];
         notifyListeners(); // Notify listeners about the change
-        print('Username updated: $_username');
       }
     } catch (e) {
       print("Error getting username: $e");

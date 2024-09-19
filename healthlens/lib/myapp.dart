@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'entry_point.dart'; // Import the entry_point file
 
 void main() {
@@ -20,3 +20,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+ */

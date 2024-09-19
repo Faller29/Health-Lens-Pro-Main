@@ -131,10 +131,7 @@ class Auth {
       url = null;
     }
 
-    print(chronicDisease);
     saveData();
-    print('saved Locally');
-    print(userName);
   }
 
   // Get the user's name from local storage

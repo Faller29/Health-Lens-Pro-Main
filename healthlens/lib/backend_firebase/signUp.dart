@@ -57,7 +57,6 @@ Future<bool> signUp(
 ) async {
   //concatenating name
   String fullName = fName + " " + mName + " " + lName;
-  print(fullName);
 
   desiredBodyWeight = desiredBW(height);
 
@@ -102,14 +101,11 @@ Future<bool> signUp(
     default:
       PA = 0;
   }
-  print('object');
   double thisTER = (desiredBodyWeight! * PA);
-  print(thisTER);
 
   String strThisTER = thisTER.toStringAsFixed(0);
   int intTER = int.parse(strThisTER);
   TER = roundUp50s(intTER);
-  print(TER);
 
   int carbs = 0, protein = 0, fats = 0;
   double doubleCarbs = 0, doubleProtein = 0, doubleFats = 0;

@@ -1,14 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:healthlens/views/camera_view.dart';
 import 'package:iconly/iconly.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'homePage.dart';
 import 'camerapage.dart';
 import 'profilePage.dart';
 import 'analyticspage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'main.dart';
 
 class EntryPoint extends StatefulWidget {
   final PageController? pageController;

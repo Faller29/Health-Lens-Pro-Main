@@ -39,7 +39,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     fetchImageUrl(); // Fetch the image URL when the widget is created
-    print(thisUser!.uid);
   }
 
   Future<void> fetchImageUrl() async {

@@ -100,21 +100,6 @@ void main() async {
   currentUserEmail = prefs.getString('currentUserEmail') ?? '';
   currentUserPincode = prefs.getString('currentUserPincode') ?? '';
   runApp(MyApp());
-
-  // Enable offline persistence
-
-  // Connect to the Authentication emulator
-  //FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-  //FirebaseFirestore.instance.useFirestoreEmulator('localhost', 9098);
-
-  //test connection to firebase
-  /**try {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    users.add({'test': 'connected'});
-    print('Data added successfully!');
-  } catch (e) {
-    print('Error adding data: $e');
-  }**/
 }
 
 class MyApp extends StatelessWidget {
@@ -179,7 +164,6 @@ class MyApp extends StatelessWidget {
   Future<bool> _isFirstLaunch() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
-    print(Future.delayed(Duration(minutes: 1)));
     // Set isFirstLaunch to false after 2 minutes
     Future.delayed(Duration(minutes: 1), () async {
       prefs.setBool('isFirstLaunch', false);
@@ -195,9 +179,6 @@ class Auth {
 
     if (user != null) {
       thisUser = user;
-
-      print(thisUser);
-      print(thisUser?.uid);
     }
     try {
       final result = await InternetAddress.lookup('example.com');
@@ -216,7 +197,12 @@ class Auth {
               .doc(thisUserUid)
               .collection('MacrosIntakeHistory')
               .doc(currentDate);
-
+          DocumentSnapshot document = await db
+              .collection("userMacros")
+              .doc(thisUserUid)
+              .collection('MacrosIntakeHistory')
+              .doc(currentDate)
+              .get();
           //get uuser daily macros
           final userMacros =
               await db.collection("userMacros").doc(thisUserUid).get();
@@ -256,12 +242,10 @@ class Auth {
                 .ref()
                 .child('users/$thisUserUid/profile.jpg');
             url = await userRef.getDownloadURL();
-            print(thisUserUid);
           } catch (e) {
             // If the download URL is not found or any error occurs, set url to an empty string
             url = null;
           }
-          print(url);
 
           chronicDisease = prefs.getStringList('chronicDisease');
           userFullName = prefs.getString('userFullName') ?? '';
@@ -290,24 +274,38 @@ class Auth {
           dailyProtein = prefs.getInt('dailyProtein') ?? 0;
           dailyFats = prefs.getInt('dailyFats') ?? 0;
           dailyCalories = prefs.getInt('dailyCalories') ?? 0;
-          await dailyUserMacros.set({
-            'carbs': dailyCarbs,
-            'fats': dailyFats,
-            'proteins': dailyProtein,
-          });
 
-          print(dailyCarbs);
-          print(dailyFats);
-          print(dailyProtein);
-          print('cal: $dailyCalories');
-          print('carbs $gramCarbs');
-          print((dailyCarbs ?? 0) / (gramCarbs ?? 0));
-
-          print('carbs $gramFats');
-          print((dailyFats ?? 0) / (gramFats ?? 0));
-
-          print('carbs $gramProtein');
-          print((dailyProtein ?? 0) / (gramProtein ?? 0));
+          if (document.exists) {
+            await dailyUserMacros.set({
+              'carbs': dailyCarbs,
+              'fats': dailyFats,
+              'proteins': dailyProtein,
+            });
+          } else {
+            await dailyUserMacros.set({
+              'carbs': 0,
+              'fats': 0,
+              'proteins': 0,
+              'calories': 0,
+            });
+            await FirebaseFirestore.instance
+                .collection('userMacros')
+                .doc(thisUser?.uid)
+                .set({
+              'carbs': 0,
+              'proteins': 0,
+              'fats': 0,
+              'calories': 0,
+            }, SetOptions(merge: true));
+            await prefs.setInt('dailyCarbs', 0);
+            await prefs.setInt('dailyProtein', 0);
+            await prefs.setInt('dailyFats', 0);
+            await prefs.setInt('dailyCalories', 0);
+            dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
+            dailyProtein = prefs.getInt('dailyProtein') ?? 0;
+            dailyFats = prefs.getInt('dailyFats') ?? 0;
+            dailyCalories = prefs.getInt('dailyCalories') ?? 0;
+          }
           fetchMacrosData();
         }
       }

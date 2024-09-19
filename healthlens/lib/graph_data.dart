@@ -28,16 +28,6 @@ List<AverageData> barChart = [];
 List<AverageData> barChart1 = [];
 List<AverageData> barChart2 = [];
 
-final List<ChartData> weightData = [
-  ChartData('1', 76, 16, 14),
-  ChartData('2', 76, 12, 18),
-  ChartData('3', 76, 23, 15),
-  ChartData('4', 75.5, 16, 13),
-  ChartData('5', 75.1, 23, 18),
-  ChartData('6', 75.4, 11, 15),
-  ChartData('7', 75.8, 11, 25),
-];
-
 Future<void> fetchMacrosData() async {
   final firestore = FirebaseFirestore.instance;
   final DateTime now = DateTime.now();
