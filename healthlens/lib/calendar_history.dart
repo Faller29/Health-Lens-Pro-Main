@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/food_data_history.dart';
+import 'package:healthlens/history_page.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-
+import 'package:intl/intl.dart';
 import 'graph_data.dart';
 
 void main() {
@@ -98,31 +99,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 initialSelectedDate: DateTime.now(),
                 onTap: (CalendarTapDetails details) {
-                  if (details.targetElement == CalendarElement.calendarCell) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: Colors.white,
-                          title: Text('Selected Date'),
-                          content: Container(
-                            height: 100,
-                            width: 100,
-                            color: Colors.white,
-                            child: Center(
-                              child: Text(details.date.toString()),
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Close'),
-                            ),
-                          ],
-                        );
-                      },
+                  if (details.targetElement == CalendarElement.calendarCell &&
+                      details.date != null) {
+                    String formattedDate =
+                        DateFormat('yy-MM-dd').format(details.date!);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            HistoryPage(formattedDate: formattedDate),
+                      ),
                     );
                   }
                 },

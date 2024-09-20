@@ -14,6 +14,8 @@ List<WeightData> monthlyWeight = [];
 Future<Map<String, List<WeightData>>> predictWeightChange() async {
   final firestore = FirebaseFirestore.instance;
   final String? _userId = thisUser?.uid;
+  print('predict weight of: ');
+  print(_userId);
   if (_userId == null) {
     throw Exception("User ID is null");
   }

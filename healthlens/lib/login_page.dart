@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/backend_firebase/auth.dart';
 import 'package:healthlens/entry_point.dart';
@@ -27,9 +28,10 @@ class _LoginPageState extends State<LoginPage> {
   String _userName = '';
   String _email = ''; // Add this to store the email
   bool _isChangingAccount = false;
-  bool _changeAccountPressed = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pincodeController = TextEditingController();
+  final String requiredPin = '';
+  bool loading = false;
 
   @override
   void initState() {
@@ -71,11 +73,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLogin() async {
+    loading = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     _emailController.text = _email;
     String email = _emailController.text;
     String pincode = _pincodeController.text;
+
     User? user = await _authService.signInWithEmailAndPincode(email, pincode);
 
     print(_email);
@@ -101,6 +105,17 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => EntryPoint()),
+      );
+    }
+    loading = false;
+    if (user == null) {
+      String errorMessage = 'Log in Failed. Check your Email and Password';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            behavior: SnackBarBehavior.floating,
+            elevation: 3,
+            duration: const Duration(seconds: 2),
+            content: Text(errorMessage)),
       );
     }
   }
@@ -166,137 +181,69 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                          16.0, 12.0, 16.0, 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Visibility(
-                            visible: _changeAccountPressed,
-                            child: TextButton.icon(
-                              onPressed: () {
-                                setState(() {
-                                  _isChangingAccount = !_isChangingAccount;
-                                  _changeAccountPressed = false;
-                                  if (!_isChangingAccount) {
-                                    _emailController.text = _email;
-                                  } else {
-                                    _email = '';
-                                  }
-                                  print(_email);
-                                  print(_emailController.text);
-                                });
-                              },
-                              label: Text(
-                                'Change Account',
-                                style: GoogleFonts.urbanist(
-                                  color: Colors.black,
-                                  fontSize: 12.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              icon: FaIcon(
-                                FontAwesomeIcons.exchangeAlt,
-                                color: Color(0xFF101213),
-                                size: 11.0,
-                              ),
-                              style: ButtonStyle(
-                                side: MaterialStatePropertyAll(
-                                  BorderSide(
-                                    color: Color(0xFFE0E3E7),
-                                    width: 1.0,
-                                  ),
-                                ),
-                                shape:
-                                    MaterialStateProperty.all<OutlinedBorder>(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        50.0), // Set the desired border radius
-                                  ),
-                                ),
-                                padding: MaterialStateProperty.all<EdgeInsets>(
-                                  EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                       child: Align(
-                        alignment: Alignment.center,
-                        child: _isChangingAccount
-                            ? Padding(
-                                padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
-                                child: TextFormField(
-                                  initialValue: _email,
-                                  decoration: InputDecoration(
-                                    contentPadding:
-                                        EdgeInsets.fromLTRB(10, 10, 10, 10),
-                                    labelText: 'Email',
-                                    labelStyle: GoogleFonts.outfit(
-                                      fontSize: 15.0,
-                                    ),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0xffe0e3e7),
-                                        width: 2.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0xff4b39ef),
-                                        width: 2.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    errorBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.red,
-                                        width: 2.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    focusedErrorBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0xff4b39ef),
-                                        width: 2.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 18.0,
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value == null || value.isEmpty) {
-                                        // Handle empty or null value
-                                      } else {
-                                        _email = value;
-                                      }
-                                    });
-                                  },
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your Email';
-                                    }
-                                    return null; // Validation successful
-                                  },
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
+                            child: TextFormField(
+                              initialValue: _email,
+                              decoration: InputDecoration(
+                                contentPadding:
+                                    EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                labelText: 'Email',
+                                labelStyle: GoogleFonts.outfit(
+                                  fontSize: 15.0,
                                 ),
-                              )
-                            : Text(
-                                _userName.isNotEmpty ? _userName : 'No User',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 22.0,
-                                    fontWeight: FontWeight.bold),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xffe0e3e7),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xff4b39ef),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                errorBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedErrorBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xff4b39ef),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
                               ),
-                      ),
+                              style: GoogleFonts.outfit(
+                                fontSize: 18.0,
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  if (value == null || value.isEmpty) {
+                                    // Handle empty or null value
+                                  } else {
+                                    _email = value;
+                                  }
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your Email';
+                                }
+                                return null; // Validation successful
+                              },
+                            ),
+                          )),
                     ),
                     Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 0),
@@ -309,6 +256,7 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               PinCodeTextField(
+                                blinkWhenObscuring: true,
                                 controller: _pincodeController,
                                 autoDisposeControllers: false,
                                 appContext: context,
@@ -324,27 +272,27 @@ class _LoginPageState extends State<LoginPage> {
                                 errorTextSpace: 16.0,
                                 showCursor: true,
                                 cursorColor: Color(0xff4b39ef),
-                                obscureText: false,
+                                obscureText: true,
                                 hintCharacter: '●',
                                 keyboardType: TextInputType.number,
                                 pinTheme: PinTheme(
-                                  fieldHeight: 44.0,
-                                  fieldWidth: 44.0,
-                                  borderWidth: 2.0,
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(12.0),
-                                    bottomRight: Radius.circular(12.0),
-                                    topLeft: Radius.circular(12.0),
-                                    topRight: Radius.circular(12.0),
-                                  ),
-                                  shape: PinCodeFieldShape.box,
-                                  activeColor: Colors.black,
-                                  inactiveColor: Colors.grey,
-                                  selectedColor: Color(0xff4b39ef),
-                                  activeFillColor: Colors.black,
-                                  inactiveFillColor: Colors.grey,
-                                  selectedFillColor: Color(0xff4b39ef),
-                                ),
+                                    fieldHeight: 44.0,
+                                    fieldWidth: 44.0,
+                                    borderWidth: 2.0,
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(12.0),
+                                      bottomRight: Radius.circular(12.0),
+                                      topLeft: Radius.circular(12.0),
+                                      topRight: Radius.circular(12.0),
+                                    ),
+                                    shape: PinCodeFieldShape.box,
+                                    activeColor: Color(0xFF017E07),
+                                    inactiveColor: Colors.grey,
+                                    selectedColor: Color(0xff4b39ef),
+                                    activeFillColor: Color(0xFF017E07),
+                                    inactiveFillColor: Colors.grey,
+                                    selectedFillColor: Color(0xff4b39ef),
+                                    errorBorderColor: Colors.red),
                                 onChanged: (_) {},
                                 autovalidateMode:
                                     AutovalidateMode.onUserInteraction,

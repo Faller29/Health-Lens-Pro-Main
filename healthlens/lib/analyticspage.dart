@@ -1,9 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/food_data_history.dart';
 import 'package:healthlens/graph_data.dart';
+import 'package:healthlens/history_page.dart';
+import 'package:healthlens/main.dart';
 import 'package:iconly/iconly.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
 
 class AnalyticsPage extends StatefulWidget {
   const AnalyticsPage({Key? key}) : super(key: key);
@@ -134,7 +139,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
                         child: SizedBox(
-                          height: 400,
+                          height: MediaQuery.sizeOf(context).height / 1.35,
                           child: PageView(
                             controller: _pageController,
                             onPageChanged: (index) {
@@ -170,7 +175,85 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                 ),
                               ),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/calendar');
+                                showCupertinoModalPopup(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                      builder: (BuildContext context,
+                                          StateSetter setState) {
+                                        return Card(
+                                          color: Colors.white,
+                                          elevation: 0,
+                                          margin: const EdgeInsets.fromLTRB(
+                                              10, 200, 10, 200),
+                                          child: SfCalendar(
+                                            view: CalendarView.month,
+                                            showTodayButton: true,
+                                            headerHeight: 50,
+                                            showNavigationArrow: true,
+                                            viewNavigationMode:
+                                                ViewNavigationMode.snap,
+                                            todayHighlightColor:
+                                                Color(0xff4b39ef),
+                                            todayTextStyle: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                            showDatePickerButton: true,
+                                            monthViewSettings:
+                                                MonthViewSettings(
+                                              monthCellStyle: MonthCellStyle(
+                                                todayBackgroundColor:
+                                                    Color(0xff4b39ef),
+                                              ),
+                                              showTrailingAndLeadingDates:
+                                                  false,
+                                            ),
+                                            headerStyle: CalendarHeaderStyle(
+                                              textAlign: TextAlign.center,
+                                              textStyle: GoogleFonts.outfit(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                              backgroundColor:
+                                                  Color(0xff4b39ef),
+                                            ),
+                                            viewHeaderStyle: ViewHeaderStyle(
+                                              dayTextStyle:
+                                                  GoogleFonts.readexPro(
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              backgroundColor: Color.fromARGB(
+                                                  255, 236, 236, 236),
+                                            ),
+                                            initialSelectedDate: DateTime.now(),
+                                            maxDate: DateTime.now(),
+                                            onTap:
+                                                (CalendarTapDetails details) {
+                                              if (details.targetElement ==
+                                                      CalendarElement
+                                                          .calendarCell &&
+                                                  details.date != null) {
+                                                String formattedDate =
+                                                    DateFormat('yyyy-MM-dd')
+                                                        .format(details.date!);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        HistoryPage(
+                                                            formattedDate:
+                                                                formattedDate),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
                               },
                               icon: const Icon(
                                 IconlyBroken.calendar,
@@ -185,7 +268,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   ),
                 ),
               ),
-              Padding(
+              /* Padding(
                 padding: const EdgeInsets.all(14),
                 child: Container(
                   width: MediaQuery.sizeOf(context).width,
@@ -257,7 +340,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     ],
                   ),
                 ),
-              )
+              ) */
             ],
           ),
         ],
@@ -268,49 +351,69 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   Widget _buildStackedColumnChart() {
     return Column(
       children: [
-        SizedBox(
-          height: 320,
+        Container(
+          height: 150,
           width: MediaQuery.sizeOf(context).width,
           child: SfCartesianChart(
-            enableAxisAnimation: true,
             zoomPanBehavior: ZoomPanBehavior(
               enablePinching: true,
               zoomMode: ZoomMode.x,
               enablePanning: true,
             ),
-            primaryXAxis: const CategoryAxis(
-              minimum: 0,
+            primaryXAxis: CategoryAxis(
+              labelIntersectAction: AxisLabelIntersectAction.hide,
             ),
-            primaryYAxis: const CategoryAxis(
+            primaryYAxis: CategoryAxis(
+              labelIntersectAction: AxisLabelIntersectAction.hide,
               rangePadding: ChartRangePadding.none,
-              minimum: 0,
             ),
-            legend: const Legend(
+            legend: Legend(
               isVisible: true,
             ),
             series: <CartesianSeries>[
               StackedLineSeries<ChartData, String>(
                   color: fats,
-                  dataLabelSettings: const DataLabelSettings(
+                  dataLabelSettings: DataLabelSettings(
+                    labelIntersectAction: LabelIntersectAction.hide,
+                    showZeroValue: true,
+                    showCumulativeValues: true,
                     isVisible: true,
                     margin: EdgeInsets.all(3),
-                    labelPosition: ChartDataLabelPosition.outside,
+                    labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
                         TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                     labelAlignment: ChartDataLabelAlignment.middle,
                     alignment: ChartAlignment.center,
                     useSeriesColor: true,
                   ),
-                  groupName: 'Fats',
                   name: 'Fats',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y1,
-                  pointColorMapper: (ChartData data, _) =>
-                      const Color(0xff249689)),
+                  pointColorMapper: (ChartData data, _) => Color(0xff249689)),
+            ],
+          ),
+        ),
+        Container(
+          width: MediaQuery.sizeOf(context).width,
+          height: 150,
+          child: SfCartesianChart(
+            zoomPanBehavior: ZoomPanBehavior(
+              enablePinching: true,
+              zoomMode: ZoomMode.x,
+              enablePanning: true,
+            ),
+            primaryXAxis: CategoryAxis(),
+            primaryYAxis: CategoryAxis(
+              rangePadding: ChartRangePadding.none,
+            ),
+            legend: Legend(
+              isVisible: true,
+            ),
+            series: <CartesianSeries>[
               StackedLineSeries<ChartData, String>(
                   color: protein,
-                  dataLabelSettings: const DataLabelSettings(
+                  dataLabelSettings: DataLabelSettings(
                     isVisible: true,
                     margin: EdgeInsets.all(3),
                     labelPosition: ChartDataLabelPosition.inside,
@@ -320,18 +423,42 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     alignment: ChartAlignment.center,
                     useSeriesColor: true,
                   ),
-                  groupName: 'Protein',
                   name: 'Protein',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y2,
-                  pointColorMapper: (ChartData data, _) =>
-                      const Color(0xffff5963)),
+                  pointColorMapper: (ChartData data, _) => Color(0xffff5963)),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: MediaQuery.sizeOf(context).width,
+          height: 150,
+          child: SfCartesianChart(
+            zoomPanBehavior: ZoomPanBehavior(
+              enablePinching: true,
+              zoomMode: ZoomMode.x,
+              enablePanning: true,
+            ),
+            primaryXAxis: CategoryAxis(
+              labelIntersectAction: AxisLabelIntersectAction.hide,
+            ),
+            primaryYAxis: CategoryAxis(
+              labelIntersectAction: AxisLabelIntersectAction.hide,
+              rangePadding: ChartRangePadding.none,
+            ),
+            legend: Legend(
+              isVisible: true,
+            ),
+            series: <CartesianSeries>[
               StackedLineSeries<ChartData, String>(
                   color: carbs,
-                  dataLabelSettings: const DataLabelSettings(
+                  dataLabelSettings: DataLabelSettings(
+                    showZeroValue: true,
+                    showCumulativeValues: true,
                     isVisible: true,
                     margin: EdgeInsets.all(3),
+                    labelIntersectAction: LabelIntersectAction.hide,
                     labelPosition: ChartDataLabelPosition.inside,
                     useSeriesColor: true,
                     textStyle:
@@ -339,74 +466,245 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     labelAlignment: ChartDataLabelAlignment.middle,
                     alignment: ChartAlignment.center,
                   ),
-                  groupName: 'Carbohydrates',
                   name: 'Carbohydrates',
                   dataSource: chartData,
                   xValueMapper: (ChartData data, _) => data.x,
                   yValueMapper: (ChartData data, _) => data.y3,
-                  pointColorMapper: (ChartData data, _) =>
-                      const Color(0xff4b39ef)),
+                  pointColorMapper: (ChartData data, _) => Color(0xff4b39ef)),
             ],
           ),
         ),
         SizedBox(
-            width: MediaQuery.sizeOf(context).width,
-            height: 80,
-            child: SfCartesianChart(
-                primaryXAxis: const CategoryAxis(
-                  minimum: 0,
+          width: MediaQuery.sizeOf(context).width,
+          height: 80,
+          child: SfCartesianChart(
+            primaryXAxis: const CategoryAxis(
+              minimum: 0,
+            ),
+            series: <CartesianSeries>[
+              StackedBarSeries<AverageData, String>(
+                  color: fats,
+                  dataLabelSettings: const DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
+                  dataSource: barChart,
+                  name: 'Fats',
+                  xValueMapper: (AverageData data, _) => data.x,
+                  yValueMapper: (AverageData data, _) => data.y,
+                  pointColorMapper: (AverageData data, _) =>
+                      const Color(0xff249689)),
+              StackedBarSeries<AverageData, String>(
+                  color: protein,
+                  dataLabelSettings: const DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
+                  dataSource: barChart,
+                  name: 'Protein',
+                  xValueMapper: (AverageData data, _) => data.x,
+                  yValueMapper: (AverageData data, _) => data.y2,
+                  pointColorMapper: (AverageData data, _) =>
+                      const Color(0xffff5963)),
+              StackedBarSeries<AverageData, String>(
+                color: carbs,
+                dataLabelSettings: const DataLabelSettings(
+                  isVisible: true,
+                  labelPosition: ChartDataLabelPosition.inside,
+                  textStyle:
+                      TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                  labelAlignment: ChartDataLabelAlignment.middle,
+                  alignment: ChartAlignment.center,
                 ),
-                series: <CartesianSeries>[
-                  StackedBarSeries<AverageData, String>(
-                      color: fats,
-                      dataLabelSettings: const DataLabelSettings(
-                        isVisible: true,
-                        labelPosition: ChartDataLabelPosition.inside,
-                        textStyle: TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold),
-                        labelAlignment: ChartDataLabelAlignment.middle,
-                        alignment: ChartAlignment.center,
+                dataSource: barChart,
+                name: 'Carbohydrates',
+                xValueMapper: (AverageData data, _) => data.x,
+                yValueMapper: (AverageData data, _) => data.y3,
+                pointColorMapper: (AverageData data, _) =>
+                    const Color(0xff4b39ef),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Macronutrients',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                      dataSource: barChart,
-                      name: 'Fats',
-                      xValueMapper: (AverageData data, _) => data.x,
-                      yValueMapper: (AverageData data, _) => data.y,
-                      pointColorMapper: (AverageData data, _) =>
-                          const Color(0xff249689)),
-                  StackedBarSeries<AverageData, String>(
-                      color: protein,
-                      dataLabelSettings: const DataLabelSettings(
-                        isVisible: true,
-                        labelPosition: ChartDataLabelPosition.inside,
-                        textStyle: TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold),
-                        labelAlignment: ChartDataLabelAlignment.middle,
-                        alignment: ChartAlignment.center,
-                      ),
-                      dataSource: barChart,
-                      name: 'Protein',
-                      xValueMapper: (AverageData data, _) => data.x,
-                      yValueMapper: (AverageData data, _) => data.y2,
-                      pointColorMapper: (AverageData data, _) =>
-                          const Color(0xffff5963)),
-                  StackedBarSeries<AverageData, String>(
-                    color: carbs,
-                    dataLabelSettings: const DataLabelSettings(
-                      isVisible: true,
-                      labelPosition: ChartDataLabelPosition.inside,
-                      textStyle:
-                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      labelAlignment: ChartDataLabelAlignment.middle,
-                      alignment: ChartAlignment.center,
                     ),
-                    dataSource: barChart,
-                    name: 'Carbohydrates',
-                    xValueMapper: (AverageData data, _) => data.x,
-                    yValueMapper: (AverageData data, _) => data.y3,
-                    pointColorMapper: (AverageData data, _) =>
-                        const Color(0xff4b39ef),
-                  )
-                ]))
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Fats',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Proteins',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Carbs',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 50,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Avg.',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '${avrgFat.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${avrgProteins.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${avrgCarbs.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Goal',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '${gramFats.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${gramProtein.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${gramCarbs.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
@@ -433,13 +731,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               StackedColumnSeries<ChartData, String>(
                 color: fats,
                 dataLabelSettings: const DataLabelSettings(
-                  showZeroValue: true,
-                  showCumulativeValues: true,
                   isVisible: true,
                   labelPosition: ChartDataLabelPosition.inside,
                   textStyle:
                       TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                  labelAlignment: ChartDataLabelAlignment.top,
+                  labelAlignment: ChartDataLabelAlignment.middle,
                   alignment: ChartAlignment.center,
                 ),
                 name: 'Fats',
@@ -450,10 +746,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     const Color(0xff249689),
               ),
               StackedColumnSeries<ChartData, String>(
-                  color: protein,
+                  color: fats,
                   dataLabelSettings: const DataLabelSettings(
-                    showZeroValue: true,
-                    showCumulativeValues: true,
                     isVisible: true,
                     labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
@@ -470,8 +764,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               StackedColumnSeries<ChartData, String>(
                   color: carbs,
                   dataLabelSettings: const DataLabelSettings(
-                    showZeroValue: true,
-                    showCumulativeValues: true,
                     isVisible: true,
                     labelPosition: ChartDataLabelPosition.inside,
                     textStyle:
@@ -489,65 +781,238 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           ),
         ),
         SizedBox(
-            width: MediaQuery.sizeOf(context).width,
-            height: 80,
-            child: SfCartesianChart(
-                primaryXAxis: const CategoryAxis(
-                  minimum: 0,
+          width: MediaQuery.sizeOf(context).width,
+          height: 80,
+          child: SfCartesianChart(
+            primaryXAxis: const CategoryAxis(
+              minimum: 0,
+            ),
+            series: <CartesianSeries>[
+              StackedBarSeries<AverageData, String>(
+                  color: fats,
+                  dataLabelSettings: const DataLabelSettings(
+                    showZeroValue: true,
+                    showCumulativeValues: true,
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
+                  dataSource: barChart1,
+                  name: 'Fats',
+                  xValueMapper: (AverageData data, _) => data.x,
+                  yValueMapper: (AverageData data, _) => data.y,
+                  pointColorMapper: (AverageData data, _) =>
+                      const Color(0xff249689)),
+              StackedBarSeries<AverageData, String>(
+                  color: protein,
+                  dataLabelSettings: const DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
+                  dataSource: barChart1,
+                  name: 'Protein',
+                  xValueMapper: (AverageData data, _) => data.x,
+                  yValueMapper: (AverageData data, _) => data.y2,
+                  pointColorMapper: (AverageData data, _) =>
+                      const Color(0xffff5963)),
+              StackedBarSeries<AverageData, String>(
+                color: carbs,
+                dataLabelSettings: const DataLabelSettings(
+                  isVisible: true,
+                  labelPosition: ChartDataLabelPosition.inside,
+                  textStyle:
+                      TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                  labelAlignment: ChartDataLabelAlignment.middle,
+                  alignment: ChartAlignment.center,
                 ),
-                series: <CartesianSeries>[
-                  StackedBarSeries<AverageData, String>(
-                      color: fats,
-                      dataLabelSettings: const DataLabelSettings(
-                        showZeroValue: true,
-                        showCumulativeValues: true,
-                        isVisible: true,
-                        labelPosition: ChartDataLabelPosition.inside,
-                        textStyle: TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold),
-                        labelAlignment: ChartDataLabelAlignment.middle,
-                        alignment: ChartAlignment.center,
+                dataSource: barChart1,
+                name: 'Carbohydrates',
+                xValueMapper: (AverageData data, _) => data.x,
+                yValueMapper: (AverageData data, _) => data.y3,
+                pointColorMapper: (AverageData data, _) =>
+                    const Color(0xff4b39ef),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Macronutrients',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                      dataSource: barChart1,
-                      name: 'Fats',
-                      xValueMapper: (AverageData data, _) => data.x,
-                      yValueMapper: (AverageData data, _) => data.y,
-                      pointColorMapper: (AverageData data, _) =>
-                          const Color(0xff249689)),
-                  StackedBarSeries<AverageData, String>(
-                      color: protein,
-                      dataLabelSettings: const DataLabelSettings(
-                        isVisible: true,
-                        labelPosition: ChartDataLabelPosition.inside,
-                        textStyle: TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold),
-                        labelAlignment: ChartDataLabelAlignment.middle,
-                        alignment: ChartAlignment.center,
-                      ),
-                      dataSource: barChart1,
-                      name: 'Protein',
-                      xValueMapper: (AverageData data, _) => data.x,
-                      yValueMapper: (AverageData data, _) => data.y2,
-                      pointColorMapper: (AverageData data, _) =>
-                          const Color(0xffff5963)),
-                  StackedBarSeries<AverageData, String>(
-                    color: carbs,
-                    dataLabelSettings: const DataLabelSettings(
-                      isVisible: true,
-                      labelPosition: ChartDataLabelPosition.inside,
-                      textStyle:
-                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      labelAlignment: ChartDataLabelAlignment.middle,
-                      alignment: ChartAlignment.center,
                     ),
-                    dataSource: barChart1,
-                    name: 'Carbohydrates',
-                    xValueMapper: (AverageData data, _) => data.x,
-                    yValueMapper: (AverageData data, _) => data.y3,
-                    pointColorMapper: (AverageData data, _) =>
-                        const Color(0xff4b39ef),
-                  )
-                ]))
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Fats',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Proteins',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Carbs',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 50,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Avg.',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '${avrg7Fat.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${avrg7Proteins.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${avrg7Carbs.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Goal',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '${gramFats.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${gramProtein.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${gramCarbs.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
@@ -617,60 +1082,233 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           ),
         ),
         SizedBox(
-            width: MediaQuery.sizeOf(context).width,
-            height: 80,
-            child: SfCartesianChart(
-                primaryXAxis: const CategoryAxis(
-                  minimum: 0,
+          width: MediaQuery.sizeOf(context).width,
+          height: 80,
+          child: SfCartesianChart(
+            primaryXAxis: const CategoryAxis(
+              minimum: 0,
+            ),
+            series: <CartesianSeries>[
+              StackedBarSeries<AverageData, String>(
+                  dataLabelSettings: const DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
+                  dataSource: barChart2,
+                  name: 'Fats',
+                  xValueMapper: (AverageData data, _) => data.x,
+                  yValueMapper: (AverageData data, _) => data.y,
+                  pointColorMapper: (AverageData data, _) =>
+                      const Color(0xff249689)),
+              StackedBarSeries<AverageData, String>(
+                  dataLabelSettings: const DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.inside,
+                    textStyle:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    labelAlignment: ChartDataLabelAlignment.middle,
+                    alignment: ChartAlignment.center,
+                  ),
+                  dataSource: barChart2,
+                  name: 'Protein',
+                  xValueMapper: (AverageData data, _) => data.x,
+                  yValueMapper: (AverageData data, _) => data.y2,
+                  pointColorMapper: (AverageData data, _) =>
+                      const Color(0xffff5963)),
+              StackedBarSeries<AverageData, String>(
+                dataLabelSettings: const DataLabelSettings(
+                  isVisible: true,
+                  labelPosition: ChartDataLabelPosition.inside,
+                  textStyle:
+                      TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                  labelAlignment: ChartDataLabelAlignment.middle,
+                  alignment: ChartAlignment.center,
                 ),
-                series: <CartesianSeries>[
-                  StackedBarSeries<AverageData, String>(
-                      dataLabelSettings: const DataLabelSettings(
-                        isVisible: true,
-                        labelPosition: ChartDataLabelPosition.inside,
-                        textStyle: TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold),
-                        labelAlignment: ChartDataLabelAlignment.middle,
-                        alignment: ChartAlignment.center,
+                dataSource: barChart2,
+                name: 'Carbohydrates',
+                xValueMapper: (AverageData data, _) => data.x,
+                yValueMapper: (AverageData data, _) => data.y3,
+                pointColorMapper: (AverageData data, _) =>
+                    const Color(0xff4b39ef),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Macronutrients',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                      dataSource: barChart2,
-                      name: 'Fats',
-                      xValueMapper: (AverageData data, _) => data.x,
-                      yValueMapper: (AverageData data, _) => data.y,
-                      pointColorMapper: (AverageData data, _) =>
-                          const Color(0xff249689)),
-                  StackedBarSeries<AverageData, String>(
-                      dataLabelSettings: const DataLabelSettings(
-                        isVisible: true,
-                        labelPosition: ChartDataLabelPosition.inside,
-                        textStyle: TextStyle(
-                            fontSize: 11, fontWeight: FontWeight.bold),
-                        labelAlignment: ChartDataLabelAlignment.middle,
-                        alignment: ChartAlignment.center,
-                      ),
-                      dataSource: barChart2,
-                      name: 'Protein',
-                      xValueMapper: (AverageData data, _) => data.x,
-                      yValueMapper: (AverageData data, _) => data.y2,
-                      pointColorMapper: (AverageData data, _) =>
-                          const Color(0xffff5963)),
-                  StackedBarSeries<AverageData, String>(
-                    dataLabelSettings: const DataLabelSettings(
-                      isVisible: true,
-                      labelPosition: ChartDataLabelPosition.inside,
-                      textStyle:
-                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      labelAlignment: ChartDataLabelAlignment.middle,
-                      alignment: ChartAlignment.center,
                     ),
-                    dataSource: barChart2,
-                    name: 'Carbohydrates',
-                    xValueMapper: (AverageData data, _) => data.x,
-                    yValueMapper: (AverageData data, _) => data.y3,
-                    pointColorMapper: (AverageData data, _) =>
-                        const Color(0xff4b39ef),
-                  )
-                ]))
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Fats',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Proteins',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Carbs',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 50,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Avg.',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '${avrg30Fat.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${avrg30Proteins.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${avrg30Carbs.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Goal',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '${gramFats.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff249689),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${gramProtein.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xffff5963),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '${gramCarbs.toString()}g',
+                    style: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                      textStyle: const TextStyle(
+                        color: Color(0xff4b39ef),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
       ],
     );
   }

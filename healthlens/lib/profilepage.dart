@@ -32,6 +32,7 @@ Future<> class backend_firebase async{
 
 class _ProfilePageState extends State<ProfilePage> {
   late ProfilePage _model;
+  bool dataNeedsRefresh = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -224,7 +225,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     shape: BoxShape.rectangle,
                   ),
                   child: GestureDetector(
-                    onTap: () => {Navigator.pushNamed(context, '/editUser')},
+                    onTap: () async {
+                      final result =
+                          await Navigator.pushNamed(context, '/editUser');
+                      if (result == true) {
+                        setState(() {
+                          dataNeedsRefresh =
+                              true; // Trigger a refresh in the main page
+                        });
+                      }
+                    },
                     child: Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(
@@ -285,7 +295,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     shape: BoxShape.rectangle,
                   ),
                   child: GestureDetector(
-                    onTap: () => {Navigator.pushNamed(context, '/editHealth')},
+                    onTap: () async {
+                      final result =
+                          await Navigator.pushNamed(context, '/editHealth');
+                      if (result == true) {
+                        setState(() {
+                          dataNeedsRefresh =
+                              true; // Trigger a refresh in the main page
+                        });
+                      }
+                    },
                     child: Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(

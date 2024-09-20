@@ -248,8 +248,7 @@ class _healthProfile extends State<healthProfile> {
         await prefs.setDouble('weight', double.parse(_weightController.text));
 
         saveData();
-        Navigator.of(context).pop();
-
+        Navigator.pop(context, true);
         // Show success message for Firestore update
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

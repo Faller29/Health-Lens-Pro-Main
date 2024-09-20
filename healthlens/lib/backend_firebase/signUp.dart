@@ -158,6 +158,9 @@ Future<bool> signUp(
 
     String initial = mName[0].toUpperCase();
     thisUser = userCredential.user;
+
+    print("userId in Sign Up: ${thisUser!.uid}");
+
     currentUserDoc =
         FirebaseFirestore.instance.collection('user').doc(thisUser!.uid);
     await currentUserDoc?.set({
@@ -201,17 +204,18 @@ Future<bool> signUp(
         'carbs': 0,
         'proteins': 0,
         'fats': 0,
+        'calories': 0,
       });
     }
-    final macros = userMacrosDoc.data() as Map<String, dynamic>;
-    ;
+
     final currentUserInfo =
         await db.collection("user").doc(thisUser?.uid).get();
     final data = currentUserInfo.data() as Map<String, dynamic>;
+    print(data);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userName', thisUser?.displayName ?? 'No user');
+    print('trying to save');
+    //await prefs.setString('userName', thisUser?.displayName ?? 'No user');
     await prefs.setString('firstName', data['firstName']);
-
     await prefs.setString('middleInitial', initial);
     await prefs.setString('middleName', data['middleName']);
     await prefs.setString('lastName', data['lastName']);
@@ -231,12 +235,15 @@ Future<bool> signUp(
         'chronicDisease', data['chronicDisease'].cast<String>());
     await prefs.setString('email', email);
     await prefs.setDouble('desiredBW', data['desiredBodyWeight']);
-
-    await prefs.setInt('dailyCarbs', macros['carbs']);
-    await prefs.setInt('dailyProtein', macros['fats']);
-    await prefs.setInt('dailyFats', macros['proteins']);
+    print('saving');
+    await prefs.setInt('dailyCarbs', 0);
+    await prefs.setInt('dailyProtein', 0);
+    await prefs.setInt('dailyFats', 0);
+    await prefs.setInt('dailyCalories', 0);
     // Sign up successful
+    print('saved?');
     saveData();
+    print('it saved');
     return true;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {

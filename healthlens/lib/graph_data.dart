@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'main.dart';
 import 'package:intl/intl.dart';
-
-final _userId = thisUser?.uid;
 
 class ChartData {
   ChartData(this.x, this.y1, this.y2, this.y3);
@@ -38,7 +37,7 @@ Future<void> fetchMacrosData() async {
   // Fetch data for today
   QuerySnapshot<Map<String, dynamic>> todaySnapshot = await firestore
       .collection('food_history')
-      .doc(_userId)
+      .doc(thisUser?.uid)
       .collection(todayDate)
       .get();
   final Map<String, Map<String, double>> todayMap = {};
@@ -73,7 +72,7 @@ Future<void> fetchMacrosData() async {
   // Fetch data for last 7 days
   QuerySnapshot<Map<String, dynamic>> last7DaysSnapshot = await firestore
       .collection('userMacros')
-      .doc(_userId)
+      .doc(thisUser?.uid)
       .collection('MacrosIntakeHistory')
       .where(FieldPath.documentId,
           isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(sevenDaysAgo))
@@ -97,7 +96,7 @@ Future<void> fetchMacrosData() async {
   // Fetch data for last 30 days
   QuerySnapshot<Map<String, dynamic>> last30DaysSnapshot = await firestore
       .collection('userMacros')
-      .doc(_userId)
+      .doc(thisUser?.uid)
       .collection('MacrosIntakeHistory')
       .where(FieldPath.documentId,
           isGreaterThanOrEqualTo:
@@ -120,6 +119,25 @@ Future<void> fetchMacrosData() async {
 
   updateAverageData();
 
+  // Iterate over each item in the barChart
+  for (var data in barChart) {
+    // Access the fields of each AverageData object
+    avrgFat = data.y; // Assuming y represents fats
+    avrgProteins = data.y2; // Assuming y2 represents proteins
+    avrgCarbs = data.y3; // Assuming y3 represents carbs
+  }
+  for (var data in barChart1) {
+    // Access the fields of each AverageData object
+    avrg7Fat = data.y; // Assuming y represents fats
+    avrg7Proteins = data.y2; // Assuming y2 represents proteins
+    avrg7Carbs = data.y3; // Assuming y3 represents carbs
+  }
+  for (var data in barChart2) {
+    // Access the fields of each AverageData object
+    avrg30Fat = data.y; // Assuming y represents fats
+    avrg30Proteins = data.y2; // Assuming y2 represents proteins
+    avrg30Carbs = data.y3; // Assuming y3 represents carbs
+  }
   // Optional: Calculate overall average for specific period or other metrics if needed
 }
 

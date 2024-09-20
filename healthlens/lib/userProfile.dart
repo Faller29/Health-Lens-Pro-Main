@@ -167,7 +167,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             content: Text('Profile updated successfully in Firestore!'),
           ),
         );
-        Navigator.of(context).pop();
+        Navigator.pop(context, true);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

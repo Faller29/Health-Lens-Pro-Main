@@ -53,6 +53,7 @@ List<WeightData>? dailyWeight;
 class _HomePage extends State<HomePage> {
   final List<Item> _data = generateItems(1);
   bool isVisible = false, inverseVisible = true;
+  bool dataNeedsRefresh = false;
 
   @override
   void initState() {
@@ -819,8 +820,15 @@ class _HomePage extends State<HomePage> {
                         textAlign: TextAlign.end,
                       ),
                       onPressed: (((dailyCalories! / TER!) * 100) > 5)
-                          ? () {
-                              Navigator.pushNamed(context, '/exercise');
+                          ? () async {
+                              final result = await Navigator.pushNamed(
+                                  context, '/exercise');
+                              if (result == true) {
+                                setState(() {
+                                  dataNeedsRefresh =
+                                      true; // Trigger a refresh in the main page
+                                });
+                              }
                             }
                           : () {
                               showCupertinoModalPopup(
@@ -829,7 +837,39 @@ class _HomePage extends State<HomePage> {
                                     return StatefulBuilder(builder:
                                         (BuildContext context,
                                             StateSetter setState) {
-                                      return Center();
+                                      return Center(
+                                        child: Card(
+                                          color: Colors.white,
+                                          elevation: 0,
+                                          margin: const EdgeInsets.fromLTRB(
+                                              10, 150, 10, 150),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                  20,
+                                              height: 100,
+                                              child: Center(
+                                                child: Flexible(
+                                                  child: Text(
+                                                    'Please eat food first before doing exercise. Currently you have less than 5% energy which is not enough to expend energy',
+                                                    style:
+                                                        GoogleFonts.readexPro(
+                                                      fontSize:
+                                                          MediaQuery.of(context)
+                                                              .textScaler
+                                                              .scale(14),
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
                                     });
                                   });
                             },

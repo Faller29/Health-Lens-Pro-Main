@@ -54,7 +54,16 @@ int? dailyCarbs;
 int? dailyProtein;
 int? dailyFats;
 int? dailyCalories;
-
+String error = '';
+num avrgFat = 0;
+num avrgProteins = 0;
+num avrgCarbs = 0;
+num avrg7Fat = 0;
+num avrg7Proteins = 0;
+num avrg7Carbs = 0;
+num avrg30Fat = 0;
+num avrg30Proteins = 0;
+num avrg30Carbs = 0;
 var url;
 
 void saveData() async {

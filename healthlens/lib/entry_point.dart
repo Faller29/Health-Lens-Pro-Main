@@ -5,6 +5,7 @@ import 'camerapage.dart';
 import 'profilePage.dart';
 import 'analyticspage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/graph_data.dart';
 
 class EntryPoint extends StatefulWidget {
   final PageController? pageController;

@@ -23,6 +23,8 @@ class Auth {
       );
 
       thisUser = userCredential.user;
+      print('loggedIn: $thisUser');
+      print('User ID: ${thisUser?.uid}');
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('currentUser', thisUser!.uid.toString());
       userUid = prefs.getString('currentUser')!;
@@ -60,8 +62,50 @@ class Auth {
       await prefs.setDouble('desiredBW', data['desiredBodyWeight']);
       await prefs.setString('lifestyle', data['lifestyle']);
 
-      // Sign up successful
+      final userMacrosDoc = await FirebaseFirestore.instance
+          .collection('userMacros')
+          .doc(thisUser?.uid)
+          .get();
+      final userMacros = userMacrosDoc.data()!;
+      await prefs.setInt('dailyCarbs', _parseInt(userMacros['carbs']));
+      await prefs.setInt('dailyProtein', _parseInt(userMacros['proteins']));
+      await prefs.setInt('dailyFats', _parseInt(userMacros['fats']));
+      await prefs.setInt('dailyCalories', _parseInt(userMacros['calories']));
+      print("signIn success");
       saveData();
+      print('''
+        User Info:
+        -----------
+        userId: ${thisUser!.uid}
+        Full Name: $userFullName
+        Age: $age
+        Gender: $gender
+        Email: $email
+        TER: $TER
+        Lifestyle: $lifestyle
+        Height: ${height?.toStringAsFixed(2)} m
+        Weight: ${weight?.toStringAsFixed(2)} kg
+        Phone Number: $phoneNumber
+        Macronutrient Intake:
+          Carbs: $gramCarbs g
+          Protein: $gramProtein g
+          Fats: $gramFats g
+        Physical Activity: $physicalActivity
+        BMI: $userBMI
+        Chronic Disease(s): ${chronicDisease?.join(', ') ?? 'None'}
+        First Name: $firstName
+        Middle Name: $middleName
+        Last Name: $lastName
+        Middle Initial: $middleInitial
+        Current User Email: $currentUserEmail
+        Current User Pincode: $currentUserPincode
+        Desired Body Weight: ${desiredBodyWeight?.toStringAsFixed(2)} kg
+        Daily Macronutrients Goals:
+          Carbs: $dailyCarbs g
+          Protein: $dailyProtein g
+          Fats: $dailyFats g
+          Calories: $dailyCalories kcal
+      ''');
       print('success Log in');
       return thisUser;
     } on FirebaseAuthException catch (e) {
@@ -74,14 +118,25 @@ class Auth {
     }
   }
 
+  int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        return 0; // Default to 0 if parsing fails
+      }
+    }
+    return 0;
+  }
+
   // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
+    thisUser = null;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userEmail');
-    await prefs.remove('currentUserEmail');
-
-    await prefs.remove('currentUserPincode');
+    await prefs.clear();
     thisUser = null;
     currentUserEmail = '';
     currentUserPincode = '';
