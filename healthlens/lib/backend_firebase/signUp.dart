@@ -194,7 +194,7 @@ Future<bool> signUp(
 
     // Retrieve the user's current macronutrients
     final userMacrosDoc = await userMacrosDocRef.get();
-
+    final String currentDate = DateTime.now().toIso8601String().split('T')[0];
     if (!userMacrosDoc.exists) {
       // Document does not exist, create it with default values
       print(
@@ -205,6 +205,7 @@ Future<bool> signUp(
         'proteins': 0,
         'fats': 0,
         'calories': 0,
+        'lastLogIn': currentDate,
       });
     }
 
@@ -240,6 +241,8 @@ Future<bool> signUp(
     await prefs.setInt('dailyProtein', 0);
     await prefs.setInt('dailyFats', 0);
     await prefs.setInt('dailyCalories', 0);
+    await prefs.setString('lastLogIn', currentDate);
+
     // Sign up successful
     print('saved?');
     saveData();

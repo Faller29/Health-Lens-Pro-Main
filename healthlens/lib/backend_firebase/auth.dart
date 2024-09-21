@@ -35,7 +35,7 @@ class Auth {
       if (thisUser != null) {
         await _saveUserDetails(thisUser?.displayName ?? 'Unknown User', email);
       }
-
+      final String currentDate = DateTime.now().toIso8601String().split('T')[0];
       final currentUserInfo =
           await db.collection("user").doc(thisUser?.uid).get();
       final data = currentUserInfo.data() as Map<String, dynamic>;
@@ -71,6 +71,8 @@ class Auth {
       await prefs.setInt('dailyProtein', _parseInt(userMacros['proteins']));
       await prefs.setInt('dailyFats', _parseInt(userMacros['fats']));
       await prefs.setInt('dailyCalories', _parseInt(userMacros['calories']));
+      await prefs.setString('lastLogIn', currentDate);
+
       print("signIn success");
       saveData();
       print('''

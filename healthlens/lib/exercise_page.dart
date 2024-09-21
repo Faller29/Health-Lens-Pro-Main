@@ -53,31 +53,30 @@ class _ExercisePageState extends State<ExercisePage> {
                           SizedBox(height: 5),
 
                           // Exercise Instructions
-                          Text('Instructions: ${exercise['instructions']}',
-                              style: GoogleFonts.readexPro(fontSize: 14)),
-                          SizedBox(height: 5),
+                          Text(
+                            'Instructions: ${exercise['instructions']}',
+                            style: GoogleFonts.readexPro(fontSize: 14),
+                          ),
+                          SizedBox(height: 20),
 
-                          // Calories Burned
-                          Text('Calories Burned: ${exercise['calories']} cal',
-                              style: GoogleFonts.readexPro(fontSize: 14)),
-                          SizedBox(height: 10),
-
-                          // Macronutrients Burned
-                          Text('Macronutrients Burned:',
-                              style: GoogleFonts.readexPro(
-                                  fontSize: 14, fontWeight: FontWeight.bold)),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                  'Carbs: ${exercise['macronutrients']['carbs']} g',
-                                  style: GoogleFonts.readexPro(fontSize: 14)),
+                                'Calories Burned:',
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
                               Text(
-                                  'Fats: ${exercise['macronutrients']['fats']} g',
-                                  style: GoogleFonts.readexPro(fontSize: 14)),
-                              Text(
-                                  'Proteins: ${exercise['macronutrients']['proteins']} g',
-                                  style: GoogleFonts.readexPro(fontSize: 14)),
+                                '${exercise['calories']} cal',
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 14,
+                                    color: Color(0xFF940A00),
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ],
                           ),
                           SizedBox(height: 10),

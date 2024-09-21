@@ -11,6 +11,7 @@ import 'package:healthlens/firebase_options.dart';
 import 'package:healthlens/foodServing.dart';
 import 'package:healthlens/graph_data.dart';
 import 'package:healthlens/healthProfile.dart';
+import 'package:healthlens/mealPlanPage.dart';
 import 'package:healthlens/userProfile.dart';
 import 'package:provider/provider.dart';
 import 'login_page.dart';
@@ -20,6 +21,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'backend_firebase/auth.dart';
 import 'healthProfile.dart';
+import 'package:intl/intl.dart';
 
 User? thisUser;
 String? userUid;
@@ -64,6 +66,7 @@ num avrg7Carbs = 0;
 num avrg30Fat = 0;
 num avrg30Proteins = 0;
 num avrg30Carbs = 0;
+String lastLogIn = '';
 var url;
 
 void saveData() async {
@@ -95,6 +98,7 @@ void saveData() async {
   dailyProtein = prefs.getInt('dailyProtein') ?? 0;
   dailyFats = prefs.getInt('dailyFats') ?? 0;
   dailyCalories = prefs.getInt('dailyCalories') ?? 0;
+  lastLogIn = prefs.getString('lastLogIn') ?? '';
 }
 
 void main() async {
@@ -147,6 +151,7 @@ class MyApp extends StatelessWidget {
         '/editHealth': (context) => healthProfile(),
         '/foodServing': (context) => FoodServing(),
         '/exercise': (context) => ExercisePage(),
+        '/mealPlan': (context) => MealPlanPage(),
       },
     );
   }
@@ -246,6 +251,8 @@ class Auth {
           await prefs.setInt('dailyFats', macros['fats']);
           await prefs.setInt('dailyCalories', macros['calories']);
 
+          await prefs.setString('lastLogIn', macros['lastLogIn']);
+
           try {
             final userRef = FirebaseStorage.instance
                 .ref()
@@ -283,12 +290,14 @@ class Auth {
           dailyProtein = prefs.getInt('dailyProtein') ?? 0;
           dailyFats = prefs.getInt('dailyFats') ?? 0;
           dailyCalories = prefs.getInt('dailyCalories') ?? 0;
+          lastLogIn = prefs.getString('lastLogIn') ?? '';
 
           if (document.exists) {
             await dailyUserMacros.set({
               'carbs': dailyCarbs,
               'fats': dailyFats,
               'proteins': dailyProtein,
+              'calories': dailyCalories,
             });
           } else {
             await dailyUserMacros.set({
@@ -297,6 +306,8 @@ class Auth {
               'proteins': 0,
               'calories': 0,
             });
+          }
+          if (lastLogIn != currentDate) {
             await FirebaseFirestore.instance
                 .collection('userMacros')
                 .doc(thisUser?.uid)
@@ -305,7 +316,9 @@ class Auth {
               'proteins': 0,
               'fats': 0,
               'calories': 0,
+              'lastLogIn': currentDate,
             }, SetOptions(merge: true));
+
             await prefs.setInt('dailyCarbs', 0);
             await prefs.setInt('dailyProtein', 0);
             await prefs.setInt('dailyFats', 0);

@@ -889,19 +889,7 @@ class _HomePage extends State<HomePage> {
             height: 110,
             child: GestureDetector(
               onTap: () {
-                // Show modal on tap
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Container(
-                      height: 150,
-                      color: Colors.white,
-                      child: const Center(
-                        child: Text("All  Suggested Food"),
-                      ),
-                    );
-                  },
-                );
+                Navigator.pushNamed(context, '/mealPlan');
               },
               child: Material(
                 //elevation: 4,

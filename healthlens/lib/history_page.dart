@@ -18,10 +18,15 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   late String formattedDate;
   List<Map<String, dynamic>> foodHistory = [];
+  List<Map<String, dynamic>> ExerciseHistory = [];
   bool isLoading = true; // Loading state flag
   double historyCarbs = 0;
   double historyFats = 0;
   double historyProtein = 0;
+  double historyCalories = 0;
+
+  double totalCaloriesBurned = 0;
+  double historyExerciseCalories = 0;
   final ScrollController _scrollController = ScrollController();
 
   // Add keys for sections
@@ -48,9 +53,27 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
     formattedDate = widget.formattedDate;
-    fetchFoodHistory();
+    fetchData(); // Combine fetch operations into one
   }
 
+// A function to fetch both food and exercise history, then perform calorie deduction
+  Future<void> fetchData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    // Fetch both food and exercise history in parallel
+    await Future.wait([fetchFoodHistory(), fetchExerciseHistory()]);
+
+    // Deduct the exercise calories from the total food calories
+    setState(() {
+      historyCalories -= totalCaloriesBurned;
+      print('Final total after exercise deduction: $historyCalories');
+      isLoading = false; // Both data fetching are completed
+    });
+  }
+
+// Fetch food history and accumulate carbs, proteins, fats, and calories
   Future<void> fetchFoodHistory() async {
     try {
       String uid = thisUser!.uid; // Use the actual UID
@@ -58,12 +81,19 @@ class _HistoryPageState extends State<HistoryPage> {
           .collection('food_history')
           .doc(uid)
           .collection(formattedDate);
-      print(formattedDate);
 
-      // Get all documents under the formattedDate collection (which represent time subcollections)
+      print('Fetching food history for $formattedDate');
+
+      // Get all documents under the formattedDate collection (representing time subcollections)
       QuerySnapshot timeSnapshots = await dateRef.get();
 
       List<Map<String, dynamic>> fetchedHistory = [];
+
+      // Reset macronutrient accumulations for food history
+      historyCarbs = 0;
+      historyProtein = 0;
+      historyFats = 0;
+      historyCalories = 0; // Reset historyCalories for food
 
       // Iterate through each time subcollection (document)
       for (var timeDoc in timeSnapshots.docs) {
@@ -80,68 +110,71 @@ class _HistoryPageState extends State<HistoryPage> {
             'quantity': item['quantity'],
             'timestamp': timeDoc.id, // Use the time as the timestamp
           });
-          historyCarbs += item['carbs']; // Accumulate daily carbs
-          historyProtein += item['fats'];
-          historyFats += item['proteins'];
+
+          // Accumulate daily macronutrients for food
+          historyCarbs += (item['carbs'] * item['quantity']);
+          historyProtein += (item['proteins'] * item['quantity']);
+          historyFats += (item['fats'] * item['quantity']);
         }
       }
 
+      // Calculate the total food calories: 4 calories per gram of carbs and proteins, 9 per gram of fats
+      historyCalories =
+          (historyCarbs * 4) + (historyProtein * 4) + (historyFats * 9);
+      print('Food calories: $historyCalories');
+
       setState(() {
         foodHistory = fetchedHistory;
-        isLoading = false; // Data has been fetched
       });
     } catch (e) {
       print('Error fetching food history: $e');
-      setState(() {
-        isLoading = false; // Stop loading in case of error
-      });
     }
   }
 
+// Fetch exercise history and accumulate calories burned from exercise
   Future<void> fetchExerciseHistory() async {
     try {
-      String uid = thisUser!.uid; // Use the actual UID
+      String uid = thisUser!.uid; // Get the user's UID
       CollectionReference dateRef = FirebaseFirestore.instance
           .collection('user_activity')
           .doc(uid)
-          .collection(formattedDate);
-      print(formattedDate);
+          .collection(formattedDate); // Access collection for the specific date
 
-      // Get all documents under the formattedDate collection (which represent time subcollections)
+      print('Fetching exercise history for $formattedDate');
+
+      // Fetch all documents for the specified date (each document represents an exercise session at a specific time)
       QuerySnapshot timeSnapshots = await dateRef.get();
 
-      List<Map<String, dynamic>> fetchedHistory = [];
+      // Initialize an empty list to store the fetched exercise history
+      List<Map<String, dynamic>> fetchedExerciseHistory = [];
+      totalCaloriesBurned = 0; // Reset the total calories burned
 
-      // Iterate through each time subcollection (document)
+      // Iterate through each exercise session document
       for (var timeDoc in timeSnapshots.docs) {
-        // Fetch items from each time document
-        List<dynamic> items = timeDoc.get('items');
+        Map<String, dynamic> exerciseData =
+            timeDoc.data() as Map<String, dynamic>;
 
-        for (var item in items) {
-          fetchedHistory.add({
-            'item': item['item'],
-            'part': item['part'],
-            'carbs': item['carbs'],
-            'fats': item['fats'],
-            'proteins': item['proteins'],
-            'quantity': item['quantity'],
-            'timestamp': timeDoc.id, // Use the time as the timestamp
-          });
-          historyCarbs += item['carbs']; // Accumulate daily carbs
-          historyProtein += item['fats'];
-          historyFats += item['proteins'];
-        }
+        // Collect exercise data from each document
+        fetchedExerciseHistory.add({
+          'exercise': exerciseData['exercise'], // Exercise name
+          'calories': exerciseData['calories'], // Calories burned
+          'timestamp': timeDoc.id, // Use document ID as the timestamp
+        });
+
+        // Accumulate total calories burned for the day
+        totalCaloriesBurned += (exerciseData['calories']?.toDouble() ?? 0);
+
+        print(
+            'Exercise: ${exerciseData['exercise']}, Calories: ${exerciseData['calories']}, Timestamp: ${timeDoc.id}');
       }
 
+      print('Total exercise calories burned: $totalCaloriesBurned');
+
       setState(() {
-        foodHistory = fetchedHistory;
-        isLoading = false; // Data has been fetched
+        ExerciseHistory = fetchedExerciseHistory;
       });
     } catch (e) {
-      print('Error fetching food history: $e');
-      setState(() {
-        isLoading = false; // Stop loading in case of error
-      });
+      print('Error fetching exercise history: $e');
     }
   }
 
@@ -214,23 +247,99 @@ class _HistoryPageState extends State<HistoryPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 20),
+
+                    //calories
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
+                      child: SizedBox(
+                        child: SfLinearGauge(
+                          showLabels: false,
+                          minorTicksPerInterval: 4,
+                          useRangeColorForAxis: true,
+                          animateAxis: true,
+                          axisTrackStyle: LinearAxisTrackStyle(thickness: 1),
+                          ranges: <LinearGaugeRange>[
+                            //First range
+                            LinearGaugeRange(
+                                startValue: 0,
+                                endValue: ((historyCalories / TER!) * 100),
+                                color: Colors.green),
+                          ],
+                          markerPointers: [
+                            LinearShapePointer(
+                                elevation: 3,
+                                value: ((historyCalories / TER!) * 100)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 10, 0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            Text(
+                              "Calories: ",
+                              style: GoogleFonts.readexPro(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
+                                textStyle: const TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              "${historyCalories.toString()}/${TER}",
+                              style: GoogleFonts.readexPro(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
+                                textStyle: const TextStyle(
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextButton(
                             onPressed: goToFoodHistory,
-                            child: Text('Food History')),
+                            child: Text(
+                              'Food History',
+                              style: GoogleFonts.readexPro(
+                                fontSize: 14.0,
+                                textStyle: const TextStyle(
+                                    color: Color(0xff4b39ef),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            )),
                         TextButton(
                             onPressed: goToExerciseHistory,
-                            child: Text('Exercise History')),
+                            child: Text(
+                              'Exercise History',
+                              style: GoogleFonts.readexPro(
+                                fontSize: 14.0,
+                                textStyle: const TextStyle(
+                                    color: Color(0xff4b39ef),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            )),
                       ],
                     ),
                   ],
                 ),
               ),
             ),
+
             // Food History section with a GlobalKey
             Padding(
               key: _foodHistoryKey, // Set the key for this section
@@ -309,7 +418,7 @@ class _HistoryPageState extends State<HistoryPage> {
               padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : foodHistory.isEmpty
+                  : ExerciseHistory.isEmpty
                       ? Center(
                           child: Container(
                             padding: EdgeInsets.all(15),
@@ -321,9 +430,9 @@ class _HistoryPageState extends State<HistoryPage> {
                       : ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: foodHistory.length,
+                          itemCount: ExerciseHistory.length,
                           itemBuilder: (context, index) {
-                            var item = foodHistory[index];
+                            var item = ExerciseHistory[index];
                             return Card(
                               color: Colors.white,
                               elevation: 3,
@@ -333,11 +442,10 @@ class _HistoryPageState extends State<HistoryPage> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 tileColor: Colors.white,
-                                title: Text("${item['item']} (${item['part']})",
+                                title: Text("${item['exercise']}",
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold)),
-                                subtitle: Text(
-                                    "Carbs: ${item['carbs']}, Fats: ${item['fats']}, Proteins: ${item['proteins']}, Quantity: ${item['quantity']}"),
+                                subtitle: Text("Calories: ${item['calories']}"),
                                 trailing: Text(item['timestamp']),
                               ),
                             );
