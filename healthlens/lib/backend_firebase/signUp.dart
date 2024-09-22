@@ -41,6 +41,7 @@ double desiredBW(double height) {
 }
 
 Future<bool> signUp(
+  String username,
   String email,
   String password,
   String sex,
@@ -51,6 +52,7 @@ Future<bool> signUp(
   int age,
   double height,
   double doubleWeight,
+  int phoneNumber,
   List<String> chronicDisease,
 ) async {
   //concatenating name
@@ -152,7 +154,7 @@ Future<bool> signUp(
         .createUserWithEmailAndPassword(email: email, password: password);
 
     // Update the user's profile with the username
-    await userCredential.user?.updateDisplayName(fName);
+    await userCredential.user?.updateDisplayName(username);
 
     String initial = mName[0].toUpperCase();
     thisUser = userCredential.user;
@@ -173,6 +175,7 @@ Future<bool> signUp(
       'height': height,
       'lifestyle': lifestyle,
       'name': fullName,
+      'phoneNumber': phoneNumber,
       'sex': sex,
       'weight': doubleWeight,
       'TER': TER,
@@ -223,6 +226,7 @@ Future<bool> signUp(
     await prefs.setInt('TER', data['TER']);
     await prefs.setDouble('height', data['height']);
     await prefs.setDouble('weight', data['weight']);
+    await prefs.setInt('phoneNumber', data['phoneNumber']);
     await prefs.setInt('gramCarbs', data['reqCarbs']);
     await prefs.setInt('gramProtein', data['reqProtein']);
     await prefs.setInt('gramFats', data['reqFats']);

@@ -38,7 +38,8 @@ class _SetupPageState extends State<SetupPage> {
 
   List<String> chronicDisease = [];
   String nextText = "Next";
-  String? email,
+  String? username,
+      email,
       code,
       gender = 'Male',
       lifeStyle = 'Sedentary',
@@ -47,7 +48,7 @@ class _SetupPageState extends State<SetupPage> {
       lName;
   late String pinCode;
   int genderIndex = 0;
-  late int age;
+  late int phoneNumber, age;
   late double height, weight;
   final emailRegex =
       RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
@@ -135,6 +136,7 @@ class _SetupPageState extends State<SetupPage> {
       try {
         print('try to sign up');
         bool signUpSuccess = await signUp(
+          username!,
           email!,
           pinCode,
           gender!,
@@ -145,6 +147,7 @@ class _SetupPageState extends State<SetupPage> {
           age,
           height,
           weight,
+          phoneNumber,
           chronicDisease,
         );
         print('try to sign up1');
@@ -206,7 +209,7 @@ class _SetupPageState extends State<SetupPage> {
                     Positioned(
                       top: 10,
                       right: 10,
-                      child: TextButton(
+                      child: TextButton.icon(
                         onPressed: () {
                           Navigator.pushReplacement(
                             context,
@@ -215,24 +218,20 @@ class _SetupPageState extends State<SetupPage> {
                             ),
                           );
                         },
-                        child: Row(
-                          children: [
-                            Icon(
-                              IconlyBroken.login,
+                        label: Text(
+                          'Log In',
+                          style: GoogleFonts.readexPro(
+                            fontSize: 14.0,
+                            textStyle: TextStyle(
                               color: Color(0xff4b39ef),
-                              size: 20,
                             ),
-                            Text(
-                              'Log In',
-                              style: GoogleFonts.readexPro(
-                                fontSize: 14.0,
-                                textStyle: TextStyle(
-                                  color: Color(0xff4b39ef),
-                                ),
-                              ),
-                              textAlign: TextAlign.end,
-                            ),
-                          ],
+                          ),
+                          textAlign: TextAlign.end,
+                        ),
+                        icon: Icon(
+                          IconlyBroken.login,
+                          color: Color(0xff4b39ef),
+                          size: 20,
                         ),
                       ),
                     ),
@@ -394,19 +393,10 @@ class _SetupPageState extends State<SetupPage> {
                                                                           0.0),
                                                                   child:
                                                                       TextFormField(
-                                                                    textInputAction:
-                                                                        TextInputAction
-                                                                            .next,
                                                                     initialValue:
                                                                         fName,
                                                                     decoration:
                                                                         InputDecoration(
-                                                                      contentPadding:
-                                                                          EdgeInsets.fromLTRB(
-                                                                              10,
-                                                                              10,
-                                                                              10,
-                                                                              10),
                                                                       labelText:
                                                                           'First Name',
                                                                       labelStyle:
@@ -467,7 +457,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                     style: GoogleFonts
                                                                         .outfit(
                                                                       fontSize:
-                                                                          16.0,
+                                                                          14.0,
                                                                     ),
                                                                     onChanged:
                                                                         (value) {
@@ -510,19 +500,10 @@ class _SetupPageState extends State<SetupPage> {
                                                                           0.0),
                                                                   child:
                                                                       TextFormField(
-                                                                    textInputAction:
-                                                                        TextInputAction
-                                                                            .next,
                                                                     initialValue:
                                                                         mName,
                                                                     decoration:
                                                                         InputDecoration(
-                                                                      contentPadding:
-                                                                          EdgeInsets.fromLTRB(
-                                                                              10,
-                                                                              10,
-                                                                              10,
-                                                                              10),
                                                                       labelText:
                                                                           'Middle Name',
                                                                       labelStyle:
@@ -583,7 +564,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                     style: GoogleFonts
                                                                         .outfit(
                                                                       fontSize:
-                                                                          16.0,
+                                                                          14.0,
                                                                     ),
                                                                     onChanged:
                                                                         (value) {
@@ -626,19 +607,10 @@ class _SetupPageState extends State<SetupPage> {
                                                                           0.0),
                                                                   child:
                                                                       TextFormField(
-                                                                    textInputAction:
-                                                                        TextInputAction
-                                                                            .next,
                                                                     initialValue:
                                                                         lName,
                                                                     decoration:
                                                                         InputDecoration(
-                                                                      contentPadding:
-                                                                          EdgeInsets.fromLTRB(
-                                                                              10,
-                                                                              10,
-                                                                              10,
-                                                                              10),
                                                                       labelText:
                                                                           'Last Name',
                                                                       labelStyle:
@@ -699,7 +671,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                     style: GoogleFonts
                                                                         .outfit(
                                                                       fontSize:
-                                                                          16.0,
+                                                                          14.0,
                                                                     ),
                                                                     onChanged:
                                                                         (value) {
@@ -869,9 +841,6 @@ class _SetupPageState extends State<SetupPage> {
                                                                             0.0),
                                                                 child:
                                                                     TextFormField(
-                                                                  textInputAction:
-                                                                      TextInputAction
-                                                                          .next,
                                                                   keyboardType:
                                                                       TextInputType.numberWithOptions(
                                                                           decimal:
@@ -885,12 +854,6 @@ class _SetupPageState extends State<SetupPage> {
 
                                                                   decoration:
                                                                       InputDecoration(
-                                                                    contentPadding:
-                                                                        EdgeInsets.fromLTRB(
-                                                                            10,
-                                                                            10,
-                                                                            10,
-                                                                            10),
                                                                     labelText:
                                                                         'Age',
                                                                     labelStyle:
@@ -956,7 +919,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                       GoogleFonts
                                                                           .outfit(
                                                                     fontSize:
-                                                                        16.0,
+                                                                        14.0,
                                                                   ),
                                                                   onChanged:
                                                                       (value) {
@@ -993,9 +956,6 @@ class _SetupPageState extends State<SetupPage> {
                                                                             0.0),
                                                                 child:
                                                                     TextFormField(
-                                                                  textInputAction:
-                                                                      TextInputAction
-                                                                          .next,
                                                                   keyboardType:
                                                                       TextInputType.numberWithOptions(
                                                                           decimal:
@@ -1008,12 +968,6 @@ class _SetupPageState extends State<SetupPage> {
                                                                   //onChanged: (value) => doubleVar = double.parse(value),
                                                                   decoration:
                                                                       InputDecoration(
-                                                                    contentPadding:
-                                                                        EdgeInsets.fromLTRB(
-                                                                            10,
-                                                                            10,
-                                                                            10,
-                                                                            10),
                                                                     labelText:
                                                                         'Height [cm]',
                                                                     labelStyle:
@@ -1079,7 +1033,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                       GoogleFonts
                                                                           .outfit(
                                                                     fontSize:
-                                                                        16.0,
+                                                                        14.0,
                                                                   ),
                                                                   onChanged:
                                                                       (value) {
@@ -1118,9 +1072,6 @@ class _SetupPageState extends State<SetupPage> {
                                                                             0.0),
                                                                 child:
                                                                     TextFormField(
-                                                                  textInputAction:
-                                                                      TextInputAction
-                                                                          .next,
                                                                   keyboardType:
                                                                       TextInputType.numberWithOptions(
                                                                           decimal:
@@ -1133,12 +1084,6 @@ class _SetupPageState extends State<SetupPage> {
                                                                   //onChanged: (value) => doubleVar = double.parse(value),
                                                                   decoration:
                                                                       InputDecoration(
-                                                                    contentPadding:
-                                                                        EdgeInsets.fromLTRB(
-                                                                            10,
-                                                                            10,
-                                                                            10,
-                                                                            10),
                                                                     labelText:
                                                                         'Weight [kg]',
                                                                     labelStyle:
@@ -1204,7 +1149,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                       GoogleFonts
                                                                           .outfit(
                                                                     fontSize:
-                                                                        16.0,
+                                                                        14.0,
                                                                   ),
                                                                   onChanged:
                                                                       (value) {
@@ -1538,6 +1483,102 @@ class _SetupPageState extends State<SetupPage> {
                                                         ),
                                                         Column(
                                                           children: [
+                                                            Container(
+                                                              width: MediaQuery
+                                                                          .sizeOf(
+                                                                              context)
+                                                                      .width /
+                                                                  1.5,
+                                                              child:
+                                                                  TextFormField(
+                                                                initialValue:
+                                                                    username,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  labelText:
+                                                                      'Username',
+                                                                  labelStyle:
+                                                                      GoogleFonts
+                                                                          .outfit(
+                                                                    fontSize:
+                                                                        15.0,
+                                                                  ),
+                                                                  enabledBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xffe0e3e7),
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  focusedBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xff4b39ef),
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  errorBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  focusedErrorBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                ),
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .outfit(
+                                                                  fontSize:
+                                                                      14.0,
+                                                                ),
+                                                                onChanged:
+                                                                    (value) {
+                                                                  username = value
+                                                                      .toTitleCase;
+                                                                },
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .isEmpty) {
+                                                                    return 'Please enter your username';
+                                                                  }
+                                                                  return null; // Validation successful
+                                                                },
+                                                              ),
+                                                            ),
                                                             SizedBox(
                                                               height: 10,
                                                             ),
@@ -1546,12 +1587,9 @@ class _SetupPageState extends State<SetupPage> {
                                                                           .sizeOf(
                                                                               context)
                                                                       .width /
-                                                                  1.2,
+                                                                  1.5,
                                                               child:
                                                                   TextFormField(
-                                                                textInputAction:
-                                                                    TextInputAction
-                                                                        .next,
                                                                 keyboardType:
                                                                     TextInputType
                                                                         .emailAddress,
@@ -1559,13 +1597,6 @@ class _SetupPageState extends State<SetupPage> {
                                                                     email,
                                                                 decoration:
                                                                     InputDecoration(
-                                                                  contentPadding:
-                                                                      EdgeInsets
-                                                                          .fromLTRB(
-                                                                              10,
-                                                                              10,
-                                                                              10,
-                                                                              10),
                                                                   labelText:
                                                                       'Email',
                                                                   labelStyle:
@@ -1631,7 +1662,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                     GoogleFonts
                                                                         .outfit(
                                                                   fontSize:
-                                                                      18.0,
+                                                                      14.0,
                                                                 ),
                                                                 onChanged:
                                                                     (value) {
@@ -1653,6 +1684,178 @@ class _SetupPageState extends State<SetupPage> {
                                                             SizedBox(
                                                               height: 10,
                                                             ),
+                                                            Container(
+                                                              width: MediaQuery
+                                                                          .sizeOf(
+                                                                              context)
+                                                                      .width /
+                                                                  1.5,
+                                                              child: Container(
+                                                                child: Column(
+                                                                  children: [
+                                                                    Row(
+                                                                      children: [
+                                                                        Container(
+                                                                          width:
+                                                                              MediaQuery.sizeOf(context).width / 2,
+                                                                          child:
+                                                                              TextFormField(
+                                                                            keyboardType:
+                                                                                TextInputType.number,
+                                                                            maxLength:
+                                                                                11,
+                                                                            decoration:
+                                                                                InputDecoration(
+                                                                              labelText: 'Phone Number',
+                                                                              labelStyle: GoogleFonts.outfit(
+                                                                                fontSize: 15.0,
+                                                                              ),
+                                                                              enabledBorder: UnderlineInputBorder(
+                                                                                borderSide: BorderSide(
+                                                                                  color: Color(0xffe0e3e7),
+                                                                                  width: 2.0,
+                                                                                ),
+                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                              ),
+                                                                              focusedBorder: UnderlineInputBorder(
+                                                                                borderSide: BorderSide(
+                                                                                  color: Color(0xff4b39ef),
+                                                                                  width: 2.0,
+                                                                                ),
+                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                              ),
+                                                                              errorBorder: UnderlineInputBorder(
+                                                                                borderSide: BorderSide(
+                                                                                  color: Colors.black,
+                                                                                  width: 2.0,
+                                                                                ),
+                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                              ),
+                                                                              focusedErrorBorder: UnderlineInputBorder(
+                                                                                borderSide: BorderSide(
+                                                                                  color: Colors.black,
+                                                                                  width: 2.0,
+                                                                                ),
+                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                              ),
+                                                                            ),
+                                                                            style:
+                                                                                GoogleFonts.outfit(
+                                                                              fontSize: 14.0,
+                                                                            ),
+                                                                            onChanged:
+                                                                                (value) {
+                                                                              phoneNumber = int.tryParse(value ?? '') ?? 0;
+                                                                              print(phoneNumber);
+                                                                            },
+                                                                            validator:
+                                                                                (value) {
+                                                                              if (value == null || value.isEmpty) {
+                                                                                return 'Please enter your Phone Number';
+                                                                              }
+                                                                              return null; // Validation successful
+                                                                            },
+                                                                          ),
+                                                                        ),
+                                                                        Padding(
+                                                                          padding: EdgeInsets.fromLTRB(
+                                                                              6,
+                                                                              0,
+                                                                              0,
+                                                                              0),
+                                                                          child:
+                                                                              IconButton(
+                                                                            onPressed:
+                                                                                (null),
+                                                                            icon:
+                                                                                Icon(
+                                                                              Icons.send,
+                                                                              color: Color(0xff4b39ef),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    ),
+                                                                    Container(
+                                                                      child:
+                                                                          Container(
+                                                                        child:
+                                                                            Row(
+                                                                          children: [
+                                                                            Container(
+                                                                              width: MediaQuery.sizeOf(context).width / 3,
+                                                                              child: TextFormField(
+                                                                                  initialValue: code,
+                                                                                  keyboardType: TextInputType.number,
+                                                                                  decoration: InputDecoration(
+                                                                                    labelText: 'Enter Code',
+                                                                                    labelStyle: GoogleFonts.outfit(
+                                                                                      fontSize: 15.0,
+                                                                                    ),
+                                                                                    enabledBorder: UnderlineInputBorder(
+                                                                                      borderSide: BorderSide(
+                                                                                        color: Color(0xffe0e3e7),
+                                                                                        width: 2.0,
+                                                                                      ),
+                                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                                    ),
+                                                                                    focusedBorder: UnderlineInputBorder(
+                                                                                      borderSide: BorderSide(
+                                                                                        color: Color(0xff4b39ef),
+                                                                                        width: 2.0,
+                                                                                      ),
+                                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                                    ),
+                                                                                    errorBorder: UnderlineInputBorder(
+                                                                                      borderSide: BorderSide(
+                                                                                        color: Colors.black,
+                                                                                        width: 2.0,
+                                                                                      ),
+                                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                                    ),
+                                                                                    focusedErrorBorder: UnderlineInputBorder(
+                                                                                      borderSide: BorderSide(
+                                                                                        color: Colors.black,
+                                                                                        width: 2.0,
+                                                                                      ),
+                                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                                    ),
+                                                                                  ),
+                                                                                  style: GoogleFonts.outfit(
+                                                                                    fontSize: 14.0,
+                                                                                  ),
+                                                                                  onChanged: (value) {
+                                                                                    setState(() {
+                                                                                      if (value == null || value.isEmpty) {}
+                                                                                      code = value;
+                                                                                    });
+                                                                                  }),
+                                                                            ),
+                                                                            TextButton(
+                                                                              child: Text(
+                                                                                'verify',
+                                                                                style: GoogleFonts.readexPro(
+                                                                                  fontSize: 14.0,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  textStyle: TextStyle(
+                                                                                    color: Color(0xff4b39ef),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              onPressed: (null),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
                                                         SizedBox(
@@ -1672,8 +1875,6 @@ class _SetupPageState extends State<SetupPage> {
                                                                         0.0),
                                                             child:
                                                                 PinCodeTextField(
-                                                              blinkWhenObscuring:
-                                                                  true,
                                                               autoDisposeControllers:
                                                                   false,
                                                               appContext:
@@ -1682,7 +1883,7 @@ class _SetupPageState extends State<SetupPage> {
                                                               textStyle:
                                                                   GoogleFonts
                                                                       .readexPro(
-                                                                fontSize: 18.0,
+                                                                fontSize: 10.0,
                                                               ),
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
@@ -1697,7 +1898,8 @@ class _SetupPageState extends State<SetupPage> {
                                                               showCursor: true,
                                                               cursorColor: Color(
                                                                   0xff4b39ef),
-                                                              obscureText: true,
+                                                              obscureText:
+                                                                  false,
                                                               hintCharacter:
                                                                   '●',
                                                               keyboardType:
@@ -1730,23 +1932,22 @@ class _SetupPageState extends State<SetupPage> {
                                                                 shape:
                                                                     PinCodeFieldShape
                                                                         .box,
-                                                                activeColor: Color(
-                                                                    0xFF017E07),
+                                                                activeColor:
+                                                                    Colors
+                                                                        .black,
                                                                 inactiveColor:
                                                                     Colors.grey,
                                                                 selectedColor:
                                                                     Color(
                                                                         0xff4b39ef),
                                                                 activeFillColor:
-                                                                    Color(
-                                                                        0xFF017E07),
+                                                                    Colors
+                                                                        .black,
                                                                 inactiveFillColor:
                                                                     Colors.grey,
                                                                 selectedFillColor:
                                                                     Color(
                                                                         0xff4b39ef),
-                                                                errorBorderColor:
-                                                                    Colors.red,
                                                               ),
                                                               onCompleted:
                                                                   (value) async {

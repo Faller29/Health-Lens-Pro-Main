@@ -33,7 +33,7 @@ class Auth {
       await prefs.setString('currentUserPincode', pincode);
 
       if (thisUser != null) {
-        await _saveUserDetails(email);
+        await _saveUserDetails(thisUser?.displayName ?? 'Unknown User', email);
       }
       final String currentDate = DateTime.now().toIso8601String().split('T')[0];
       final currentUserInfo =
@@ -50,6 +50,7 @@ class Auth {
       await prefs.setInt('TER', data['TER']);
       await prefs.setDouble('height', data['height']);
       await prefs.setDouble('weight', data['weight']);
+      await prefs.setInt('phoneNumber', data['phoneNumber']);
       await prefs.setInt('gramCarbs', data['reqCarbs']);
       await prefs.setInt('gramProtein', data['reqProtein']);
       await prefs.setInt('gramFats', data['reqFats']);
@@ -86,6 +87,7 @@ class Auth {
         Lifestyle: $lifestyle
         Height: ${height?.toStringAsFixed(2)} m
         Weight: ${weight?.toStringAsFixed(2)} kg
+        Phone Number: $phoneNumber
         Macronutrient Intake:
           Carbs: $gramCarbs g
           Protein: $gramProtein g
@@ -144,8 +146,9 @@ class Auth {
   }
 
   // Save the user's name and email locally
-  Future<void> _saveUserDetails(String email) async {
+  Future<void> _saveUserDetails(String userName, String email) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userName', userName);
     await prefs.setString('userEmail', email);
 
     final currentUserInfo =
@@ -163,6 +166,7 @@ class Auth {
     await prefs.setInt('TER', data['TER']);
     await prefs.setDouble('height', data['height']);
     await prefs.setDouble('weight', data['weight']);
+    await prefs.setInt('phoneNumber', data['phoneNumber']);
     await prefs.setInt('gramCarbs', data['reqCarbs']);
     await prefs.setInt('gramProtein', data['reqProtein']);
     await prefs.setInt('gramFats', data['reqFats']);
@@ -187,6 +191,12 @@ class Auth {
     saveData();
   }
 
+  // Get the user's name from local storage
+  Future<String?> getUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userName');
+  }
+
   // Get the user's email from local storage
   Future<String?> getUserEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -194,7 +204,7 @@ class Auth {
   }
 
   // Sign up with email and password
-  Future<bool> signUp(String email, String password) async {
+  Future<bool> signUp(String username, String email, String password) async {
     try {
       // Create a new user with email and password
       UserCredential userCredential =
@@ -202,6 +212,9 @@ class Auth {
         email: email,
         password: password,
       );
+
+      // Update the user's profile with the username
+      await userCredential.user?.updateDisplayName(username);
 
       // Sign up successful
       return true;
