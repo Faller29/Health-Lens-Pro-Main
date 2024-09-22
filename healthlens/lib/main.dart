@@ -11,6 +11,7 @@ import 'package:healthlens/firebase_options.dart';
 import 'package:healthlens/foodServing.dart';
 import 'package:healthlens/graph_data.dart';
 import 'package:healthlens/healthProfile.dart';
+import 'package:healthlens/mealPlanGenerator.dart';
 import 'package:healthlens/mealPlanPage.dart';
 import 'package:healthlens/userProfile.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +37,6 @@ int? TER;
 String? lifestyle;
 double? height;
 double? weight;
-int? phoneNumber;
 List<dynamic>? chronicDisease = [];
 int? gramCarbs;
 int? gramProtein;
@@ -79,7 +79,6 @@ void saveData() async {
   lifestyle = prefs.getString('lifestyle') ?? '';
   height = prefs.getDouble('height') ?? 0.0;
   weight = prefs.getDouble('weight') ?? 0.0;
-  phoneNumber = prefs.getInt('phoneNumber') ?? 0;
   gramCarbs = prefs.getInt('gramCarbs') ?? 0;
   gramProtein = prefs.getInt('gramProtein') ?? 0;
   gramFats = prefs.getInt('gramFats') ?? 0;
@@ -151,6 +150,7 @@ class MyApp extends StatelessWidget {
         '/editHealth': (context) => healthProfile(),
         '/foodServing': (context) => FoodServing(),
         '/exercise': (context) => ExercisePage(),
+        '/mealCreator': (context) => FoodSelectorPage(),
         '/mealPlan': (context) => MealPlanPage(),
       },
     );
@@ -237,7 +237,6 @@ class Auth {
           await prefs.setInt('TER', data['TER']);
           await prefs.setDouble('height', data['height']);
           await prefs.setDouble('weight', data['weight']);
-          await prefs.setInt('phoneNumber', data['phoneNumber']);
           await prefs.setInt('gramCarbs', data['gramCarbs']);
           await prefs.setInt('gramProtein', data['gramProtein']);
           await prefs.setInt('gramFats', data['gramFats']);
@@ -272,7 +271,6 @@ class Auth {
           lifestyle = prefs.getString('lifestyle') ?? '';
           height = prefs.getDouble('height') ?? 0.0;
           weight = prefs.getDouble('weight') ?? 0.0;
-          phoneNumber = prefs.getInt('phoneNumber') ?? 0;
           gramCarbs = prefs.getInt('gramCarbs') ?? 0;
           gramProtein = prefs.getInt('gramProtein') ?? 0;
           gramFats = prefs.getInt('gramFats') ?? 0;

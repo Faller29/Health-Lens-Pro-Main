@@ -50,11 +50,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userName = await _authService.getUserName();
     String? email = prefs.getString('email'); // Load the saved email
 
     setState(() {
-      _userName = userName ?? '';
       _email = email ?? ''; // Set the email to the saved one
       if (!_isChangingAccount) {
         _emailController.text = _email; // Pre-fill the email field
@@ -187,6 +185,8 @@ class _LoginPageState extends State<LoginPage> {
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
                             child: TextFormField(
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.emailAddress,
                               initialValue: _email,
                               decoration: InputDecoration(
                                 contentPadding:
