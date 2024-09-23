@@ -25,13 +25,15 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final Auth _authService = Auth();
+  final AuthService forgotPassword = AuthService();
+
   String _userName = '';
   String _email = ''; // Add this to store the email
   bool _isChangingAccount = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pincodeController = TextEditingController();
   final String requiredPin = '';
-  bool loading = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -50,11 +52,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loadUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userName = await _authService.getUserName();
     String? email = prefs.getString('email'); // Load the saved email
 
     setState(() {
-      _userName = userName ?? '';
       _email = email ?? ''; // Set the email to the saved one
       if (!_isChangingAccount) {
         _emailController.text = _email; // Pre-fill the email field
@@ -73,49 +73,61 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLogin() async {
-    loading = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    // Show the loading Snackbar
+    final snackBar = SnackBar(
+      behavior: SnackBarBehavior.floating,
+      elevation: 3,
+      content: Row(
+        children: [
+          CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
+          SizedBox(width: 10),
+          Expanded(child: Text('Logging in...')),
+        ],
+      ),
+      duration: Duration(minutes: 1), // Keep it visible until dismissed
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    // Get email and pincode
     _emailController.text = _email;
     String email = _emailController.text;
     String pincode = _pincodeController.text;
 
+    // Perform login
     User? user = await _authService.signInWithEmailAndPincode(email, pincode);
 
-    print(_email);
-    print('_email');
-
-    print(email);
-    print('email');
-
-    print(_emailController.text);
-    print('emailC');
-    print(user);
+    // Dismiss the Snackbar after login attempt
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
     if (user != null) {
-      //await prefs.setString('email', email); // Save the email locally
-      await prefs.setString(
-          'userName', user.email ?? ''); // Save the username locally
+      // Save user data locally
+      await prefs.setString('userName', user.email ?? '');
+      await prefs.setString('currentEmail', email); // Save email locally
 
       setState(() {
         _isChangingAccount = false;
       });
-      await prefs.setString('currentEmail', email); // Save the email locally
 
+      // Navigate to the next page
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => EntryPoint()),
       );
-    }
-    loading = false;
-    if (user == null) {
+    } else {
+      // Show error message if login fails
       String errorMessage = 'Log in Failed. Check your Email and Password';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            behavior: SnackBarBehavior.floating,
-            elevation: 3,
-            duration: const Duration(seconds: 2),
-            content: Text(errorMessage)),
+          behavior: SnackBarBehavior.floating,
+          elevation: 3,
+          duration: const Duration(seconds: 2),
+          content: Text(errorMessage),
+        ),
       );
     }
   }
@@ -165,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.urbanist(
                           color: Color(0xFF101213),
-                          fontSize: 48.0,
+                          fontSize: 45.0,
                           letterSpacing: 0.0,
                           fontWeight: FontWeight.bold,
                         ),
@@ -187,6 +199,8 @@ class _LoginPageState extends State<LoginPage> {
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
                             child: TextFormField(
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.emailAddress,
                               initialValue: _email,
                               decoration: InputDecoration(
                                 contentPadding:
@@ -308,8 +322,31 @@ class _LoginPageState extends State<LoginPage> {
                                       style: TextStyle(
                                           color: Colors.blue, fontSize: 14.0),
                                     ),
-                                    onPressed: () {
-                                      print('Forgot Password button pressed');
+                                    onPressed: () async {
+                                      if (_email.isNotEmpty) {
+                                        print(_email);
+                                        _errorMessage = await forgotPassword
+                                            .sendPasswordResetEmail(_email);
+                                        // Optionally show a success message
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(_errorMessage!),
+                                          ),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            behavior: SnackBarBehavior.floating,
+                                            elevation: 3,
+                                            duration:
+                                                const Duration(seconds: 2),
+                                            content: Text(
+                                                'Please Enter your Email.'),
+                                          ),
+                                        );
+                                      }
                                     },
                                   ),
                                 ),
@@ -331,6 +368,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       style: ButtonStyle(
+                        overlayColor: MaterialStateColor.resolveWith(
+                            (states) => Colors.white30),
                         backgroundColor: MaterialStatePropertyAll<Color>(
                           Color(0xff4b39ef),
                         ),

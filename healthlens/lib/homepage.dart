@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_popup/flutter_popup.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/backend_firebase/foodExchange.dart';
+import 'package:healthlens/backend_firebase/modals.dart';
 import 'package:healthlens/food_data_history.dart';
 import 'package:healthlens/graph_data.dart';
 import 'package:healthlens/models/category_model.dart';
@@ -19,6 +22,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'main.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'weightPredition.dart';
+import 'package:intl/intl.dart';
 
 const double contWidth = 100;
 const double contHeight = 140;
@@ -49,28 +53,128 @@ class HomePage extends StatefulWidget {
 }
 
 List<WeightData>? dailyWeight;
+List<WeightData>? weeklyWeight;
+List<WeightData>? monthlyWeight;
 
 class _HomePage extends State<HomePage> {
   final List<Item> _data = generateItems(1);
   bool isVisible = false, inverseVisible = true;
   bool dataNeedsRefresh = false;
+  late Timer _timer;
+  String _currentDay = '';
+  String _currentTime = '';
+  // Function to get the current day name
+  String _getCurrentDay() {
+    DateTime now = DateTime.now();
+    switch (now.weekday) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
+    }
+  }
+
+  // Function to get the current time in hh:mm format
+  String _getCurrentTime() {
+    DateTime now = DateTime.now();
+    String hour =
+        now.hour.toString().padLeft(2, '0'); // Ensures 2 digits for hours
+    String minute =
+        now.minute.toString().padLeft(2, '0'); // Ensures 2 digits for minutes
+    return '$hour:$minute';
+  }
 
   @override
   void initState() {
     super.initState();
     fetchImageUrl();
     print(thisUser!.uid);
-    _fetchWeightData();
+    _currentDay = _getCurrentDay();
+    _currentTime = _getCurrentTime();
+
+    // Update the time every minute
+    _timer = Timer.periodic(const Duration(minutes: 1), (Timer t) {
+      if (mounted) {
+        setState(() {
+          _currentDay = _getCurrentDay();
+          _currentTime = _getCurrentTime();
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Clear the lists to reset the state
+    if (dailyWeight!.isNotEmpty ||
+        weeklyWeight!.isNotEmpty ||
+        monthlyWeight!.isNotEmpty) {
+      dailyWeight?.clear();
+      weeklyWeight?.clear();
+      monthlyWeight?.clear();
+    }
+    super.dispose(); // Call the superclass's dispose method
+  }
+
+  Future<Map<String, dynamic>> getSavedMacronutrientData() async {
+    String uid = thisUser!.uid;
+    String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('userFoodBookMark')
+        .doc(uid)
+        .get();
+
+    if (snapshot.exists) {
+      return snapshot.data() as Map<String, dynamic>;
+    } else {
+      return {}; // Return an empty map if no data exists
+    }
   }
 
 // Inside your fetch function, you can initialize it
+  bool _isDataFetched = false;
+
   Future<void> _fetchWeightData() async {
+    if (_isDataFetched) return; // Prevent multiple calls
+
     try {
+      print("Fetching weight data...");
+
       final weightDataMap = await predictWeightChange();
+
       setState(() {
-        dailyWeight = (weightDataMap['daily'] ?? [])
-            .cast<WeightData>(); // Ensure default is a non-null list
+        // Reset the lists
+        dailyWeight = [];
+        weeklyWeight = [];
+        monthlyWeight = [];
+        // Assign fetched data
+        dailyWeight = (weightDataMap['daily'] ?? []).cast<WeightData>();
+        weeklyWeight = (weightDataMap['weekly'] ?? []).cast<WeightData>();
+        monthlyWeight = (weightDataMap['monthly'] ?? []).cast<WeightData>();
+
+        // Print monthly weight data
+        int myNum = 1;
+        print("Monthly Weight Data:");
+        for (var weightData in monthlyWeight!) {
+          print('Date: ${weightData.x}, Weight: ${weightData.y1}');
+          print(myNum++);
+        }
       });
+
+      _isDataFetched = true; // Set flag to true after fetching
     } catch (e) {
       print("Error fetching weight data: $e");
     }
@@ -97,6 +201,46 @@ class _HomePage extends State<HomePage> {
     }
   }
 
+  List<Widget> _getFoodRestrictions() {
+    List<String> messages = [];
+
+    if (chronicDisease!.contains('Obesity')) {
+      messages.add('You are not allowed to eat fatty food.');
+      messages.add('Keep out of too much oily food');
+      messages.add(
+          "Don't eat Fatty Part of Pork as it is Bad for your health condition.");
+    }
+    if (chronicDisease!.contains('Hypertension')) {
+      messages.add('You are not allowed to eat salty food.');
+      messages.add('Keep out of too much oily food');
+      messages.add(
+          "Don't eat Fatty Part of Pork as it is Bad for your health condition.");
+    }
+    if (chronicDisease!.contains('Diabetes [Type 1 & 2]')) {
+      messages.add('You are not allowed to eat sugary food.');
+      messages.add('Keep out of too much oily food');
+      messages.add(
+          "Don't eat Fatty Part of Pork as it is Bad for your health condition.");
+    }
+
+    // If there are no restrictions, you can add a default message
+    if (messages.isEmpty) {
+      messages.add('No specific food restrictions.');
+    }
+
+    // Convert messages to Text widgets
+    return messages
+        .map((message) => Text(
+              message,
+              style: GoogleFonts.readexPro(
+                color: const Color(0xFF57636C),
+                fontSize: 14.0,
+                fontWeight: FontWeight.normal,
+              ),
+            ))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,7 +252,7 @@ class _HomePage extends State<HomePage> {
             child: Container(
               width: MediaQuery.sizeOf(context).width,
               height: 100.0,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
@@ -125,155 +269,131 @@ class _HomePage extends State<HomePage> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              14.0, 0.0, 14.0, 0.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(50.0),
-                            child: url != null
-                                ? CachedNetworkImage(
-                                    key: ValueKey(url),
-                                    imageUrl: url,
-                                    placeholder: (context, url) =>
-                                        CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.error),
-                                    fit: BoxFit.cover,
-                                    width: 70,
-                                    height: 70,
-                                  )
-                                : Icon(
-                                    Icons.account_circle,
-                                    size: 60,
-                                    color: Colors.grey,
-                                  ),
-                          ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            14.0, 0.0, 14.0, 0.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(50.0),
+                          child: url != null
+                              ? CachedNetworkImage(
+                                  key: ValueKey(url),
+                                  imageUrl: url,
+                                  placeholder: (context, url) =>
+                                      CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      Image.asset('assets/images/profile.jpg'),
+                                  fit: BoxFit.cover,
+                                  width: 70,
+                                  height: 70,
+                                )
+                              : Image.asset(
+                                  'assets/images/profile.jpg',
+                                  fit: BoxFit.cover,
+                                  width: 70,
+                                  height: 70,
+                                ),
                         ),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              0.0, 14.0, 0.0, 14.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width:
-                                    (0.35 * MediaQuery.sizeOf(context).width),
-                                child: Text(
-                                  userFullName.split(" ").first,
+                      ),
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 14.0, 0.0, 14.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: (0.35 * MediaQuery.sizeOf(context).width),
+                              child: Text(
+                                userFullName.split(" ").first,
 
-                                  style: GoogleFonts.readexPro(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: MediaQuery.of(context)
-                                        .textScaler
-                                        .scale(20),
-                                  ),
-                                  //textScaler: TextScaler.linear(1),
-                                ),
-                              ),
-                              Text(
-                                textAlign: TextAlign.left,
-                                age.toString() + ' Years Old',
                                 style: GoogleFonts.readexPro(
-                                  color: Color(0xFF57636C),
+                                  fontWeight: FontWeight.bold,
                                   fontSize: MediaQuery.of(context)
                                       .textScaler
-                                      .scale(14),
+                                      .scale(20),
                                 ),
+                                //textScaler: TextScaler.linear(1),
                               ),
-                              Text(
-                                'BMI: ' + userBMI.toString(),
-                                style: GoogleFonts.readexPro(
-                                  color: Color(0xFF57636C),
-                                  fontSize: MediaQuery.of(context)
-                                      .textScaler
-                                      .scale(12),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      // Show modal on tap
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Container(
-                            height: 150,
-                            color: Colors.white,
-                            child: const Center(
-                              child: Text("User Profile Overview"),
                             ),
-                          );
-                        },
-                      );
-                    },
+                            Text(
+                              textAlign: TextAlign.left,
+                              age.toString() + ' Years Old',
+                              style: GoogleFonts.readexPro(
+                                color: const Color(0xFF57636C),
+                                fontSize:
+                                    MediaQuery.of(context).textScaler.scale(14),
+                              ),
+                            ),
+                            Text(
+                              'BMI: ' + userBMI.toString(),
+                              style: GoogleFonts.readexPro(
+                                color: const Color(0xFF57636C),
+                                fontSize:
+                                    MediaQuery.of(context).textScaler.scale(12),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   GestureDetector(
-                    child: Expanded(
-                      child: Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(
-                            14.0, 0.0, 0.0, 0.0),
-                        child: Container(
-                          width: 122.0,
-                          height: 100.0,
-                          decoration: const BoxDecoration(
-                            color: Color(0xff4b39ef),
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(8.0),
-                              bottomRight: Radius.circular(0.0),
-                              topLeft: Radius.circular(8.0),
-                              topRight: Radius.circular(0.0),
-                            ),
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          14.0, 0.0, 0.0, 0.0),
+                      child: Container(
+                        width: 122.0,
+                        height: 100.0,
+                        decoration: const BoxDecoration(
+                          color: Color(0xff4b39ef),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(8.0),
+                            bottomRight: Radius.circular(0.0),
+                            topLeft: Radius.circular(8.0),
+                            topRight: Radius.circular(0.0),
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Text(
-                                    'DAY 01',
-                                    style: GoogleFonts.readexPro(
-                                      fontSize: 20.0,
-                                      textStyle: const TextStyle(
-                                        color: Color(0xffffffff),
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    'Time: 11:30',
-                                    style: GoogleFonts.readexPro(
-                                      fontSize: 11.0,
-                                      textStyle: const TextStyle(
-                                        color: Color(0xffffffff),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                'Weight: 75kg',
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 15.0,
-                                  textStyle: const TextStyle(
-                                    color: Color(0xffffffff),
-                                  ),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              _currentDay,
+                              style: GoogleFonts.readexPro(
+                                fontSize: 25.0,
+                                textStyle: const TextStyle(
+                                  color: Color(0xffffffff),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            Text(
+                              'Time: $_currentTime',
+                              style: GoogleFonts.readexPro(
+                                fontSize: 14.0,
+                                textStyle: const TextStyle(
+                                  color: Color(0xffffffff),
+                                ),
+                              ),
+                            ),
+                            Text(
+                              'Weight: ${weight}kg',
+                              style: GoogleFonts.readexPro(
+                                fontSize: 14.0,
+                                textStyle: const TextStyle(
+                                  color: Color(0xffffffff),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    onTap: () {
+                    onTap: () async {
+                      await _fetchWeightData();
+
                       // Show modal on tap
                       showCupertinoModalPopup(
                         context: context,
@@ -287,13 +407,13 @@ class _HomePage extends State<HomePage> {
                                 margin:
                                     const EdgeInsets.fromLTRB(10, 150, 10, 150),
                                 child: Padding(
-                                  padding: EdgeInsets.all(8),
+                                  padding: const EdgeInsets.all(8),
                                   child: SingleChildScrollView(
                                     child: Column(
                                       children: [
                                         Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                          padding: const EdgeInsets.fromLTRB(
+                                              0, 10, 0, 10),
                                           child: Text(
                                             'Health Information',
                                             style: GoogleFonts.readexPro(
@@ -307,232 +427,507 @@ class _HomePage extends State<HomePage> {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.fromLTRB(
-                                              8, 10, 8, 2),
-                                          child: SizedBox(
-                                            height: 300,
-                                            child: SfCartesianChart(
-                                              title: ChartTitle(
-                                                  text: 'Predicted Weight',
-                                                  textStyle:
-                                                      GoogleFonts.readexPro(
-                                                          color:
-                                                              Color(0xFF57636C),
-                                                          fontSize: 12),
-                                                  alignment:
-                                                      ChartAlignment.near),
-                                              zoomPanBehavior: ZoomPanBehavior(
-                                                enablePinching: true,
-                                                zoomMode: ZoomMode.x,
-                                                enablePanning: true,
-                                              ),
-                                              primaryXAxis: CategoryAxis(
-                                                initialVisibleMaximum: 5,
-                                              ),
-                                              primaryYAxis: NumericAxis(
-                                                  labelStyle:
-                                                      TextStyle(fontSize: 10),
-                                                  anchorRangeToVisiblePoints:
-                                                      true),
-                                              legend: Legend(
-                                                  itemPadding: 0,
-                                                  isVisible: true,
-                                                  position: LegendPosition.top,
-                                                  alignment:
-                                                      ChartAlignment.far),
-                                              series: <CartesianSeries>[
-                                                ColumnSeries<WeightData,
-                                                        String>(
-                                                    color: Color(0xff4b39ef),
-                                                    dataLabelSettings:
-                                                        DataLabelSettings(
-                                                      isVisible: true,
-                                                      showZeroValue: true,
-                                                      labelPosition:
-                                                          ChartDataLabelPosition
-                                                              .inside,
-                                                      textStyle: TextStyle(
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                      labelAlignment:
-                                                          ChartDataLabelAlignment
-                                                              .middle,
-                                                      alignment:
-                                                          ChartAlignment.center,
+                                              5, 10, 5, 2),
+                                          child: Card(
+                                            elevation: 3,
+                                            color: Colors.white,
+                                            shadowColor: Colors.blue,
+                                            child: Material(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(12.0),
+                                                child: Column(
+                                                  children: [
+                                                    SfCartesianChart(
+                                                      title: ChartTitle(
+                                                          text:
+                                                              'Predicted Weight',
+                                                          textStyle: GoogleFonts
+                                                              .readexPro(
+                                                                  color: const Color(
+                                                                      0xFF57636C),
+                                                                  fontSize: 12),
+                                                          alignment:
+                                                              ChartAlignment
+                                                                  .near),
+                                                      zoomPanBehavior:
+                                                          ZoomPanBehavior(
+                                                        enablePinching: true,
+                                                        zoomMode: ZoomMode.x,
+                                                        enablePanning: true,
+                                                      ),
+                                                      primaryXAxis:
+                                                          const CategoryAxis(
+                                                        initialVisibleMaximum:
+                                                            5,
+                                                      ),
+                                                      primaryYAxis:
+                                                          const NumericAxis(
+                                                              decimalPlaces: 2,
+                                                              labelStyle:
+                                                                  TextStyle(
+                                                                      fontSize:
+                                                                          10),
+                                                              anchorRangeToVisiblePoints:
+                                                                  true),
+                                                      legend: const Legend(
+                                                          itemPadding: 0,
+                                                          isVisible: true,
+                                                          position:
+                                                              LegendPosition
+                                                                  .top,
+                                                          alignment:
+                                                              ChartAlignment
+                                                                  .far),
+                                                      series: <CartesianSeries>[
+                                                        ColumnSeries<WeightData,
+                                                                String>(
+                                                            color: const Color(
+                                                                0xff4b39ef),
+                                                            dataLabelSettings:
+                                                                const DataLabelSettings(
+                                                              isVisible: true,
+                                                              showZeroValue:
+                                                                  true,
+                                                              labelPosition:
+                                                                  ChartDataLabelPosition
+                                                                      .inside,
+                                                              textStyle: TextStyle(
+                                                                  fontSize: 10,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                              labelAlignment:
+                                                                  ChartDataLabelAlignment
+                                                                      .top,
+                                                              alignment:
+                                                                  ChartAlignment
+                                                                      .center,
+                                                            ),
+                                                            name: 'Weight',
+                                                            dataSource:
+                                                                dailyWeight,
+                                                            xValueMapper:
+                                                                (WeightData data,
+                                                                        _) =>
+                                                                    data.x,
+                                                            yValueMapper:
+                                                                (WeightData data,
+                                                                        _) =>
+                                                                    data.y1,
+                                                            pointColorMapper:
+                                                                (WeightData data,
+                                                                        _) =>
+                                                                    const Color(
+                                                                        0xff4b39ef)),
+                                                      ],
                                                     ),
-                                                    name: 'Weight',
-                                                    dataSource: dailyWeight,
-                                                    xValueMapper:
-                                                        (WeightData data, _) =>
-                                                            data.x,
-                                                    yValueMapper:
-                                                        (WeightData data, _) =>
-                                                            data.y1,
-                                                    pointColorMapper:
-                                                        (WeightData data, _) =>
-                                                            Color(0xff4b39ef)),
-                                              ],
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              15.0),
+                                                      child: Column(
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .fromLTRB(
+                                                                    10,
+                                                                    10,
+                                                                    10,
+                                                                    20),
+                                                            child: Text(
+                                                              'Estimated Days, Weeks, and Months to achieve Ideal Body Weight.',
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                textStyle:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            children: [
+                                                              Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    'Days: ',
+                                                                    style: GoogleFonts
+                                                                        .readexPro(
+                                                                      textStyle:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    'Weeks: ',
+                                                                    style: GoogleFonts
+                                                                        .readexPro(
+                                                                      textStyle:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    'Months: ',
+                                                                    style: GoogleFonts
+                                                                        .readexPro(
+                                                                      textStyle:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                              Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    '${dailyWeight!.length} days',
+                                                                    style: GoogleFonts
+                                                                        .readexPro(
+                                                                      textStyle:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '${weeklyWeight!.length} weeks',
+                                                                    style: GoogleFonts
+                                                                        .readexPro(
+                                                                      textStyle:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '${monthlyWeight!.length} months',
+                                                                    style: GoogleFonts
+                                                                        .readexPro(
+                                                                      textStyle:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    ElevatedButton(
+                                                      onPressed: () => {
+                                                        Navigator.pushNamed(
+                                                            context,
+                                                            '/editHealth')
+                                                      },
+                                                      style: ButtonStyle(
+                                                        overlayColor:
+                                                            MaterialStateColor
+                                                                .resolveWith(
+                                                                    (states) =>
+                                                                        Colors
+                                                                            .white30),
+                                                        backgroundColor:
+                                                            const MaterialStatePropertyAll<
+                                                                Color>(
+                                                          Colors.blueAccent,
+                                                        ),
+                                                        side:
+                                                            const MaterialStatePropertyAll(
+                                                          BorderSide(
+                                                            color: Color(
+                                                                0xFFE0E3E7),
+                                                            width: 1.0,
+                                                          ),
+                                                        ),
+                                                        shape: MaterialStateProperty
+                                                            .all<
+                                                                OutlinedBorder>(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50.0),
+                                                          ),
+                                                        ),
+                                                        padding:
+                                                            MaterialStateProperty
+                                                                .all<
+                                                                    EdgeInsets>(
+                                                          const EdgeInsets
+                                                              .fromLTRB(
+                                                              10, 5, 10, 5),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Update Weight',
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                          fontSize: 11.0,
+                                                          textStyle:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                        Visibility(
-                                          visible: inverseVisible,
-                                          child: TextButton(
-                                            onPressed: () => {
-                                              Navigator.pushNamed(
-                                                  context, '/editHealth')
-                                            },
-                                            child: Text('Update Weight'),
-                                          ),
+                                        SizedBox(
+                                          height: 20,
                                         ),
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(
-                                              10, 10, 10, 10),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Weight: ',
-                                                style: GoogleFonts.readexPro(
-                                                  color: Color(0xFF57636C),
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                              ),
-                                              Column(children: [
-                                                Text(
-                                                  weight.toString(),
-                                                  style: GoogleFonts.readexPro(
-                                                    color: Color(0xFF57636C),
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight:
-                                                        FontWeight.normal,
+                                        Card(
+                                          elevation: 3,
+                                          color: Colors.white,
+                                          shadowColor: Colors.blue,
+                                          child: Material(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Column(
+                                                children: [
+                                                  Center(
+                                                    child: Text(
+                                                      'Health Details',
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                        fontSize: 18.0,
+                                                        textStyle:
+                                                            const TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                              ]),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(
-                                              10, 10, 10, 10),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Height: ',
-                                                style: GoogleFonts.readexPro(
-                                                  color: Color(0xFF57636C),
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                              ),
-                                              Column(children: [
-                                                Text(
-                                                  height.toString(),
-                                                  style: GoogleFonts.readexPro(
-                                                    color: Color(0xFF57636C),
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight:
-                                                        FontWeight.normal,
+                                                  SizedBox(
+                                                    height: 30,
                                                   ),
-                                                ),
-                                              ]),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(
-                                              10, 10, 10, 10),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'BMI: ',
-                                                style: GoogleFonts.readexPro(
-                                                  color: Color(0xFF57636C),
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                              ),
-                                              Column(children: [
-                                                Text(
-                                                  userBMI!,
-                                                  style: GoogleFonts.readexPro(
-                                                    color: Color(0xFF57636C),
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight:
-                                                        FontWeight.normal,
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .fromLTRB(
+                                                                20, 0, 5, 10),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Weight:',
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'Height:',
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'BMI:',
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'Chronic Disease:',
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'Lifestyle:',
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .fromLTRB(
+                                                                20, 0, 5, 10),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              weight.toString(),
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              height.toString(),
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              userBMI!,
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children:
+                                                                  chronicDisease!
+                                                                      .map((e) =>
+                                                                          Text(
+                                                                            e,
+                                                                            style:
+                                                                                GoogleFonts.readexPro(
+                                                                              color: const Color(0xFF57636C),
+                                                                              fontSize: 14.0,
+                                                                              fontWeight: FontWeight.normal,
+                                                                            ),
+                                                                          ))
+                                                                      .toList(),
+                                                            ),
+                                                            Text(
+                                                              lifestyle!,
+                                                              style: GoogleFonts
+                                                                  .readexPro(
+                                                                color: const Color(
+                                                                    0xFF57636C),
+                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ]),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(
-                                              10, 10, 10, 10),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Chronic Disease: ',
-                                                style: GoogleFonts.readexPro(
-                                                  color: Color(0xFF57636C),
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                              ),
-                                              Column(
-                                                children: chronicDisease!
-                                                    .map((e) => Text(
-                                                          e,
-                                                          style: GoogleFonts
-                                                              .readexPro(
-                                                            color: Color(
-                                                                0xFF57636C),
-                                                            fontSize: 14.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
-                                                          ),
-                                                        ))
-                                                    .toList(),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(
-                                              10, 10, 10, 10),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Lifestyle: ',
-                                                style: GoogleFonts.readexPro(
-                                                  color: Color(0xFF57636C),
-                                                  fontSize: 14.0,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                              ),
-                                              Column(children: [
-                                                Text(
-                                                  lifestyle!,
-                                                  style: GoogleFonts.readexPro(
-                                                    color: Color(0xFF57636C),
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight:
-                                                        FontWeight.normal,
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Text(
+                                                      'Foods Not allowed',
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                        color: Colors.black,
+                                                        fontSize: 14.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                              ]),
-                                            ],
+                                                  SizedBox(
+                                                      height:
+                                                          20), // Optional spacing
+                                                  ..._getFoodRestrictions(),
+                                                  SizedBox(
+                                                      height:
+                                                          20), // Optional spacing
+                                                ],
+                                              ),
+                                            ),
                                           ),
                                         )
                                       ],
@@ -749,7 +1144,7 @@ class _HomePage extends State<HomePage> {
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Padding(
@@ -760,7 +1155,8 @@ class _HomePage extends State<HomePage> {
                         minorTicksPerInterval: 4,
                         useRangeColorForAxis: true,
                         animateAxis: true,
-                        axisTrackStyle: LinearAxisTrackStyle(thickness: 1),
+                        axisTrackStyle:
+                            const LinearAxisTrackStyle(thickness: 1),
                         ranges: <LinearGaugeRange>[
                           //First range
                           LinearGaugeRange(
@@ -810,7 +1206,7 @@ class _HomePage extends State<HomePage> {
                     alignment: Alignment.bottomRight,
                     child: TextButton.icon(
                       label: Text(
-                        'Exercise',
+                        'My Meal Plan',
                         style: GoogleFonts.readexPro(
                           fontSize: 14.0,
                           textStyle: const TextStyle(
@@ -819,62 +1215,11 @@ class _HomePage extends State<HomePage> {
                         ),
                         textAlign: TextAlign.end,
                       ),
-                      onPressed: (((dailyCalories! / TER!) * 100) > 5)
-                          ? () async {
-                              final result = await Navigator.pushNamed(
-                                  context, '/exercise');
-                              if (result == true) {
-                                setState(() {
-                                  dataNeedsRefresh =
-                                      true; // Trigger a refresh in the main page
-                                });
-                              }
-                            }
-                          : () {
-                              showCupertinoModalPopup(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return StatefulBuilder(builder:
-                                        (BuildContext context,
-                                            StateSetter setState) {
-                                      return Center(
-                                        child: Card(
-                                          color: Colors.white,
-                                          elevation: 0,
-                                          margin: const EdgeInsets.fromLTRB(
-                                              10, 150, 10, 150),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  20,
-                                              height: 100,
-                                              child: Center(
-                                                child: Flexible(
-                                                  child: Text(
-                                                    'Please eat food first before doing exercise. Currently you have less than 5% energy which is not enough to expend energy',
-                                                    style:
-                                                        GoogleFonts.readexPro(
-                                                      fontSize:
-                                                          MediaQuery.of(context)
-                                                              .textScaler
-                                                              .scale(14),
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    });
-                                  });
-                            },
+                      onPressed: () {
+                        showMacronutrientModal(context);
+                      },
                       icon: const Icon(
-                        Icons.fitness_center,
+                        Icons.book,
                         color: Color(0xff4b39ef),
                         size: 20,
                       ),
@@ -884,7 +1229,128 @@ class _HomePage extends State<HomePage> {
               ),
             ),
           ),
-          Container(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Material(
+                  elevation: 3,
+                  borderRadius: BorderRadius.circular(10),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: InkWell(
+                    onTap: (((dailyCalories! / TER!) * 100) > 5)
+                        ? () async {
+                            final result =
+                                await Navigator.pushNamed(context, '/exercise');
+                            if (result == true) {
+                              setState(() {
+                                dataNeedsRefresh =
+                                    true; // Trigger a refresh in the main page
+                              });
+                            }
+                          }
+                        : () {
+                            showCupertinoModalPopup(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return StatefulBuilder(builder:
+                                      (BuildContext context,
+                                          StateSetter setState) {
+                                    return Center(
+                                      child: Card(
+                                        color: const Color.fromARGB(
+                                            234, 255, 255, 255),
+                                        elevation: 0,
+                                        margin: const EdgeInsets.fromLTRB(
+                                            10, 150, 10, 150),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                20,
+                                            height: 100,
+                                            child: Text(
+                                              'Please eat food first before doing exercise. Currently you have less than 5% energy which is not enough to expend energy',
+                                              style: GoogleFonts.readexPro(
+                                                fontSize: MediaQuery.of(context)
+                                                    .textScaler
+                                                    .scale(14),
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  });
+                                });
+                          },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Ink.image(
+                          image: const AssetImage('assets/images/exercise.png'),
+                          height: 160,
+                          width: 160,
+                        ),
+                        Text(
+                          'Exercise',
+                          style: GoogleFonts.readexPro(
+                            textStyle: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Material(
+                  elevation: 3,
+                  borderRadius: BorderRadius.circular(10),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: InkWell(
+                    onTap: () {
+                      mealPlanGeneratorSelector(context);
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Ink.image(
+                          image: const AssetImage('assets/images/food.png'),
+                          height: 160,
+                          width: 160,
+                        ),
+                        Text(
+                          'Meal Plan',
+                          style: GoogleFonts.readexPro(
+                            textStyle: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          /* Container(
             padding: const EdgeInsets.all(10.0),
             height: 110,
             child: GestureDetector(
@@ -919,90 +1385,407 @@ class _HomePage extends State<HomePage> {
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(
-              14.0,
-              0.0,
-              14.0,
-              0.0,
-            ),
-            child: Container(
-              width: 350.0,
-              decoration: BoxDecoration(
-                color: const Color(0xffffffff),
-                boxShadow: [
-                  const BoxShadow(
-                    blurRadius: 4.0,
-                    color: Color(0x33000000),
-                    offset: Offset(
-                      0.0,
-                      2.0,
+          ), */
+        ],
+      ),
+    );
+  }
+
+  void showMacronutrientModal(BuildContext context) async {
+    Map<String, dynamic> savedData = await getSavedMacronutrientData();
+
+    if (savedData.isNotEmpty) {
+      showCupertinoModalPopup(
+          context: context,
+          builder: (context) {
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Center(
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 0,
+                    margin: const EdgeInsets.fromLTRB(10, 150, 10, 150),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(30, 25, 25, 10),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Title
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                "My Meal Plan",
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 20.0,
+                                  textStyle: const TextStyle(
+                                    color: Color.fromARGB(255, 0, 0, 0),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  overlayColor: MaterialStateColor.resolveWith(
+                                      (states) => Colors.white30),
+                                  backgroundColor:
+                                      const MaterialStatePropertyAll<Color>(
+                                    Colors.redAccent,
+                                  ),
+                                  side: const MaterialStatePropertyAll(
+                                    BorderSide(
+                                      color: Color(0xFFE0E3E7),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  shape:
+                                      MaterialStateProperty.all<OutlinedBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50.0),
+                                    ),
+                                  ),
+                                  padding:
+                                      MaterialStateProperty.all<EdgeInsets>(
+                                    const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  // Show confirmation dialog before clearing
+                                  _showClearConfirmationDialog(context);
+                                },
+                                child: Text(
+                                  'Clear',
+                                  style: GoogleFonts.readexPro(
+                                    fontSize: 11.0,
+                                    textStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // Loop through each item in the saved data
+                            ...savedData.values.map((selectedFoods) {
+                              if (selectedFoods is List) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment
+                                      .start, // Align all items to the start
+                                  children:
+                                      selectedFoods.map<Widget>((selectedFood) {
+                                    String foodName = selectedFood['foodName'];
+                                    String servingPart =
+                                        selectedFood['servingPart'];
+                                    int quantity = selectedFood[
+                                        'quantity']; // Get quantity
+
+                                    if (itemMacronutrients
+                                            .containsKey(foodName) &&
+                                        itemMacronutrients[foodName]!
+                                            .containsKey(servingPart)) {
+                                      Map<String, int> macronutrients =
+                                          itemMacronutrients[foodName]![
+                                              servingPart]!;
+
+                                      // Calculate macronutrients based on quantity
+                                      int totalCarbs =
+                                          macronutrients['carbs']! * quantity;
+                                      int totalFats =
+                                          macronutrients['fats']! * quantity;
+                                      int totalProteins =
+                                          macronutrients['proteins']! *
+                                              quantity;
+
+                                      return Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0,
+                                            0,
+                                            0,
+                                            8), // Use vertical padding to minimize left/right gap
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              foodName,
+                                              style: GoogleFonts.readexPro(
+                                                fontSize: 14.0,
+                                                textStyle: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 0, 0, 0),
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              "Serving: $servingPart",
+                                              style: GoogleFonts.readexPro(
+                                                fontSize: 12.0,
+                                                textStyle: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 0, 0, 0),
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              'Quantity: x$quantity\n'
+                                              'Carbs: $totalCarbs g, '
+                                              'Fats: $totalFats g, '
+                                              'Proteins: $totalProteins g',
+                                              style: GoogleFonts.readexPro(
+                                                fontSize: 12.0,
+                                                textStyle: const TextStyle(
+                                                  color: Colors.black54,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return const SizedBox(); // Empty widget if no match found
+                                    }
+                                  }).toList(),
+                                );
+                              } else {
+                                return const SizedBox(); // Empty widget if selectedFoods is not a List
+                              }
+                            }).toList(),
+
+                            const SizedBox(height: 20),
+                            const Divider(),
+                            // Show total macronutrients
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Text(
+                                "Total Macronutrients",
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 16.0,
+                                  textStyle: const TextStyle(
+                                    color: Color.fromARGB(255, 0, 0, 0),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            // Calculate the total macronutrients from the saved data
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Text(
+                                "Carbs: ${calculateTotalMacronutrients(savedData)['carbs']} g\n"
+                                "Fats: ${calculateTotalMacronutrients(savedData)['fats']} g\n"
+                                "Proteins: ${calculateTotalMacronutrients(savedData)['proteins']} g\n",
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 14.0,
+                                  textStyle: const TextStyle(
+                                    color: Color.fromARGB(255, 0, 0, 0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
                     ),
-                  )
-                ],
-                borderRadius: BorderRadius.circular(8.0),
-                shape: BoxShape.rectangle,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0.0, 14.0, 0.0, 14.0),
+                  ),
+                );
+              },
+            );
+          });
+    } else {
+      showCupertinoModalPopup(
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return Center(
+                child: Card(
+                  color: const Color.fromARGB(234, 255, 255, 255),
+                  elevation: 0,
+                  margin: const EdgeInsets.fromLTRB(10, 150, 10, 150),
+                  child: Container(
+                    height: 200,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            "Activity",
-                            style: GoogleFonts.readexPro(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Text(
+                              "My Meal Plan",
+                              style: GoogleFonts.readexPro(
+                                fontSize: 20.0,
+                                textStyle: const TextStyle(
+                                  color: Color.fromARGB(255, 0, 0, 0),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                        ExpansionPanelList(
-                          expansionCallback: (int index, bool isExpanded) {
-                            setState(() {
-                              _data[index].isExpanded = isExpanded;
-                            });
-                          },
-                          children: _data.map<ExpansionPanel>((Item item) {
-                            return ExpansionPanel(
-                              headerBuilder:
-                                  (BuildContext context, bool isExpanded) {
-                                return ListTile(
-                                  title: Text(
-                                    item.headerValue,
-                                    style: GoogleFonts.readexPro(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold,
-                                      textStyle: const TextStyle(
-                                        color: Color.fromARGB(255, 0, 0, 0),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              body: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: item.expandedContent,
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width - 20,
+                            height: 100,
+                            child: Center(
+                              child: Text(
+                                'You have no saved Meal Plan.\n'
+                                'Use Meal Plan Generator or Create your own Meal Plan.',
+                                style: GoogleFonts.readexPro(
+                                  fontSize: MediaQuery.of(context)
+                                      .textScaler
+                                      .scale(14),
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              isExpanded: item.isExpanded,
-                            );
-                          }).toList(),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
+              );
+            });
+          });
+    }
+  }
+
+  void _showClearConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(
+            "Clear Food Items",
+            style: GoogleFonts.readexPro(
+              fontSize: 20.0,
+              textStyle: const TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold),
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to clear all food items?",
+            style: GoogleFonts.readexPro(
+              fontSize: 14.0,
+              textStyle: const TextStyle(
+                color: Colors.black54,
               ),
             ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                clearFoodItems(context); // Pass context to show Snackbar
+                Navigator.of(context).pop(); // Close dialog
+                Navigator.of(context).pop(); // Close modal
+              },
+              child: Text(
+                "Confirm",
+                style: GoogleFonts.readexPro(
+                  fontSize: 15.0,
+                  textStyle: const TextStyle(
+                      color: Colors.green, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text(
+                "No",
+                style: GoogleFonts.readexPro(
+                  fontSize: 15.0,
+                  textStyle: const TextStyle(
+                      color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  Future<void> clearFoodItems(BuildContext context) async {
+    String uid = thisUser!.uid;
+
+    // Clear the food items from Firestore
+    try {
+      await FirebaseFirestore.instance
+          .collection('userFoodBookMark')
+          .doc(uid)
+          .set({}); // Update the selectedFoods field to an empty list
+
+      // Show confirmation Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("All food items have been cleared."),
+          behavior: SnackBarBehavior.floating,
+          elevation: 3,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to clear food items. Please try again."),
+          behavior: SnackBarBehavior.floating,
+          elevation: 3,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Map<String, int> calculateTotalMacronutrients(
+      Map<String, dynamic> savedData) {
+    int totalCarbs = 0;
+    int totalFats = 0;
+    int totalProteins = 0;
+
+    // Iterate through the savedData from Firebase
+    savedData.forEach((_, selectedFoods) {
+      if (selectedFoods is List) {
+        for (var selectedFood in selectedFoods) {
+          String foodName = selectedFood['foodName'];
+          String servingPart = selectedFood['servingPart'];
+          int quantity = selectedFood['quantity']; // Get the quantity
+
+          // Check if the item exists in itemMacronutrients
+          if (itemMacronutrients.containsKey(foodName) &&
+              itemMacronutrients[foodName]!.containsKey(servingPart)) {
+            Map<String, int> macronutrients =
+                itemMacronutrients[foodName]![servingPart]!;
+
+            // Sum up the macronutrients considering the quantity
+            totalCarbs += macronutrients['carbs']! * quantity;
+            totalFats += macronutrients['fats']! * quantity;
+            totalProteins += macronutrients['proteins']! * quantity;
+          }
+        }
+      }
+    });
+
+    // Return the total macronutrient sums
+    return {
+      'carbs': totalCarbs,
+      'fats': totalFats,
+      'proteins': totalProteins,
+    };
   }
 }

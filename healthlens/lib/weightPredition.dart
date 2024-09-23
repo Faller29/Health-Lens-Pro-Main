@@ -93,7 +93,6 @@ Future<Map<String, List<WeightData>>> predictWeightChange() async {
       dateFormat.format(currentDate), formatWeight(idealBodyWeight)));
   monthlyWeight.add(WeightData(
       dateFormat.format(currentDate), formatWeight(idealBodyWeight)));
-
   return {
     'daily': dailyWeight,
     'weekly': weeklyWeight,

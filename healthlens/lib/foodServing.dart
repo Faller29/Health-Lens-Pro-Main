@@ -128,18 +128,20 @@ class _FoodServingState extends State<FoodServing> {
     } else {
       chronicIndexList.add(4);
     }
-
+    print(chronicIndexList);
     // Helper function to get the warning message based on the chronic index
     String _getWarningMessage(int chronicIndex) {
       switch (chronicIndex) {
         case 1:
-          return 'This food is bad for your health if you have Obesity.';
+          return 'This food is bad for your health if you have Obesity.\nKeep out of too much Oily Foods as it is bad for your Health';
         case 2:
-          return 'This food is bad for your health if you have Hypertension.';
+          return 'This food is bad for your health if you have Hypertension.\nKeep out of too much Oily Foods as it is bad for your Health';
         case 3:
-          return 'This food is bad for your health if you have Diabetes.';
+          return 'This food is bad for your health if you have Diabetes.\nKeep out of too much Oily or Sweet Foods as it is bad for your Health';
+        case 4:
+          return 'This food is not healthy for you.\nKeep out of Oily Foods as it is bad for your Health';
         default:
-          return 'This food is not healthy for you.';
+          return '';
       }
     }
 
@@ -150,10 +152,19 @@ class _FoodServingState extends State<FoodServing> {
           children: [
             Builder(
               builder: (context) {
-                if (itemRemovedId.contains('Egg')) {
+                if (itemRemovedId.contains('Egg') ||
+                    itemRemovedId.contains('Bread')) {
                   return Text('Type:', style: GoogleFonts.readexPro());
-                } else if (itemRemovedId.contains('Rice')) {
+                } else if (itemRemovedId.contains('Rice') ||
+                    itemRemovedId.contains('Potato') ||
+                    itemRemovedId.contains('Onion') ||
+                    itemRemovedId.contains('Onion') ||
+                    itemRemovedId.contains('Pork (Lechon Kawali)') ||
+                    itemRemovedId.contains('Chicken (Adobong Iga)')) {
                   return Text('Serving Size:', style: GoogleFonts.readexPro());
+                } else if (itemRemovedId.contains('Pork (Breaded Pork Chop)') ||
+                    itemRemovedId.contains('Fish (Daing na Bangus)')) {
+                  return Text('Slice:', style: GoogleFonts.readexPro());
                 } else {
                   return Text('Select part:', style: GoogleFonts.readexPro());
                 }
@@ -229,8 +240,11 @@ class _FoodServingState extends State<FoodServing> {
         ),
         for (var chronicIndex in chronicIndexList)
           if (itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]
-                  ?['warnings'] ==
-              chronicIndex)
+                      ?['warnings'] ==
+                  chronicIndex ||
+              itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]
+                      ?['warnings'] ==
+                  4)
             Row(
               children: [
                 Icon(Icons.warning, color: Colors.red),
@@ -248,6 +262,24 @@ class _FoodServingState extends State<FoodServing> {
                 ),
               ],
             ),
+        if (itemRemovedId.contains('Pork'))
+          Row(
+            children: [
+              Icon(Icons.warning, color: Colors.red),
+              SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  "\nDon't eat Fatty Part of Pork as it is Bad for your health condition.",
+                  style: GoogleFonts.readexPro(
+                    fontSize: 12,
+                    textStyle: TextStyle(
+                      color: const Color.fromARGB(255, 177, 41, 31),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
       ],
     );
   }
@@ -306,7 +338,7 @@ class _FoodServingState extends State<FoodServing> {
       final String currentDate = DateTime.now().toIso8601String().split('T')[0];
       // Get the current time in 'hh:mm' format
       final String currentTime =
-          "${DateTime.now().hour}:${DateTime.now().minute}";
+          "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
       // Check if adding the current food serving will exceed the user's max intake
       // Check the data structure of wrappedData
 

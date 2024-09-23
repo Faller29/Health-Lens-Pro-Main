@@ -1,0 +1,44 @@
+final List<Map<String, String>> faqItems = [
+  {
+    'question': ' How do we detect the food?',
+    'answer':
+        'Navigate to the Dashboard area, below your screen you’ll see a “Camera”, click it, allow the necessary access then click the “Start Detection” to start scanning. Once the food is detected, click the “Eat Food” to view the necessary macronutrients such as Fats, Carbs, and Protein.',
+  },
+  {
+    'question': 'Why is there no exercise recommended when I am clicking it?',
+    'answer':
+        'You might not be able to reach the needed requirements such as calories for the system to display some recommendation for the exercise.',
+  },
+  {
+    'question': 'What is the purpose of the “Physical Lifestyle”?',
+    'answer':
+        "This is to determine if you are active or not in terms of your lifestyle and adjust your daily needed macronutrients based on your physical lifestyle. There are 4 types of Physical Lifestyle present in the application: \n\na.	Sedentary. Sedentary lifestyle pertains to having no physical exercise at all. \n\nb.	Light. Light lifestyle pertains to having a minimal exercise such as walking for about 10 to 15 minutes a day, warming up, doing physical activity such as Zumba and so much more. \n\nc.	Moderate. Moderate lifestyle correlates to having an active lifestyle such as actively doing joggings, planned routines for body workout and more. \n\nd.	Vigorous. Vigorous lifestyle concerns to being a hardcore active lifestyle such as visiting gyms doing heavy workouts and controlled diets.",
+  },
+  {
+    'question': "Why does my scanner can't detect some of my food?",
+    'answer':
+        'There are cases that your scanned food will not display the macronutrients. This is because the system only detects certain viands (ulam).',
+  },
+  {
+    'question':
+        'What is the difference between manual and auto create meal plan?',
+    'answer':
+        "Manual Meal Plan lets you to choose your desired meal plan, in this way you can carefully select your desired diet for your health. Meanwhile, the Auto Create Meal Plan has a set of meal plans that the system chose for you."
+  },
+  {
+    'question': 'What is the difference between macronutrients and calories?',
+    'answer':
+        'Macronutrients pertains to Fats, Carbohydrates, and Protein. These are the breakdown of calories that will be distributed to the body. Meanwhile, calories pertain to the energy that our body will be using.',
+  },
+  {
+    'question': 'Why macronutrients are important?',
+    'answer':
+        'The nutritional elements of food known as macronutrients are what the body needs to function properly and to keep its systems and structure intact. For optimal operation, your body need higher dosages of these nutrients.',
+  },
+  {
+    'question':
+        'How do we ensure that the provided information such as macronutrients contents are accurate?',
+    'answer':
+        'Our Team collaborates with great professionals especially in the medical field. We interview and value every advice that they gave to our team providing an accurate data that the system will offer.',
+  }
+];

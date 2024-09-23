@@ -50,7 +50,7 @@ class _EntryPointState extends State<EntryPoint> {
       ),
       body: Center(
         child: [
-          HomePage(),
+          const HomePage(),
           CameraPage(),
           AnalyticsPage(),
           ProfilePage(),
@@ -108,27 +108,33 @@ class CustomNavigationBar extends StatelessWidget {
           int index = entry.key;
           CustomNavigationBarItem item = entry.value;
           bool isSelected = index == currentIndex;
-          return GestureDetector(
-            onTap: () => onTap(index),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  item.icon,
-                  color: isSelected
-                      ? Color(0xff4b39ef)
-                      : Color.fromARGB(255, 255, 255, 255),
-                ),
-                Text(
-                  item.label,
-                  style: TextStyle(
-                      color: isSelected
-                          ? Color(0xff4b39ef)
-                          : Color.fromARGB(255, 255, 255, 255),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              splashColor:
+                  Colors.white.withOpacity(0.5), // More visible splash color
+              borderRadius: BorderRadius.circular(50),
+              onTap: () => onTap(index),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    item.icon,
+                    color: isSelected
+                        ? Color(0xff4b39ef)
+                        : Color.fromARGB(255, 255, 255, 255),
+                  ),
+                  Text(
+                    item.label,
+                    style: TextStyle(
+                        color: isSelected
+                            ? Color(0xff4b39ef)
+                            : Color.fromARGB(255, 255, 255, 255),
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
           );
         }).toList(),

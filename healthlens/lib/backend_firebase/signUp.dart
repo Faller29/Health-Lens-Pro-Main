@@ -1,5 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:healthlens/main.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class WeakPasswordException implements Exception {}
 
 class EmailAlreadyInUseException implements Exception {}
+
+final FirebaseStorage _storage = FirebaseStorage.instance;
 
 //roundUp to the nearest 50 and hundreds for calorie
 int roundUp50s(int number) {
@@ -41,7 +47,6 @@ double desiredBW(double height) {
 }
 
 Future<bool> signUp(
-  String username,
   String email,
   String password,
   String sex,
@@ -52,7 +57,6 @@ Future<bool> signUp(
   int age,
   double height,
   double doubleWeight,
-  int phoneNumber,
   List<String> chronicDisease,
 ) async {
   //concatenating name
@@ -154,7 +158,7 @@ Future<bool> signUp(
         .createUserWithEmailAndPassword(email: email, password: password);
 
     // Update the user's profile with the username
-    await userCredential.user?.updateDisplayName(username);
+    await userCredential.user?.updateDisplayName(fName);
 
     String initial = mName[0].toUpperCase();
     thisUser = userCredential.user;
@@ -175,7 +179,6 @@ Future<bool> signUp(
       'height': height,
       'lifestyle': lifestyle,
       'name': fullName,
-      'phoneNumber': phoneNumber,
       'sex': sex,
       'weight': doubleWeight,
       'TER': TER,
@@ -208,7 +211,7 @@ Future<bool> signUp(
         'lastLogIn': currentDate,
       });
     }
-
+    uploadProfileImage();
     final currentUserInfo =
         await db.collection("user").doc(thisUser?.uid).get();
     final data = currentUserInfo.data() as Map<String, dynamic>;
@@ -226,10 +229,9 @@ Future<bool> signUp(
     await prefs.setInt('TER', data['TER']);
     await prefs.setDouble('height', data['height']);
     await prefs.setDouble('weight', data['weight']);
-    await prefs.setInt('phoneNumber', data['phoneNumber']);
-    await prefs.setInt('gramCarbs', data['reqCarbs']);
-    await prefs.setInt('gramProtein', data['reqProtein']);
-    await prefs.setInt('gramFats', data['reqFats']);
+    await prefs.setInt('gramCarbs', data['gramCarbs']);
+    await prefs.setInt('gramProtein', data['gramProtein']);
+    await prefs.setInt('gramFats', data['gramFats']);
     await prefs.setString('physicalActivity', data['lifestyle']);
     await prefs.setString('userBMI', data['bmi']);
     await prefs.setStringList(
@@ -258,5 +260,22 @@ Future<bool> signUp(
   } catch (e) {
     // Handle other errors
     return false;
+  }
+}
+
+Future<void> uploadProfileImage() async {
+  final String userId = thisUser!.uid;
+  final userRef = _storage.ref().child('users/$userId/profile.jpg');
+
+  // Load the image from assets
+  ByteData data = await rootBundle.load('assets/images/profile.jpg');
+  List<int> bytes = data.buffer.asUint8List();
+
+  // Upload the image to Firebase Storage
+  try {
+    await userRef.putData(Uint8List.fromList(bytes));
+    print('Profile image uploaded successfully!');
+  } catch (e) {
+    print('Error uploading profile image: $e');
   }
 }

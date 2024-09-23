@@ -146,7 +146,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
           'lastName': _lNameController.text,
           'middleInitial': initial,
           'age': int.parse(_ageController.text),
-          'profileImageUrl': _profileImageUrl,
         });
         await prefs.setString('userFullName', userFullname);
         await prefs.setString('firstName', _fNameController.text);

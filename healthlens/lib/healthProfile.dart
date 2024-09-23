@@ -43,7 +43,7 @@ class _healthProfile extends State<healthProfile> {
     super.initState();
     _heightController.text = heightHere.toString();
     _weightController.text = weightHere.toString();
-
+    fetchPhysicalLifestyle();
     _loadChronicDiseasesFromFirestore();
   }
 

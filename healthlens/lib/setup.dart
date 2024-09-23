@@ -35,11 +35,10 @@ class _SetupPageState extends State<SetupPage> {
     {"name": "Hypertension", "isChecked": false},
     {"name": "Obesity", "isChecked": false},
   ];
-
+  bool visible = true;
   List<String> chronicDisease = [];
   String nextText = "Next";
-  String? username,
-      email,
+  String? email,
       code,
       gender = 'Male',
       lifeStyle = 'Sedentary',
@@ -48,7 +47,7 @@ class _SetupPageState extends State<SetupPage> {
       lName;
   late String pinCode;
   int genderIndex = 0;
-  late int phoneNumber, age;
+  late int age;
   late double height, weight;
   final emailRegex =
       RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
@@ -92,10 +91,12 @@ class _SetupPageState extends State<SetupPage> {
         curve: Curves.ease,
       );
       setState(() {
+        visible = false;
         _currentPageIndex--;
       });
       if (_currentPageIndex == 0) {
         setState(() {
+          visible = true;
           _currentPageIndex = 0;
         });
       }
@@ -127,16 +128,29 @@ class _SetupPageState extends State<SetupPage> {
       );
       setState(() {
         _currentPageIndex++;
+        visible = false;
         if (_currentPageIndex == 4) {
           nextText = "Finish";
         }
       });
       print(_currentPageIndex);
     } else if (_currentPageIndex == 4) {
+      final snackBar = SnackBar(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 10),
+            Expanded(child: Text('Signing up...')),
+          ],
+        ),
+
+        behavior: SnackBarBehavior.floating,
+        elevation: 3,
+        duration: Duration(minutes: 1), // Keep it visible until dismissed
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       try {
-        print('try to sign up');
         bool signUpSuccess = await signUp(
-          username!,
           email!,
           pinCode,
           gender!,
@@ -147,10 +161,10 @@ class _SetupPageState extends State<SetupPage> {
           age,
           height,
           weight,
-          phoneNumber,
           chronicDisease,
         );
-        print('try to sign up1');
+
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         if (signUpSuccess) {
           Navigator.pushAndRemoveUntil(
             context,
@@ -160,23 +174,40 @@ class _SetupPageState extends State<SetupPage> {
         } else {
           // Generic sign-up failed message
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign up failed. Please try again.')),
+            SnackBar(
+                behavior: SnackBarBehavior.floating,
+                elevation: 3,
+                duration: const Duration(seconds: 2),
+                content: Text('Sign up failed. Please try again.')),
           );
         }
       } on WeakPasswordException {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
               content: Text('Weak password. Please choose a stronger one.')),
         );
       } on EmailAlreadyInUseException {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
               content:
                   Text('Email already in use. Please use a different email.')),
         );
       } catch (e) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sign up failed. Please try again.')),
+          SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
+              content: Text('Sign up failed. Please try again.')),
         );
       }
     }
@@ -184,646 +215,161 @@ class _SetupPageState extends State<SetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        final currentFocus = FocusScope.of(context);
-        if (currentFocus.hasFocus) {
-          currentFocus.unfocus();
-        }
-      },
-      child: Scaffold(
-        key: scaffoldKey,
-        body: SafeArea(
-          top: true,
-          child: Form(
-            key: formKey,
-            child: SingleChildScrollView(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.935,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: TextButton.icon(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginPage(),
-                            ),
-                          );
-                        },
-                        label: Text(
-                          'Log In',
-                          style: GoogleFonts.readexPro(
-                            fontSize: 14.0,
-                            textStyle: TextStyle(
-                              color: Color(0xff4b39ef),
-                            ),
-                          ),
-                          textAlign: TextAlign.end,
-                        ),
-                        icon: Icon(
-                          IconlyBroken.login,
-                          color: Color(0xff4b39ef),
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              width: double.infinity,
-                              height: 500.0,
-                              child: Stack(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 10.0),
-                                    child: PageView(
-                                      controller: _pageController,
-                                      onPageChanged: _handlePageChange,
-                                      scrollDirection: Axis.horizontal,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      children: [
-                                        PageViewPage(
-                                          children: [
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  -1.0, 0.0),
+    return Scaffold(
+      key: scaffoldKey,
+      body: SafeArea(
+        top: true,
+        child: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.935,
+              decoration: BoxDecoration(
+                color: Colors.white,
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            width: double.infinity,
+                            height: 500.0,
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 10.0),
+                                  child: PageView(
+                                    controller: _pageController,
+                                    onPageChanged: _handlePageChange,
+                                    scrollDirection: Axis.horizontal,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    children: [
+                                      PageViewPage(
+                                        children: [
+                                          Align(
+                                            alignment:
+                                                AlignmentDirectional(-1.0, 0.0),
+                                            child: Text(
+                                              'Welcome To HealthLens Pro!',
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 40.0,
+                                              ),
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: AlignmentDirectional(
+                                                -1.0, -1.0),
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(
+                                                      0.0, 4.0, 0.0, 15.0),
                                               child: Text(
-                                                'Welcome To HealthLens Pro!',
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 40.0,
+                                                'HealthLens Pro is an Application to Help Manage Macronutrients intake.........',
+                                                style: GoogleFonts.readexPro(
+                                                  fontSize: 14.0,
                                                 ),
                                               ),
                                             ),
-                                            Align(
+                                          ),
+                                          Align(
+                                            alignment:
+                                                AlignmentDirectional(0.0, 0.0),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: CachedNetworkImage(
+                                                imageUrl:
+                                                    'https://images.unsplash.com/photo-1494390248081-4e521a5940db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxOHx8aGVhbHRofGVufDB8fHx8MTcxMzk1NDY2MXww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                placeholder: (context, url) =>
+                                                    CircularProgressIndicator(),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(Icons.error),
+                                                fit: BoxFit.cover,
+                                                width: 300.0,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.3,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      PageViewPage(
+                                        children: [
+                                          Align(
+                                            alignment:
+                                                AlignmentDirectional(-1.0, 0.0),
+                                            child: Text(
+                                              'Profile Set Up',
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 40.0,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Align(
                                               alignment: AlignmentDirectional(
-                                                  -1.0, -1.0),
+                                                  0.0, 0.0),
                                               child: Padding(
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
-                                                        0.0, 4.0, 0.0, 15.0),
-                                                child: Text(
-                                                  'HealthLens Pro is an Application to Help Manage Macronutrients intake.........',
-                                                  style: GoogleFonts.readexPro(
-                                                    fontSize: 14.0,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                                child: CachedNetworkImage(
-                                                  imageUrl:
-                                                      'https://images.unsplash.com/photo-1494390248081-4e521a5940db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxOHx8aGVhbHRofGVufDB8fHx8MTcxMzk1NDY2MXww&ixlib=rb-4.0.3&q=80&w=1080',
-                                                  placeholder: (context, url) =>
-                                                      CircularProgressIndicator(),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Icon(Icons.error),
-                                                  fit: BoxFit.cover,
-                                                  width: 300.0,
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.3,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        PageViewPage(
-                                          children: [
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  -1.0, 0.0),
-                                              child: Text(
-                                                'Profile Set Up',
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 40.0,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Align(
-                                                alignment: AlignmentDirectional(
-                                                    0.0, 0.0),
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(24.0, 24.0,
-                                                          24.0, 0.0),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                0, 20, 0, 10),
-                                                        child: Align(
-                                                          alignment:
-                                                              AlignmentDirectional(
-                                                                  0.0, 0.0),
-                                                          child: Text(
-                                                            'STEP 1/4',
-                                                            style: GoogleFonts
-                                                                .readexPro(
-                                                                    fontSize:
-                                                                        18.0,
-                                                                    color: Color(
-                                                                        0xff4b39ef)),
-                                                          ),
+                                                        24.0, 24.0, 24.0, 0.0),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 20, 0, 10),
+                                                      child: Align(
+                                                        alignment:
+                                                            AlignmentDirectional(
+                                                                0.0, 0.0),
+                                                        child: Text(
+                                                          'STEP 1/4',
+                                                          style: GoogleFonts
+                                                              .readexPro(
+                                                                  fontSize:
+                                                                      18.0,
+                                                                  color: Color(
+                                                                      0xff4b39ef)),
                                                         ),
                                                       ),
-                                                      Text(
-                                                        'User Information',
-                                                        style:
-                                                            GoogleFonts.outfit(
-                                                          fontSize: 30.0,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                        ),
+                                                    ),
+                                                    Text(
+                                                      'User Information',
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 30.0,
+                                                        fontWeight:
+                                                            FontWeight.w700,
                                                       ),
-                                                      Text(
-                                                        'Please enter your name and sex to continue',
-                                                        style: GoogleFonts
-                                                            .readexPro(
-                                                          fontSize: 14.0,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      'Please enter your name and sex to continue',
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                        fontSize: 14.0,
                                                       ),
-                                                      Expanded(
-                                                        child:
-                                                            SingleChildScrollView(
-                                                          child: Column(
-                                                            children: [
-                                                              Align(
-                                                                alignment:
-                                                                    AlignmentDirectional(
-                                                                        0.0,
-                                                                        -1.0),
-                                                                child: Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          8.0,
-                                                                          30.0,
-                                                                          8.0,
-                                                                          0.0),
-                                                                  child:
-                                                                      TextFormField(
-                                                                    initialValue:
-                                                                        fName,
-                                                                    decoration:
-                                                                        InputDecoration(
-                                                                      labelText:
-                                                                          'First Name',
-                                                                      labelStyle:
-                                                                          GoogleFonts
-                                                                              .outfit(
-                                                                        fontSize:
-                                                                            15.0,
-                                                                      ),
-                                                                      enabledBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xffe0e3e7),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      focusedBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xff4b39ef),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      errorBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Colors.red,
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      focusedErrorBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xff4b39ef),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                    ),
-                                                                    style: GoogleFonts
-                                                                        .outfit(
-                                                                      fontSize:
-                                                                          14.0,
-                                                                    ),
-                                                                    onChanged:
-                                                                        (value) {
-                                                                      if (value ==
-                                                                              null ||
-                                                                          value
-                                                                              .isEmpty) {
-                                                                        // Handle empty or null value
-                                                                      } else {
-                                                                        fName =
-                                                                            value.toTitleCase;
-                                                                        print(
-                                                                            fName);
-                                                                      }
-                                                                    },
-                                                                    validator:
-                                                                        (value) {
-                                                                      if (value ==
-                                                                              null ||
-                                                                          value
-                                                                              .isEmpty) {
-                                                                        return 'Please enter your First Name';
-                                                                      }
-                                                                      return null; // Validation successful
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Align(
-                                                                alignment:
-                                                                    AlignmentDirectional(
-                                                                        0.0,
-                                                                        -1.0),
-                                                                child: Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          8.0,
-                                                                          30.0,
-                                                                          8.0,
-                                                                          0.0),
-                                                                  child:
-                                                                      TextFormField(
-                                                                    initialValue:
-                                                                        mName,
-                                                                    decoration:
-                                                                        InputDecoration(
-                                                                      labelText:
-                                                                          'Middle Name',
-                                                                      labelStyle:
-                                                                          GoogleFonts
-                                                                              .outfit(
-                                                                        fontSize:
-                                                                            15.0,
-                                                                      ),
-                                                                      enabledBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xffe0e3e7),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      focusedBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xff4b39ef),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      errorBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Colors.red,
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      focusedErrorBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xff4b39ef),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                    ),
-                                                                    style: GoogleFonts
-                                                                        .outfit(
-                                                                      fontSize:
-                                                                          14.0,
-                                                                    ),
-                                                                    onChanged:
-                                                                        (value) {
-                                                                      if (value ==
-                                                                              null ||
-                                                                          value
-                                                                              .isEmpty) {
-                                                                        // Handle empty or null value
-                                                                      } else {
-                                                                        print(
-                                                                            mName);
-                                                                        mName =
-                                                                            value.toTitleCase;
-                                                                      }
-                                                                    },
-                                                                    validator:
-                                                                        (value) {
-                                                                      if (value ==
-                                                                              null ||
-                                                                          value
-                                                                              .isEmpty) {
-                                                                        return 'Please enter your Middle Name';
-                                                                      }
-                                                                      // Validation successful
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Align(
-                                                                alignment:
-                                                                    AlignmentDirectional(
-                                                                        0.0,
-                                                                        -1.0),
-                                                                child: Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          8.0,
-                                                                          30.0,
-                                                                          8.0,
-                                                                          0.0),
-                                                                  child:
-                                                                      TextFormField(
-                                                                    initialValue:
-                                                                        lName,
-                                                                    decoration:
-                                                                        InputDecoration(
-                                                                      labelText:
-                                                                          'Last Name',
-                                                                      labelStyle:
-                                                                          GoogleFonts
-                                                                              .outfit(
-                                                                        fontSize:
-                                                                            15.0,
-                                                                      ),
-                                                                      enabledBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xffe0e3e7),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      focusedBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xff4b39ef),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      errorBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Colors.red,
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                      focusedErrorBorder:
-                                                                          UnderlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide(
-                                                                          color:
-                                                                              Color(0xff4b39ef),
-                                                                          width:
-                                                                              2.0,
-                                                                        ),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8.0),
-                                                                      ),
-                                                                    ),
-                                                                    style: GoogleFonts
-                                                                        .outfit(
-                                                                      fontSize:
-                                                                          14.0,
-                                                                    ),
-                                                                    onChanged:
-                                                                        (value) {
-                                                                      lName = value
-                                                                          .toTitleCase;
-                                                                    },
-                                                                    validator:
-                                                                        (value) {
-                                                                      if (value ==
-                                                                              null ||
-                                                                          value
-                                                                              .isEmpty) {
-                                                                        return 'Please enter your Last Name';
-                                                                      }
-                                                                      return null; // Validation successful
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0.0,
-                                                                            15.0,
-                                                                            0.0,
-                                                                            15.0),
-                                                                    child: Row(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        Text(
-                                                                          'Sex:',
-                                                                          style:
-                                                                              GoogleFonts.readexPro(
-                                                                            fontSize:
-                                                                                17.0,
-                                                                          ),
-                                                                        ),
-                                                                        RadioButtonGroup(
-                                                                            buttonHeight:
-                                                                                30,
-                                                                            buttonWidth:
-                                                                                102,
-                                                                            circular:
-                                                                                true,
-                                                                            mainColor:
-                                                                                Colors.grey,
-                                                                            selectedColor: Color(0xff4b39ef),
-                                                                            selectedBorderSide: BorderSide(width: 1, color: Color(0xff4b39ef)),
-                                                                            preSelectedIdx: genderIndex,
-                                                                            options: options,
-                                                                            callback: (RadioOption val) {
-                                                                              setState(() {
-                                                                                gender = val.label;
-                                                                                print(gender);
-                                                                              });
-                                                                            })
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    height: 10,
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        PageViewPage(
-                                          children: [
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  -1.0, 0.0),
-                                              child: Text(
-                                                'Profile Set Up',
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 40.0,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Align(
-                                                alignment: AlignmentDirectional(
-                                                    0.0, 0.0),
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(24.0, 24.0,
-                                                          24.0, 0.0),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                0, 20, 0, 10),
-                                                        child: Align(
-                                                          alignment:
-                                                              AlignmentDirectional(
-                                                                  0.0, 0.0),
-                                                          child: Text(
-                                                            'STEP 2/4',
-                                                            style: GoogleFonts
-                                                                .readexPro(
-                                                                    fontSize:
-                                                                        18.0,
-                                                                    color: Color(
-                                                                        0xff4b39ef)),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        'User Information',
-                                                        style:
-                                                            GoogleFonts.outfit(
-                                                          fontSize: 30.0,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        'Please enter your Age, Heigh, and Weight.',
-                                                        style: GoogleFonts
-                                                            .readexPro(
-                                                          fontSize: 14.0,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      Expanded(
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Expanded(
+                                                      child:
+                                                          SingleChildScrollView(
                                                         child: Column(
                                                           children: [
                                                             Align(
@@ -841,599 +387,914 @@ class _SetupPageState extends State<SetupPage> {
                                                                             0.0),
                                                                 child:
                                                                     TextFormField(
-                                                                  keyboardType:
-                                                                      TextInputType.numberWithOptions(
-                                                                          decimal:
-                                                                              true),
-                                                                  inputFormatters: [
-                                                                    FilteringTextInputFormatter
-                                                                        .allow(RegExp(
-                                                                            '[0-9.]')),
-                                                                  ],
-                                                                  //onChanged: (value) => doubleVar = double.parse(value),
-
+                                                                  textCapitalization:
+                                                                      TextCapitalization
+                                                                          .words,
+                                                                  textInputAction:
+                                                                      TextInputAction
+                                                                          .next,
+                                                                  initialValue:
+                                                                      fName,
                                                                   decoration:
                                                                       InputDecoration(
-                                                                    labelText:
-                                                                        'Age',
-                                                                    labelStyle:
-                                                                        GoogleFonts
-                                                                            .outfit(
-                                                                      fontSize:
-                                                                          15.0,
-                                                                    ),
-                                                                    enabledBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Color(
-                                                                            0xffe0e3e7),
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    focusedBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Color(
-                                                                            0xff4b39ef),
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    errorBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    focusedErrorBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                  ),
-                                                                  style:
-                                                                      GoogleFonts
-                                                                          .outfit(
-                                                                    fontSize:
-                                                                        14.0,
-                                                                  ),
-                                                                  onChanged:
-                                                                      (value) {
-                                                                    age = int.tryParse(value ??
-                                                                            '') ??
-                                                                        0;
-                                                                    print(age);
-                                                                  },
-                                                                  validator:
-                                                                      (value) {
-                                                                    if (value ==
-                                                                            null ||
-                                                                        value
-                                                                            .isEmpty) {
-                                                                      return 'Please enter your age';
-                                                                    }
-                                                                    return null; // Validation successful
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Align(
-                                                              alignment:
-                                                                  AlignmentDirectional(
-                                                                      0.0,
-                                                                      -1.0),
-                                                              child: Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            8.0,
-                                                                            30.0,
-                                                                            8.0,
-                                                                            0.0),
-                                                                child:
-                                                                    TextFormField(
-                                                                  keyboardType:
-                                                                      TextInputType.numberWithOptions(
-                                                                          decimal:
-                                                                              true),
-                                                                  inputFormatters: [
-                                                                    FilteringTextInputFormatter
-                                                                        .allow(RegExp(
-                                                                            '[0-9.]')),
-                                                                  ],
-                                                                  //onChanged: (value) => doubleVar = double.parse(value),
-                                                                  decoration:
-                                                                      InputDecoration(
-                                                                    labelText:
-                                                                        'Height [cm]',
-                                                                    labelStyle:
-                                                                        GoogleFonts
-                                                                            .outfit(
-                                                                      fontSize:
-                                                                          15.0,
-                                                                    ),
-                                                                    enabledBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Color(
-                                                                            0xffe0e3e7),
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    focusedBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Color(
-                                                                            0xff4b39ef),
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    errorBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    focusedErrorBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                  ),
-                                                                  style:
-                                                                      GoogleFonts
-                                                                          .outfit(
-                                                                    fontSize:
-                                                                        14.0,
-                                                                  ),
-                                                                  onChanged:
-                                                                      (value) {
-                                                                    height =
-                                                                        double.tryParse(value ??
-                                                                                '') ??
-                                                                            0;
-                                                                    print(
-                                                                        height);
-                                                                  },
-                                                                  validator:
-                                                                      (value) {
-                                                                    if (value ==
-                                                                            null ||
-                                                                        value
-                                                                            .isEmpty) {
-                                                                      return 'Please enter your Height';
-                                                                    }
-                                                                    return null; // Validation successful
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Align(
-                                                              alignment:
-                                                                  AlignmentDirectional(
-                                                                      0.0,
-                                                                      -1.0),
-                                                              child: Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            8.0,
-                                                                            30.0,
-                                                                            8.0,
-                                                                            0.0),
-                                                                child:
-                                                                    TextFormField(
-                                                                  keyboardType:
-                                                                      TextInputType.numberWithOptions(
-                                                                          decimal:
-                                                                              true),
-                                                                  inputFormatters: [
-                                                                    FilteringTextInputFormatter
-                                                                        .allow(RegExp(
-                                                                            '[0-9.]')),
-                                                                  ],
-                                                                  //onChanged: (value) => doubleVar = double.parse(value),
-                                                                  decoration:
-                                                                      InputDecoration(
-                                                                    labelText:
-                                                                        'Weight [kg]',
-                                                                    labelStyle:
-                                                                        GoogleFonts
-                                                                            .outfit(
-                                                                      fontSize:
-                                                                          15.0,
-                                                                    ),
-                                                                    enabledBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Color(
-                                                                            0xffe0e3e7),
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    focusedBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Color(
-                                                                            0xff4b39ef),
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    errorBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                    focusedErrorBorder:
-                                                                        UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        width:
-                                                                            2.0,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
-                                                                    ),
-                                                                  ),
-                                                                  style:
-                                                                      GoogleFonts
-                                                                          .outfit(
-                                                                    fontSize:
-                                                                        14.0,
-                                                                  ),
-                                                                  onChanged:
-                                                                      (value) {
-                                                                    weight =
-                                                                        double.tryParse(value ??
-                                                                                '') ??
-                                                                            0;
-                                                                    print(
-                                                                        weight);
-                                                                  },
-                                                                  validator:
-                                                                      (value) {
-                                                                    if (value ==
-                                                                            null ||
-                                                                        value
-                                                                            .isEmpty) {
-                                                                      return 'Please enter your weight';
-                                                                    }
-                                                                    return null; // Validation successful
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        PageViewPage(
-                                          children: [
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  -1.0, 0.0),
-                                              child: Text(
-                                                'Profile Set Up',
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 40.0,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: SingleChildScrollView(
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.fromLTRB(
-                                                              24.0,
-                                                              24.0,
-                                                              24.0,
-                                                              0.0),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Padding(
-                                                            padding: EdgeInsets
-                                                                .fromLTRB(0, 20,
-                                                                    0, 10),
-                                                            child: Align(
-                                                              alignment:
-                                                                  AlignmentDirectional(
-                                                                      0.0, 0.0),
-                                                              child: Text(
-                                                                'STEP 3/4',
-                                                                style: GoogleFonts
-                                                                    .readexPro(
-                                                                  fontSize:
-                                                                      18.0,
-                                                                  color: Color(
-                                                                      0xff4b39ef),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            'Health Information',
-                                                            style: GoogleFonts
-                                                                .outfit(
-                                                              fontSize: 30.0,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            'Please Select your current health status and Lifestyle.',
-                                                            style: GoogleFonts
-                                                                .readexPro(
-                                                              fontSize: 14.0,
-                                                            ),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                          SizedBox(
-                                                            height: 20,
-                                                          ),
-                                                          Material(
-                                                              elevation: 4,
-                                                              shadowColor: Colors
-                                                                  .grey
-                                                                  .withOpacity(
-                                                                      0.5),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8),
-                                                              child: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsets
-                                                                        .fromLTRB(
-                                                                            0,
+                                                                    contentPadding:
+                                                                        EdgeInsets.fromLTRB(
                                                                             10,
-                                                                            0,
+                                                                            10,
+                                                                            10,
                                                                             10),
-                                                                    child: Text(
-                                                                      'Physical Lifestyle: ',
-                                                                      style: GoogleFonts.readexPro(
-                                                                          fontSize:
-                                                                              18.0,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
+                                                                    labelText:
+                                                                        'First Name',
+                                                                    labelStyle:
+                                                                        GoogleFonts
+                                                                            .outfit(
+                                                                      fontSize:
+                                                                          15.0,
+                                                                    ),
+                                                                    enabledBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xffe0e3e7),
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    focusedBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xff4b39ef),
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    errorBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Colors
+                                                                            .red,
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    focusedErrorBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xff4b39ef),
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
                                                                     ),
                                                                   ),
-                                                                  Row(
-                                                                    children: [
-                                                                      Expanded(
-                                                                        child: RadioButtonGroup(
-                                                                            multilineNumber: 2,
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                                                            spaceBetween: 1,
-                                                                            betweenMultiLines: 10,
-                                                                            buttonHeight: 30,
-                                                                            buttonWidth: 115,
-                                                                            circular: true,
-                                                                            textStyle: TextStyle(fontSize: 14, color: Colors.white),
-                                                                            mainColor: Colors.grey,
-                                                                            selectedColor: Color(0xff4b39ef),
-                                                                            selectedBorderSide: BorderSide(width: 1, color: Color(0xff4b39ef)),
-                                                                            preSelectedIdx: 0,
-                                                                            options: [
-                                                                              RadioOption("SEDENTARY", "Sedentary"),
-                                                                              RadioOption("LIGHT", "Light"),
-                                                                              RadioOption("MODERATE", "Moderate"),
-                                                                              RadioOption("VIGOROUS", "Vigorous"),
-                                                                            ],
-                                                                            callback: (RadioOption val) {
-                                                                              setState(() {
-                                                                                lifeStyle = val.label;
-                                                                                print(lifeStyle);
-                                                                              });
-                                                                            }),
+                                                                  style:
+                                                                      GoogleFonts
+                                                                          .outfit(
+                                                                    fontSize:
+                                                                        16.0,
+                                                                  ),
+                                                                  onChanged:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      // Handle empty or null value
+                                                                    } else {
+                                                                      fName = value
+                                                                          .toTitleCase;
+                                                                      print(
+                                                                          fName);
+                                                                    }
+                                                                  },
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return 'Please enter your First Name';
+                                                                    }
+                                                                    return null; // Validation successful
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Align(
+                                                              alignment:
+                                                                  AlignmentDirectional(
+                                                                      0.0,
+                                                                      -1.0),
+                                                              child: Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            8.0,
+                                                                            30.0,
+                                                                            8.0,
+                                                                            0.0),
+                                                                child:
+                                                                    TextFormField(
+                                                                  textCapitalization:
+                                                                      TextCapitalization
+                                                                          .words,
+                                                                  textInputAction:
+                                                                      TextInputAction
+                                                                          .next,
+                                                                  initialValue:
+                                                                      mName,
+                                                                  decoration:
+                                                                      InputDecoration(
+                                                                    contentPadding:
+                                                                        EdgeInsets.fromLTRB(
+                                                                            10,
+                                                                            10,
+                                                                            10,
+                                                                            10),
+                                                                    labelText:
+                                                                        'Middle Name',
+                                                                    labelStyle:
+                                                                        GoogleFonts
+                                                                            .outfit(
+                                                                      fontSize:
+                                                                          15.0,
+                                                                    ),
+                                                                    enabledBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xffe0e3e7),
+                                                                        width:
+                                                                            2.0,
                                                                       ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    focusedBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xff4b39ef),
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    errorBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Colors
+                                                                            .red,
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    focusedErrorBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xff4b39ef),
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                  ),
+                                                                  style:
+                                                                      GoogleFonts
+                                                                          .outfit(
+                                                                    fontSize:
+                                                                        16.0,
+                                                                  ),
+                                                                  onChanged:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      // Handle empty or null value
+                                                                    } else {
+                                                                      print(
+                                                                          mName);
+                                                                      mName = value
+                                                                          .toTitleCase;
+                                                                    }
+                                                                  },
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return 'Please enter your Middle Name';
+                                                                    }
+                                                                    // Validation successful
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Align(
+                                                              alignment:
+                                                                  AlignmentDirectional(
+                                                                      0.0,
+                                                                      -1.0),
+                                                              child: Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            8.0,
+                                                                            30.0,
+                                                                            8.0,
+                                                                            0.0),
+                                                                child:
+                                                                    TextFormField(
+                                                                  textCapitalization:
+                                                                      TextCapitalization
+                                                                          .words,
+                                                                  textInputAction:
+                                                                      TextInputAction
+                                                                          .next,
+                                                                  initialValue:
+                                                                      lName,
+                                                                  decoration:
+                                                                      InputDecoration(
+                                                                    contentPadding:
+                                                                        EdgeInsets.fromLTRB(
+                                                                            10,
+                                                                            10,
+                                                                            10,
+                                                                            10),
+                                                                    labelText:
+                                                                        'Last Name',
+                                                                    labelStyle:
+                                                                        GoogleFonts
+                                                                            .outfit(
+                                                                      fontSize:
+                                                                          15.0,
+                                                                    ),
+                                                                    enabledBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xffe0e3e7),
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    focusedBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xff4b39ef),
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    errorBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Colors
+                                                                            .red,
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                    focusedErrorBorder:
+                                                                        UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                        color: Color(
+                                                                            0xff4b39ef),
+                                                                        width:
+                                                                            2.0,
+                                                                      ),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                    ),
+                                                                  ),
+                                                                  style:
+                                                                      GoogleFonts
+                                                                          .outfit(
+                                                                    fontSize:
+                                                                        16.0,
+                                                                  ),
+                                                                  onChanged:
+                                                                      (value) {
+                                                                    lName = value
+                                                                        .toTitleCase;
+                                                                  },
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return 'Please enter your Last Name';
+                                                                    }
+                                                                    return null; // Validation successful
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0.0,
+                                                                          15.0,
+                                                                          0.0,
+                                                                          15.0),
+                                                                  child: Row(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .max,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Text(
+                                                                        'Sex:',
+                                                                        style: GoogleFonts
+                                                                            .readexPro(
+                                                                          fontSize:
+                                                                              17.0,
+                                                                        ),
+                                                                      ),
+                                                                      RadioButtonGroup(
+                                                                          buttonHeight:
+                                                                              30,
+                                                                          buttonWidth:
+                                                                              102,
+                                                                          circular:
+                                                                              true,
+                                                                          mainColor: Colors
+                                                                              .grey,
+                                                                          selectedColor: Color(
+                                                                              0xff4b39ef),
+                                                                          selectedBorderSide: BorderSide(
+                                                                              width:
+                                                                                  1,
+                                                                              color: Color(
+                                                                                  0xff4b39ef)),
+                                                                          preSelectedIdx:
+                                                                              genderIndex,
+                                                                          options:
+                                                                              options,
+                                                                          callback:
+                                                                              (RadioOption val) {
+                                                                            setState(() {
+                                                                              gender = val.label;
+                                                                              print(gender);
+                                                                            });
+                                                                          })
                                                                     ],
                                                                   ),
-                                                                  SizedBox(
-                                                                    height: 10,
-                                                                  ),
-                                                                ],
-                                                              )),
-                                                          SizedBox(
-                                                            height: 30,
-                                                          ),
-                                                          Text(
-                                                            'Chronic Disease:',
-                                                            style: GoogleFonts
-                                                                .readexPro(
-                                                                    fontSize:
-                                                                        18.0,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                          ),
-                                                          Padding(
-                                                            padding: EdgeInsets
-                                                                .fromLTRB(0, 0,
-                                                                    0, 10),
-                                                            child: Material(
-                                                              elevation: 4,
-                                                              shadowColor: Colors
-                                                                  .grey
-                                                                  .withOpacity(
-                                                                      0.5),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8),
-                                                              child: Padding(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            20.0),
-                                                                child: Column(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  children:
-                                                                      categories
-                                                                          .map(
-                                                                              (disease) {
-                                                                    return CheckboxListTile(
-                                                                      title: Text(
-                                                                          disease[
-                                                                              'name']),
-                                                                      checkboxShape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(6),
-                                                                      ),
-                                                                      value: disease[
-                                                                          'isChecked'],
-                                                                      onChanged:
-                                                                          (val) {
-                                                                        setState(
-                                                                            () {
-                                                                          disease['isChecked'] =
-                                                                              val;
-                                                                          getCheckedDiseases();
-                                                                          print(
-                                                                              '${disease['name']} isChecked: ${disease['isChecked']}');
-                                                                        });
-                                                                      },
-                                                                    );
-                                                                  }).toList(),
                                                                 ),
+                                                                SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      PageViewPage(
+                                        children: [
+                                          Align(
+                                            alignment:
+                                                AlignmentDirectional(-1.0, 0.0),
+                                            child: Text(
+                                              'Profile Set Up',
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 40.0,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(
+                                                      24.0, 24.0, 24.0, 0.0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            0, 20, 0, 10),
+                                                    child: Align(
+                                                      alignment:
+                                                          AlignmentDirectional(
+                                                              0.0, 0.0),
+                                                      child: Text(
+                                                        'STEP 2/4',
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                                fontSize: 18.0,
+                                                                color: Color(
+                                                                    0xff4b39ef)),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'User Information',
+                                                    style: GoogleFonts.outfit(
+                                                      fontSize: 30.0,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'Please enter your Age, Heigh, and Weight.',
+                                                    style:
+                                                        GoogleFonts.readexPro(
+                                                      fontSize: 14.0,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Expanded(
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Column(
+                                                        children: [
+                                                          Align(
+                                                            alignment:
+                                                                AlignmentDirectional(
+                                                                    0.0, -1.0),
+                                                            child: Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          8.0,
+                                                                          30.0,
+                                                                          8.0,
+                                                                          0.0),
+                                                              child:
+                                                                  TextFormField(
+                                                                maxLength: 3,
+                                                                textInputAction:
+                                                                    TextInputAction
+                                                                        .next,
+                                                                keyboardType: TextInputType
+                                                                    .numberWithOptions(
+                                                                        decimal:
+                                                                            true),
+                                                                inputFormatters: [
+                                                                  FilteringTextInputFormatter
+                                                                      .allow(RegExp(
+                                                                          '[0-9.]')),
+                                                                ],
+                                                                //onChanged: (value) => doubleVar = double.parse(value),
+
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  counterText:
+                                                                      "",
+                                                                  contentPadding:
+                                                                      EdgeInsets
+                                                                          .fromLTRB(
+                                                                              10,
+                                                                              10,
+                                                                              10,
+                                                                              10),
+                                                                  labelText:
+                                                                      'Age',
+                                                                  labelStyle:
+                                                                      GoogleFonts
+                                                                          .outfit(
+                                                                    fontSize:
+                                                                        15.0,
+                                                                  ),
+                                                                  enabledBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xffe0e3e7),
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  focusedBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xff4b39ef),
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  errorBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  focusedErrorBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                ),
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .outfit(
+                                                                  fontSize:
+                                                                      16.0,
+                                                                ),
+                                                                onChanged:
+                                                                    (value) {
+                                                                  age = int.tryParse(
+                                                                          value ??
+                                                                              '') ??
+                                                                      0;
+                                                                  print(age);
+                                                                },
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .isEmpty) {
+                                                                    return 'Please enter your age';
+                                                                  }
+                                                                  return null; // Validation successful
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Align(
+                                                            alignment:
+                                                                AlignmentDirectional(
+                                                                    0.0, -1.0),
+                                                            child: Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0.0,
+                                                                          30.0,
+                                                                          8.0,
+                                                                          0.0),
+                                                              child:
+                                                                  TextFormField(
+                                                                maxLength: 3,
+                                                                textInputAction:
+                                                                    TextInputAction
+                                                                        .next,
+                                                                keyboardType: TextInputType
+                                                                    .numberWithOptions(
+                                                                        decimal:
+                                                                            true),
+                                                                inputFormatters: [
+                                                                  FilteringTextInputFormatter
+                                                                      .allow(RegExp(
+                                                                          '[0-9.]')),
+                                                                ],
+                                                                //onChanged: (value) => doubleVar = double.parse(value),
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  counterText:
+                                                                      "",
+                                                                  contentPadding:
+                                                                      EdgeInsets
+                                                                          .fromLTRB(
+                                                                              10,
+                                                                              10,
+                                                                              10,
+                                                                              10),
+                                                                  labelText:
+                                                                      'Height [cm]',
+                                                                  labelStyle:
+                                                                      GoogleFonts
+                                                                          .outfit(
+                                                                    fontSize:
+                                                                        15.0,
+                                                                  ),
+                                                                  enabledBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xffe0e3e7),
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  focusedBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xff4b39ef),
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  errorBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  focusedErrorBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                ),
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .outfit(
+                                                                  fontSize:
+                                                                      16.0,
+                                                                ),
+                                                                onChanged:
+                                                                    (value) {
+                                                                  height = double.tryParse(
+                                                                          value ??
+                                                                              '') ??
+                                                                      0;
+                                                                  print(height);
+                                                                },
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .isEmpty) {
+                                                                    return 'Please enter your Height';
+                                                                  }
+                                                                  return null; // Validation successful
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Align(
+                                                            alignment:
+                                                                AlignmentDirectional(
+                                                                    0.0, -1.0),
+                                                            child: Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0.0,
+                                                                          30.0,
+                                                                          8.0,
+                                                                          0.0),
+                                                              child:
+                                                                  TextFormField(
+                                                                maxLength: 3,
+                                                                textInputAction:
+                                                                    TextInputAction
+                                                                        .next,
+                                                                keyboardType: TextInputType
+                                                                    .numberWithOptions(
+                                                                        decimal:
+                                                                            true),
+                                                                inputFormatters: [
+                                                                  FilteringTextInputFormatter
+                                                                      .allow(RegExp(
+                                                                          '[0-9.]')),
+                                                                ],
+                                                                //onChanged: (value) => doubleVar = double.parse(value),
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  counterText:
+                                                                      "",
+                                                                  contentPadding:
+                                                                      EdgeInsets
+                                                                          .fromLTRB(
+                                                                              10,
+                                                                              10,
+                                                                              10,
+                                                                              10),
+                                                                  labelText:
+                                                                      'Weight [kg]',
+                                                                  labelStyle:
+                                                                      GoogleFonts
+                                                                          .outfit(
+                                                                    fontSize:
+                                                                        15.0,
+                                                                  ),
+                                                                  enabledBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xffe0e3e7),
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  focusedBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Color(
+                                                                          0xff4b39ef),
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  errorBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                  focusedErrorBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          2.0,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                  ),
+                                                                ),
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .outfit(
+                                                                  fontSize:
+                                                                      16.0,
+                                                                ),
+                                                                onChanged:
+                                                                    (value) {
+                                                                  weight = double.tryParse(
+                                                                          value ??
+                                                                              '') ??
+                                                                      0;
+                                                                  print(weight);
+                                                                },
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .isEmpty) {
+                                                                    return 'Please enter your weight';
+                                                                  }
+                                                                  return null; // Validation successful
+                                                                },
                                                               ),
                                                             ),
                                                           ),
                                                         ],
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
+                                                  )
+                                                ],
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        PageViewPage(
-                                          children: [
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  -1.0, 0.0),
-                                              child: Text(
-                                                'Profile Set Up',
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 40.0,
-                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      PageViewPage(
+                                        children: [
+                                          Align(
+                                            alignment:
+                                                AlignmentDirectional(-1.0, 0.0),
+                                            child: Text(
+                                              'Profile Set Up',
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 40.0,
                                               ),
                                             ),
-                                            Expanded(
-                                              child: SingleChildScrollView(
-                                                child: Align(
-                                                  alignment:
-                                                      AlignmentDirectional(
-                                                          0.0, 0.0),
-                                                  child: Padding(
+                                          ),
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(
-                                                                24.0,
-                                                                24.0,
-                                                                24.0,
-                                                                0.0),
+                                                        EdgeInsets.fromLTRB(
+                                                            24.0,
+                                                            24.0,
+                                                            24.0,
+                                                            0.0),
                                                     child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .start,
@@ -1450,18 +1311,18 @@ class _SetupPageState extends State<SetupPage> {
                                                                 AlignmentDirectional(
                                                                     0.0, 0.0),
                                                             child: Text(
-                                                              'STEP 4/4',
+                                                              'STEP 3/4',
                                                               style: GoogleFonts
                                                                   .readexPro(
-                                                                      fontSize:
-                                                                          18.0,
-                                                                      color: Color(
-                                                                          0xff4b39ef)),
+                                                                fontSize: 18.0,
+                                                                color: Color(
+                                                                    0xff4b39ef),
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
                                                         Text(
-                                                          'Account & Security',
+                                                          'Health Information',
                                                           style: GoogleFonts
                                                               .outfit(
                                                             fontSize: 30.0,
@@ -1470,7 +1331,7 @@ class _SetupPageState extends State<SetupPage> {
                                                           ),
                                                         ),
                                                         Text(
-                                                          'Create an Account to save and retrieve your data.',
+                                                          'Please Select your current health status and Lifestyle.',
                                                           style: GoogleFonts
                                                               .readexPro(
                                                             fontSize: 14.0,
@@ -1479,609 +1340,708 @@ class _SetupPageState extends State<SetupPage> {
                                                               TextAlign.center,
                                                         ),
                                                         SizedBox(
-                                                          height: 30,
+                                                          height: 20,
                                                         ),
-                                                        Column(
-                                                          children: [
-                                                            Container(
-                                                              width: MediaQuery
-                                                                          .sizeOf(
-                                                                              context)
-                                                                      .width /
-                                                                  1.5,
-                                                              child:
-                                                                  TextFormField(
-                                                                initialValue:
-                                                                    username,
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  labelText:
-                                                                      'Username',
-                                                                  labelStyle:
-                                                                      GoogleFonts
-                                                                          .outfit(
-                                                                    fontSize:
-                                                                        15.0,
-                                                                  ),
-                                                                  enabledBorder:
-                                                                      UnderlineInputBorder(
-                                                                    borderSide:
-                                                                        BorderSide(
-                                                                      color: Color(
-                                                                          0xffe0e3e7),
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                  ),
-                                                                  focusedBorder:
-                                                                      UnderlineInputBorder(
-                                                                    borderSide:
-                                                                        BorderSide(
-                                                                      color: Color(
-                                                                          0xff4b39ef),
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                  ),
-                                                                  errorBorder:
-                                                                      UnderlineInputBorder(
-                                                                    borderSide:
-                                                                        BorderSide(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                  ),
-                                                                  focusedErrorBorder:
-                                                                      UnderlineInputBorder(
-                                                                    borderSide:
-                                                                        BorderSide(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                  ),
-                                                                ),
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .outfit(
-                                                                  fontSize:
-                                                                      14.0,
-                                                                ),
-                                                                onChanged:
-                                                                    (value) {
-                                                                  username = value
-                                                                      .toTitleCase;
-                                                                },
-                                                                validator:
-                                                                    (value) {
-                                                                  if (value ==
-                                                                          null ||
-                                                                      value
-                                                                          .isEmpty) {
-                                                                    return 'Please enter your username';
-                                                                  }
-                                                                  return null; // Validation successful
-                                                                },
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            Container(
-                                                              width: MediaQuery
-                                                                          .sizeOf(
-                                                                              context)
-                                                                      .width /
-                                                                  1.5,
-                                                              child:
-                                                                  TextFormField(
-                                                                keyboardType:
-                                                                    TextInputType
-                                                                        .emailAddress,
-                                                                initialValue:
-                                                                    email,
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  labelText:
-                                                                      'Email',
-                                                                  labelStyle:
-                                                                      GoogleFonts
-                                                                          .outfit(
-                                                                    fontSize:
-                                                                        15.0,
-                                                                  ),
-                                                                  enabledBorder:
-                                                                      UnderlineInputBorder(
-                                                                    borderSide:
-                                                                        BorderSide(
-                                                                      color: Color(
-                                                                          0xffe0e3e7),
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                  ),
-                                                                  focusedBorder:
-                                                                      UnderlineInputBorder(
-                                                                    borderSide:
-                                                                        BorderSide(
-                                                                      color: Color(
-                                                                          0xff4b39ef),
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                  ),
-                                                                  errorBorder:
-                                                                      UnderlineInputBorder(
-                                                                    borderSide:
-                                                                        BorderSide(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                  ),
-                                                                  focusedErrorBorder:
-                                                                      UnderlineInputBorder(
-                                                                    borderSide:
-                                                                        BorderSide(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                  ),
-                                                                ),
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .outfit(
-                                                                  fontSize:
-                                                                      14.0,
-                                                                ),
-                                                                onChanged:
-                                                                    (value) {
-                                                                  if (value ==
-                                                                          null ||
-                                                                      value
-                                                                          .isEmpty) {
-                                                                    // Handle empty or null value
-                                                                  } else {
-                                                                    email =
-                                                                        value;
-                                                                  }
-                                                                  print(email);
-                                                                },
-                                                                validator:
-                                                                    validateEmail,
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            Container(
-                                                              width: MediaQuery
-                                                                          .sizeOf(
-                                                                              context)
-                                                                      .width /
-                                                                  1.5,
-                                                              child: Container(
-                                                                child: Column(
-                                                                  children: [
-                                                                    Row(
-                                                                      children: [
-                                                                        Container(
-                                                                          width:
-                                                                              MediaQuery.sizeOf(context).width / 2,
-                                                                          child:
-                                                                              TextFormField(
-                                                                            keyboardType:
-                                                                                TextInputType.number,
-                                                                            maxLength:
-                                                                                11,
-                                                                            decoration:
-                                                                                InputDecoration(
-                                                                              labelText: 'Phone Number',
-                                                                              labelStyle: GoogleFonts.outfit(
-                                                                                fontSize: 15.0,
-                                                                              ),
-                                                                              enabledBorder: UnderlineInputBorder(
-                                                                                borderSide: BorderSide(
-                                                                                  color: Color(0xffe0e3e7),
-                                                                                  width: 2.0,
-                                                                                ),
-                                                                                borderRadius: BorderRadius.circular(8.0),
-                                                                              ),
-                                                                              focusedBorder: UnderlineInputBorder(
-                                                                                borderSide: BorderSide(
-                                                                                  color: Color(0xff4b39ef),
-                                                                                  width: 2.0,
-                                                                                ),
-                                                                                borderRadius: BorderRadius.circular(8.0),
-                                                                              ),
-                                                                              errorBorder: UnderlineInputBorder(
-                                                                                borderSide: BorderSide(
-                                                                                  color: Colors.black,
-                                                                                  width: 2.0,
-                                                                                ),
-                                                                                borderRadius: BorderRadius.circular(8.0),
-                                                                              ),
-                                                                              focusedErrorBorder: UnderlineInputBorder(
-                                                                                borderSide: BorderSide(
-                                                                                  color: Colors.black,
-                                                                                  width: 2.0,
-                                                                                ),
-                                                                                borderRadius: BorderRadius.circular(8.0),
-                                                                              ),
-                                                                            ),
-                                                                            style:
-                                                                                GoogleFonts.outfit(
-                                                                              fontSize: 14.0,
-                                                                            ),
-                                                                            onChanged:
-                                                                                (value) {
-                                                                              phoneNumber = int.tryParse(value ?? '') ?? 0;
-                                                                              print(phoneNumber);
-                                                                            },
-                                                                            validator:
-                                                                                (value) {
-                                                                              if (value == null || value.isEmpty) {
-                                                                                return 'Please enter your Phone Number';
-                                                                              }
-                                                                              return null; // Validation successful
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                        Padding(
-                                                                          padding: EdgeInsets.fromLTRB(
-                                                                              6,
-                                                                              0,
-                                                                              0,
-                                                                              0),
-                                                                          child:
-                                                                              IconButton(
-                                                                            onPressed:
-                                                                                (null),
-                                                                            icon:
-                                                                                Icon(
-                                                                              Icons.send,
-                                                                              color: Color(0xff4b39ef),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
+                                                        Material(
+                                                            elevation: 4,
+                                                            shadowColor: Color(
+                                                                0xFF2336E2),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsets
+                                                                      .fromLTRB(
+                                                                          0,
                                                                           10,
-                                                                    ),
-                                                                    Container(
-                                                                      child:
-                                                                          Container(
-                                                                        child:
-                                                                            Row(
-                                                                          children: [
-                                                                            Container(
-                                                                              width: MediaQuery.sizeOf(context).width / 3,
-                                                                              child: TextFormField(
-                                                                                  initialValue: code,
-                                                                                  keyboardType: TextInputType.number,
-                                                                                  decoration: InputDecoration(
-                                                                                    labelText: 'Enter Code',
-                                                                                    labelStyle: GoogleFonts.outfit(
-                                                                                      fontSize: 15.0,
-                                                                                    ),
-                                                                                    enabledBorder: UnderlineInputBorder(
-                                                                                      borderSide: BorderSide(
-                                                                                        color: Color(0xffe0e3e7),
-                                                                                        width: 2.0,
-                                                                                      ),
-                                                                                      borderRadius: BorderRadius.circular(8.0),
-                                                                                    ),
-                                                                                    focusedBorder: UnderlineInputBorder(
-                                                                                      borderSide: BorderSide(
-                                                                                        color: Color(0xff4b39ef),
-                                                                                        width: 2.0,
-                                                                                      ),
-                                                                                      borderRadius: BorderRadius.circular(8.0),
-                                                                                    ),
-                                                                                    errorBorder: UnderlineInputBorder(
-                                                                                      borderSide: BorderSide(
-                                                                                        color: Colors.black,
-                                                                                        width: 2.0,
-                                                                                      ),
-                                                                                      borderRadius: BorderRadius.circular(8.0),
-                                                                                    ),
-                                                                                    focusedErrorBorder: UnderlineInputBorder(
-                                                                                      borderSide: BorderSide(
-                                                                                        color: Colors.black,
-                                                                                        width: 2.0,
-                                                                                      ),
-                                                                                      borderRadius: BorderRadius.circular(8.0),
-                                                                                    ),
-                                                                                  ),
-                                                                                  style: GoogleFonts.outfit(
-                                                                                    fontSize: 14.0,
-                                                                                  ),
-                                                                                  onChanged: (value) {
-                                                                                    setState(() {
-                                                                                      if (value == null || value.isEmpty) {}
-                                                                                      code = value;
-                                                                                    });
-                                                                                  }),
-                                                                            ),
-                                                                            TextButton(
-                                                                              child: Text(
-                                                                                'verify',
-                                                                                style: GoogleFonts.readexPro(
-                                                                                  fontSize: 14.0,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                  textStyle: TextStyle(
-                                                                                    color: Color(0xff4b39ef),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              onPressed: (null),
-                                                                            ),
-                                                                          ],
-                                                                        ),
+                                                                          0,
+                                                                          8),
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      Text(
+                                                                        'Physical Lifestyle',
+                                                                        style: GoogleFonts.readexPro(
+                                                                            fontSize:
+                                                                                18.0,
+                                                                            fontWeight:
+                                                                                FontWeight.bold),
                                                                       ),
-                                                                    )
+                                                                      IconButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          showCupertinoModalPopup(
+                                                                              context: context,
+                                                                              builder: ((context) {
+                                                                                return Center(
+                                                                                  child: Card(
+                                                                                    color: Color.fromARGB(234, 255, 255, 255),
+                                                                                    elevation: 3,
+                                                                                    margin: const EdgeInsets.fromLTRB(10, 150, 10, 150),
+                                                                                    child: Padding(
+                                                                                      padding: EdgeInsets.all(20),
+                                                                                      child: SingleChildScrollView(
+                                                                                        child: Column(
+                                                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                          //mainAxisAlignment: MainAxisAlignment.start,
+                                                                                          children: [
+                                                                                            Text(
+                                                                                              'Physical Lifestyle',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 18.0,
+                                                                                                fontWeight: FontWeight.bold,
+                                                                                              ),
+                                                                                              textAlign: TextAlign.center,
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              height: 20,
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Sedentary: ',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 14.0,
+                                                                                                fontWeight: FontWeight.bold,
+                                                                                              ),
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Mostly Resting with little or no Activity.',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 14.0,
+                                                                                              ),
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              height: 20,
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Light: ',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 14.0,
+                                                                                                fontWeight: FontWeight.bold,
+                                                                                              ),
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Occupations that require minimal movement.',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 14.0,
+                                                                                              ),
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              height: 20,
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Moderate: ',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 14.0,
+                                                                                                fontWeight: FontWeight.bold,
+                                                                                              ),
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Occupations that require periods of movement.',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 14.0,
+                                                                                              ),
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              height: 20,
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Vigorous: ',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 14.0,
+                                                                                                fontWeight: FontWeight.bold,
+                                                                                              ),
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Occupations that require extensive movement.',
+                                                                                              style: GoogleFonts.readexPro(
+                                                                                                fontSize: 14.0,
+                                                                                              ),
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                );
+                                                                              }));
+                                                                        },
+                                                                        icon: Icon(
+                                                                            IconlyBold.info_circle),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child: RadioButtonGroup(
+                                                                          multilineNumber: 2,
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                                          spaceBetween: 1,
+                                                                          betweenMultiLines: 10,
+                                                                          buttonHeight: 30,
+                                                                          buttonWidth: 115,
+                                                                          circular: true,
+                                                                          textStyle: TextStyle(fontSize: 14, color: Colors.white),
+                                                                          mainColor: Colors.grey,
+                                                                          selectedColor: Color(0xff4b39ef),
+                                                                          selectedBorderSide: BorderSide(width: 1, color: Color(0xff4b39ef)),
+                                                                          preSelectedIdx: 0,
+                                                                          options: [
+                                                                            RadioOption("SEDENTARY",
+                                                                                "Sedentary"),
+                                                                            RadioOption("LIGHT",
+                                                                                "Light"),
+                                                                            RadioOption("MODERATE",
+                                                                                "Moderate"),
+                                                                            RadioOption("VIGOROUS",
+                                                                                "Vigorous"),
+                                                                          ],
+                                                                          callback: (RadioOption val) {
+                                                                            setState(() {
+                                                                              lifeStyle = val.label;
+                                                                              print(lifeStyle);
+                                                                            });
+                                                                          }),
+                                                                    ),
                                                                   ],
                                                                 ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                                SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                              ],
+                                                            )),
                                                         SizedBox(
                                                           height: 30,
                                                         ),
-                                                        Align(
-                                                          alignment:
-                                                              AlignmentDirectional(
-                                                                  0.0, 0.0),
-                                                          child: Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        0.0,
-                                                                        10.0,
-                                                                        0.0,
-                                                                        0.0),
-                                                            child:
-                                                                PinCodeTextField(
-                                                              autoDisposeControllers:
-                                                                  false,
-                                                              appContext:
-                                                                  context,
-                                                              length: 6,
-                                                              textStyle:
-                                                                  GoogleFonts
-                                                                      .readexPro(
-                                                                fontSize: 10.0,
-                                                              ),
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceEvenly,
-                                                              enableActiveFill:
-                                                                  false,
-                                                              autoFocus: false,
-                                                              enablePinAutofill:
-                                                                  false,
-                                                              errorTextSpace:
-                                                                  16.0,
-                                                              showCursor: true,
-                                                              cursorColor: Color(
-                                                                  0xff4b39ef),
-                                                              obscureText:
-                                                                  false,
-                                                              hintCharacter:
-                                                                  '●',
-                                                              keyboardType:
-                                                                  TextInputType
-                                                                      .number,
-                                                              pinTheme:
-                                                                  PinTheme(
-                                                                fieldHeight:
-                                                                    44.0,
-                                                                fieldWidth:
-                                                                    44.0,
-                                                                borderWidth:
-                                                                    2.0,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .only(
-                                                                  bottomLeft: Radius
-                                                                      .circular(
-                                                                          12.0),
-                                                                  bottomRight: Radius
-                                                                      .circular(
-                                                                          12.0),
-                                                                  topLeft: Radius
-                                                                      .circular(
-                                                                          12.0),
-                                                                  topRight: Radius
-                                                                      .circular(
-                                                                          12.0),
-                                                                ),
-                                                                shape:
-                                                                    PinCodeFieldShape
-                                                                        .box,
-                                                                activeColor:
-                                                                    Colors
-                                                                        .black,
-                                                                inactiveColor:
-                                                                    Colors.grey,
-                                                                selectedColor:
-                                                                    Color(
-                                                                        0xff4b39ef),
-                                                                activeFillColor:
-                                                                    Colors
-                                                                        .black,
-                                                                inactiveFillColor:
-                                                                    Colors.grey,
-                                                                selectedFillColor:
-                                                                    Color(
-                                                                        0xff4b39ef),
-                                                              ),
-                                                              onCompleted:
-                                                                  (value) async {
-                                                                pinCode = value;
-                                                                print(pinCode);
-
-                                                                final SharedPreferences
-                                                                    prefs =
-                                                                    await SharedPreferences
-                                                                        .getInstance();
-                                                                await prefs
-                                                                    .setString(
-                                                                        'pinCode',
-                                                                        pinCode);
-                                                                // You can add additional logic here, like navigating to a new screen
-                                                                print(pinCode);
-                                                              },
-                                                              autovalidateMode:
-                                                                  AutovalidateMode
-                                                                      .onUserInteraction,
-                                                              onChanged: (String
-                                                                  value) {},
-                                                            ),
-                                                          ),
-                                                        ),
                                                         Text(
-                                                          'Set up 6 Digit Pin Code.',
+                                                          'Chronic Disease:',
                                                           style: GoogleFonts
                                                               .readexPro(
-                                                            fontSize: 14.0,
-                                                          ),
-                                                          textAlign:
-                                                              TextAlign.center,
+                                                                  fontSize:
+                                                                      18.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
                                                         ),
-                                                        SizedBox(
-                                                          height: 50,
+                                                        Padding(
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  0, 0, 0, 10),
+                                                          child: Material(
+                                                            elevation: 4,
+                                                            shadowColor: Color(
+                                                                0xFF2336E2),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                            child: Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(
+                                                                          20.0),
+                                                              child: Column(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                children:
+                                                                    categories.map(
+                                                                        (disease) {
+                                                                  return CheckboxListTile(
+                                                                    title: Text(
+                                                                        disease[
+                                                                            'name']),
+                                                                    checkboxShape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              6),
+                                                                    ),
+                                                                    value: disease[
+                                                                        'isChecked'],
+                                                                    onChanged:
+                                                                        (val) {
+                                                                      setState(
+                                                                          () {
+                                                                        disease['isChecked'] =
+                                                                            val;
+                                                                        getCheckedDiseases();
+                                                                        print(
+                                                                            '${disease['name']} isChecked: ${disease['isChecked']}');
+                                                                      });
+                                                                    },
+                                                                  );
+                                                                }).toList(),
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
                                                   ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      PageViewPage(
+                                        children: [
+                                          Align(
+                                            alignment:
+                                                AlignmentDirectional(-1.0, 0.0),
+                                            child: Text(
+                                              'Profile Set Up',
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 40.0,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child: Align(
+                                                alignment: AlignmentDirectional(
+                                                    0.0, 0.0),
+                                                child: Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(24.0, 24.0,
+                                                          24.0, 0.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.fromLTRB(
+                                                                0, 20, 0, 10),
+                                                        child: Align(
+                                                          alignment:
+                                                              AlignmentDirectional(
+                                                                  0.0, 0.0),
+                                                          child: Text(
+                                                            'STEP 4/4',
+                                                            style: GoogleFonts
+                                                                .readexPro(
+                                                                    fontSize:
+                                                                        18.0,
+                                                                    color: Color(
+                                                                        0xff4b39ef)),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'Account & Security',
+                                                        style:
+                                                            GoogleFonts.outfit(
+                                                          fontSize: 30.0,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'Create an Account to save and retrieve your data.',
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                          fontSize: 14.0,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                      SizedBox(
+                                                        height: 30,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Container(
+                                                            width: MediaQuery
+                                                                        .sizeOf(
+                                                                            context)
+                                                                    .width /
+                                                                1.2,
+                                                            child:
+                                                                TextFormField(
+                                                              textInputAction:
+                                                                  TextInputAction
+                                                                      .next,
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .emailAddress,
+                                                              initialValue:
+                                                                  email,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                contentPadding:
+                                                                    EdgeInsets
+                                                                        .fromLTRB(
+                                                                            10,
+                                                                            10,
+                                                                            10,
+                                                                            10),
+                                                                labelText:
+                                                                    'Email',
+                                                                labelStyle:
+                                                                    GoogleFonts
+                                                                        .outfit(
+                                                                  fontSize:
+                                                                      15.0,
+                                                                ),
+                                                                enabledBorder:
+                                                                    UnderlineInputBorder(
+                                                                  borderSide:
+                                                                      BorderSide(
+                                                                    color: Color(
+                                                                        0xffe0e3e7),
+                                                                    width: 2.0,
+                                                                  ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8.0),
+                                                                ),
+                                                                focusedBorder:
+                                                                    UnderlineInputBorder(
+                                                                  borderSide:
+                                                                      BorderSide(
+                                                                    color: Color(
+                                                                        0xff4b39ef),
+                                                                    width: 2.0,
+                                                                  ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8.0),
+                                                                ),
+                                                                errorBorder:
+                                                                    UnderlineInputBorder(
+                                                                  borderSide:
+                                                                      BorderSide(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width: 2.0,
+                                                                  ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8.0),
+                                                                ),
+                                                                focusedErrorBorder:
+                                                                    UnderlineInputBorder(
+                                                                  borderSide:
+                                                                      BorderSide(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width: 2.0,
+                                                                  ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8.0),
+                                                                ),
+                                                              ),
+                                                              style: GoogleFonts
+                                                                  .outfit(
+                                                                fontSize: 18.0,
+                                                              ),
+                                                              onChanged:
+                                                                  (value) {
+                                                                if (value ==
+                                                                        null ||
+                                                                    value
+                                                                        .isEmpty) {
+                                                                  // Handle empty or null value
+                                                                } else {
+                                                                  email = value;
+                                                                }
+                                                                print(email);
+                                                              },
+                                                              validator:
+                                                                  validateEmail,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        height: 30,
+                                                      ),
+                                                      Align(
+                                                        alignment:
+                                                            AlignmentDirectional(
+                                                                0.0, 0.0),
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                      0.0,
+                                                                      10.0,
+                                                                      0.0,
+                                                                      0.0),
+                                                          child:
+                                                              PinCodeTextField(
+                                                            blinkWhenObscuring:
+                                                                true,
+                                                            autoDisposeControllers:
+                                                                false,
+                                                            appContext: context,
+                                                            length: 6,
+                                                            textStyle:
+                                                                GoogleFonts
+                                                                    .readexPro(
+                                                              fontSize: 18.0,
+                                                            ),
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            enableActiveFill:
+                                                                false,
+                                                            autoFocus: false,
+                                                            enablePinAutofill:
+                                                                false,
+                                                            errorTextSpace:
+                                                                16.0,
+                                                            showCursor: true,
+                                                            cursorColor: Color(
+                                                                0xff4b39ef),
+                                                            obscureText: true,
+                                                            hintCharacter: '●',
+                                                            keyboardType:
+                                                                TextInputType
+                                                                    .number,
+                                                            pinTheme: PinTheme(
+                                                              fieldHeight: 44.0,
+                                                              fieldWidth: 44.0,
+                                                              borderWidth: 2.0,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .only(
+                                                                bottomLeft: Radius
+                                                                    .circular(
+                                                                        12.0),
+                                                                bottomRight: Radius
+                                                                    .circular(
+                                                                        12.0),
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        12.0),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        12.0),
+                                                              ),
+                                                              shape:
+                                                                  PinCodeFieldShape
+                                                                      .box,
+                                                              activeColor: Color(
+                                                                  0xFF017E07),
+                                                              inactiveColor:
+                                                                  Colors.grey,
+                                                              selectedColor:
+                                                                  Color(
+                                                                      0xff4b39ef),
+                                                              activeFillColor:
+                                                                  Color(
+                                                                      0xFF017E07),
+                                                              inactiveFillColor:
+                                                                  Colors.grey,
+                                                              selectedFillColor:
+                                                                  Color(
+                                                                      0xff4b39ef),
+                                                              errorBorderColor:
+                                                                  Colors.red,
+                                                            ),
+                                                            onCompleted:
+                                                                (value) async {
+                                                              pinCode = value;
+                                                              print(pinCode);
+
+                                                              final SharedPreferences
+                                                                  prefs =
+                                                                  await SharedPreferences
+                                                                      .getInstance();
+                                                              await prefs
+                                                                  .setString(
+                                                                      'pinCode',
+                                                                      pinCode);
+                                                              // You can add additional logic here, like navigating to a new screen
+                                                              print(pinCode);
+                                                            },
+                                                            autovalidateMode:
+                                                                AutovalidateMode
+                                                                    .onUserInteraction,
+                                                            onChanged: (String
+                                                                value) {},
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'Set up 6 Digit Pin Code.',
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                          fontSize: 14.0,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                      SizedBox(
+                                                        height: 50,
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: AlignmentDirectional(-1.0, 1.0),
-                                    child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          24.0, 0.0, 0.0, 16.0),
-                                      child: smooth_page_indicator
-                                          .SmoothPageIndicator(
-                                        controller: _pageController,
-                                        count: 5,
-                                        axisDirection: Axis.horizontal,
-                                        onDotClicked: (i) async {
-                                          _pageController.animateToPage(
-                                            i,
-                                            duration:
-                                                Duration(milliseconds: 500),
-                                            curve: Curves.ease,
-                                          );
-                                        },
-                                        effect: smooth_page_indicator
-                                            .ExpandingDotsEffect(
-                                          expansionFactor: 3.0,
-                                          spacing: 8.0,
-                                          radius: 16.0,
-                                          dotWidth: 30.0,
-                                          dotHeight: 10.0,
-                                          dotColor:
-                                              Color.fromARGB(40, 75, 57, 239),
-                                          activeDotColor: Color(0xff4b39ef),
-                                          paintStyle: PaintingStyle.fill,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                24.0, 10.0, 24.0, 10.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      TextButton(
-                                        onPressed: _previousPage,
-                                        child: Text("Back"),
-                                        style: TextButton.styleFrom(
-                                          backgroundColor: Colors.grey[300],
-                                          foregroundColor: Color(0xff4b39ef),
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ),
-                                ElevatedButton(
-                                  onPressed: _nextPage,
-                                  child: Text(nextText),
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Color(0xff4b39ef),
-                                    foregroundColor: Colors.white,
+                                Align(
+                                  alignment: AlignmentDirectional(-1.0, 1.0),
+                                  child: Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        24.0, 0.0, 0.0, 16.0),
+                                    child: smooth_page_indicator
+                                        .SmoothPageIndicator(
+                                      controller: _pageController,
+                                      count: 5,
+                                      axisDirection: Axis.horizontal,
+                                      onDotClicked: (i) async {
+                                        _pageController.animateToPage(
+                                          i,
+                                          duration: Duration(milliseconds: 500),
+                                          curve: Curves.ease,
+                                        );
+                                      },
+                                      effect: smooth_page_indicator
+                                          .ExpandingDotsEffect(
+                                        expansionFactor: 3.0,
+                                        spacing: 8.0,
+                                        radius: 16.0,
+                                        dotWidth: 30.0,
+                                        dotHeight: 10.0,
+                                        dotColor:
+                                            Color.fromARGB(40, 75, 57, 239),
+                                        activeDotColor: Color(0xff4b39ef),
+                                        paintStyle: PaintingStyle.fill,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                /*ElevatedButton(
-                                  onPressed: () async {
-                                    // Assuming you have variables email, password, and username
-                                    await signUp(username!,password!);
-                                  },
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              24.0, 10.0, 24.0, 10.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    TextButton(
+                                      onPressed: _previousPage,
+                                      child: Text("Back"),
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.grey[300],
+                                        foregroundColor: Color(0xff4b39ef),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: _nextPage,
                                 child: Text(nextText),
-
                                 style: TextButton.styleFrom(
                                   backgroundColor: Color(0xff4b39ef),
                                   foregroundColor: Colors.white,
                                 ),
-                              ),*/
-                              ],
-                            ),
+                              ),
+                              /*ElevatedButton(
+                                onPressed: () async {
+                                  // Assuming you have variables email, password, and username
+                                  await signUp(username!,password!);
+                                },
+                              child: Text(nextText),
+    
+                              style: TextButton.styleFrom(
+                                backgroundColor: Color(0xff4b39ef),
+                                foregroundColor: Colors.white,
+                              ),
+                            ),*/
+                            ],
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Visibility(
+                    visible: visible,
+                    child: Positioned(
+                      top: 10,
+                      right: 15,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginPage(),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Icon(
+                              IconlyBroken.login,
+                              color: Color(0xff4b39ef),
+                              size: 20,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              'Log In',
+                              style: GoogleFonts.readexPro(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
+                                textStyle: TextStyle(
+                                  color: Color(0xff4b39ef),
+                                ),
+                              ),
+                              textAlign: TextAlign.end,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

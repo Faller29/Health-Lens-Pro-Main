@@ -15,7 +15,7 @@ class ExerciseService {
       final formattedDate =
           "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
       final String currentTime =
-          "${DateTime.now().hour}:${DateTime.now().minute}";
+          "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
 
       await _firestore
           .collection('user_activity')

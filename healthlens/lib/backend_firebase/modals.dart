@@ -1,0 +1,497 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+
+void mealPlanGeneratorSelector(BuildContext context) async {
+  showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return Center(
+            child: Card(
+              color: Color.fromARGB(234, 255, 255, 255),
+              elevation: 0,
+              margin: const EdgeInsets.fromLTRB(10, 150, 10, 150),
+              child: Container(
+                height: 250,
+                child: Column(
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Text(
+                          "Create Meal Plan",
+                          style: GoogleFonts.readexPro(
+                            fontSize: 20.0,
+                            textStyle: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width - 20,
+                        child: Center(
+                          child: Text(
+                            'Choose a Meal Plan Generator.\n\n'
+                            'Auto Generate Meal Plan using the System or Manually Create One',
+                            style: GoogleFonts.readexPro(
+                              fontSize:
+                                  MediaQuery.of(context).textScaler.scale(14),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width - 20,
+                        height: 100,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xff4b39ef)),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/mealCreator');
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.book,
+                                    color: Color(0xffffffff),
+                                  ),
+                                  SizedBox(
+                                    width: 3,
+                                  ),
+                                  Text(
+                                    'Manual',
+                                    style: GoogleFonts.readexPro(
+                                      textStyle: const TextStyle(
+                                        color: Color(0xffffffff),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xff4b39ef)),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/mealPlan');
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.auto_mode,
+                                    color: Color(0xffffffff),
+                                  ),
+                                  SizedBox(
+                                    width: 3,
+                                  ),
+                                  Text(
+                                    'Auto',
+                                    style: GoogleFonts.readexPro(
+                                      textStyle: const TextStyle(
+                                        color: Color(0xffffffff),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+      });
+}
+
+// Function to change the PIN
+Future<void> changePin(BuildContext context, String email, String currentPin,
+    String newPin) async {
+  try {
+    // Get the current user
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Re-authenticate the user with email and current password (PIN)
+      AuthCredential credential =
+          EmailAuthProvider.credential(email: email, password: currentPin);
+      UserCredential userCredential =
+          await user.reauthenticateWithCredential(credential);
+
+      // Check if the re-authenticated user UID matches the current user UID
+      if (userCredential.user?.uid == user.uid) {
+        // If UIDs match, update the password (PIN)
+        await user.updatePassword(newPin);
+
+        // Show success message using SnackBar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
+              content: Text("PIN updated successfully")),
+        );
+      } else {
+        // If UIDs don't match, show an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
+              content: Text("Error: User mismatch. Please try again.")),
+        );
+      }
+    }
+  } catch (e) {
+    // Show error message using SnackBar in case of failure
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          behavior: SnackBarBehavior.floating,
+          elevation: 3,
+          duration: const Duration(seconds: 2),
+          content: Text("Error during PIN update: ${e.toString()}")),
+    );
+  }
+}
+
+// Function to display the PIN code modal
+void showPinCodeModal(BuildContext context) {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _currentPinController = TextEditingController();
+  final TextEditingController _newPinController = TextEditingController();
+
+  showCupertinoModalPopup(
+    context: context,
+    builder: (BuildContext context) {
+      return Center(
+        child: Card(
+          color: Colors.white,
+          shadowColor: Colors.black,
+          elevation: 3,
+          margin: const EdgeInsets.fromLTRB(10, 160, 10, 160),
+          child: Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                    child: Text(
+                      'Update Pin Code',
+                      style: GoogleFonts.readexPro(
+                        fontSize: 20.0,
+                        textStyle: const TextStyle(
+                          color: Color.fromARGB(255, 0, 0, 0),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 0, 5),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Current Email',
+                        style: GoogleFonts.readexPro(
+                          fontSize: 14.0,
+                          textStyle: const TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Email Input Field
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: TextField(
+                      textInputAction: TextInputAction.next,
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xffe0e3e7),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        labelText: 'Enter Current Email',
+                        labelStyle: GoogleFonts.readexPro(fontSize: 14),
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 15, 0, 5),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Current Pincode',
+                        style: GoogleFonts.readexPro(
+                          fontSize: 14.0,
+                          textStyle: const TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ), // Current PIN Input Field
+                  PinCodeTextField(
+                    blinkWhenObscuring: true,
+                    controller: _currentPinController,
+                    autoDisposeControllers: false,
+                    appContext: context,
+                    length: 6,
+                    textStyle: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                    ),
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    enableActiveFill: false,
+                    autoFocus: false,
+                    enablePinAutofill: false,
+                    errorTextSpace: 16.0,
+                    showCursor: true,
+                    cursorColor: Color(0xff4b39ef),
+                    obscureText: true,
+                    hintCharacter: '●',
+                    keyboardType: TextInputType.number,
+                    pinTheme: PinTheme(
+                        fieldHeight: 44.0,
+                        fieldWidth: 44.0,
+                        borderWidth: 2.0,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(12.0),
+                          bottomRight: Radius.circular(12.0),
+                          topLeft: Radius.circular(12.0),
+                          topRight: Radius.circular(12.0),
+                        ),
+                        shape: PinCodeFieldShape.box,
+                        activeColor: Color(0xFF017E07),
+                        inactiveColor: Colors.grey,
+                        selectedColor: Color(0xff4b39ef),
+                        activeFillColor: Color(0xFF017E07),
+                        inactiveFillColor: Colors.grey,
+                        selectedFillColor: Color(0xff4b39ef),
+                        errorBorderColor: Colors.red),
+                    onChanged: (_) {},
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'New Pincode',
+                        style: GoogleFonts.readexPro(
+                          fontSize: 14.0,
+                          textStyle: const TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ), // New PIN Input Field
+                  PinCodeTextField(
+                    blinkWhenObscuring: true,
+                    controller: _newPinController,
+                    autoDisposeControllers: false,
+                    appContext: context,
+                    length: 6,
+                    textStyle: GoogleFonts.readexPro(
+                      fontSize: 14.0,
+                    ),
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    enableActiveFill: false,
+                    autoFocus: false,
+                    enablePinAutofill: false,
+                    errorTextSpace: 16.0,
+                    showCursor: true,
+                    cursorColor: Color(0xff4b39ef),
+                    obscureText: true,
+                    hintCharacter: '●',
+                    keyboardType: TextInputType.number,
+                    pinTheme: PinTheme(
+                        fieldHeight: 44.0,
+                        fieldWidth: 44.0,
+                        borderWidth: 2.0,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(12.0),
+                          bottomRight: Radius.circular(12.0),
+                          topLeft: Radius.circular(12.0),
+                          topRight: Radius.circular(12.0),
+                        ),
+                        shape: PinCodeFieldShape.box,
+                        activeColor: Color(0xFF017E07),
+                        inactiveColor: Colors.grey,
+                        selectedColor: Color(0xff4b39ef),
+                        activeFillColor: Color(0xFF017E07),
+                        inactiveFillColor: Colors.grey,
+                        selectedFillColor: Color(0xff4b39ef),
+                        errorBorderColor: Colors.red),
+                    onChanged: (_) {},
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          overlayColor: MaterialStateColor.resolveWith(
+                              (states) => Colors.white30),
+                          backgroundColor: MaterialStatePropertyAll<Color>(
+                            Colors.redAccent,
+                          ),
+                          side: MaterialStatePropertyAll(
+                            BorderSide(
+                              color: Color(0xFFE0E3E7),
+                              width: 1.0,
+                            ),
+                          ),
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
+                          ), /* 
+                          padding: MaterialStateProperty.all<EdgeInsets>(
+                            EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          ), */
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.readexPro(
+                            color: Colors.white,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          overlayColor: MaterialStateColor.resolveWith(
+                              (states) => Colors.white30),
+                          backgroundColor: MaterialStatePropertyAll<Color>(
+                            Colors.greenAccent,
+                          ),
+                          side: MaterialStatePropertyAll(
+                            BorderSide(
+                              color: Color(0xFFE0E3E7),
+                              width: 1.0,
+                            ),
+                          ),
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
+                          ), /* 
+                          padding: MaterialStateProperty.all<EdgeInsets>(
+                            EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          ), */
+                        ),
+                        onPressed: () {
+                          // Get user inputs
+                          String email = _emailController.text;
+                          String currentPin = _currentPinController.text;
+                          String newPin = _newPinController.text;
+
+                          // Validate inputs
+                          if (email.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Email cannot be empty.")),
+                            );
+                          } else if (currentPin.length != 6) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content:
+                                      Text("Current PIN must be 6 digits.")),
+                            );
+                          } else if (newPin.length != 6) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text("New PIN must be 6 digits.")),
+                            );
+                          } else {
+                            // Call the function to change the PIN
+                            changePin(context, email, currentPin, newPin);
+                          }
+
+                          // Close the modal
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Change Pin',
+                          style: GoogleFonts.readexPro(
+                            color: Colors.white,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
