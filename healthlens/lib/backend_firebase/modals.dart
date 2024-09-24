@@ -13,8 +13,9 @@ void mealPlanGeneratorSelector(BuildContext context) async {
             builder: (BuildContext context, StateSetter setState) {
           return Center(
             child: Card(
-              color: Color.fromARGB(234, 255, 255, 255),
-              elevation: 0,
+              color: Colors.white,
+              elevation: 5,
+              shadowColor: Color(0xff4b39ef),
               margin: const EdgeInsets.fromLTRB(10, 150, 10, 150),
               child: Container(
                 height: 250,
@@ -128,8 +129,9 @@ void mealPlanGeneratorSelector(BuildContext context) async {
 }
 
 // Function to change the PIN
-Future<void> changePin(BuildContext context, String email, String currentPin,
+Future<String> changePin(BuildContext context, String email, String currentPin,
     String newPin) async {
+  String message = '';
   try {
     // Get the current user
     User? user = FirebaseAuth.instance.currentUser;
@@ -144,36 +146,17 @@ Future<void> changePin(BuildContext context, String email, String currentPin,
       if (userCredential.user?.uid == user.uid) {
         // If UIDs match, update the password (PIN)
         await user.updatePassword(newPin);
-
-        // Show success message using SnackBar
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              behavior: SnackBarBehavior.floating,
-              elevation: 3,
-              duration: const Duration(seconds: 2),
-              content: Text("PIN updated successfully")),
-        );
+        message = "PIN updated successfully";
       } else {
         // If UIDs don't match, show an error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              behavior: SnackBarBehavior.floating,
-              elevation: 3,
-              duration: const Duration(seconds: 2),
-              content: Text("Error: User mismatch. Please try again.")),
-        );
+
+        message = "Error: User mismatch. Please try again.";
       }
     }
   } catch (e) {
-    // Show error message using SnackBar in case of failure
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          behavior: SnackBarBehavior.floating,
-          elevation: 3,
-          duration: const Duration(seconds: 2),
-          content: Text("Error during PIN update: ${e.toString()}")),
-    );
+    message = 'Error during PIN update: ${e.toString()}';
   }
+  return message;
 }
 
 // Function to display the PIN code modal
@@ -183,6 +166,7 @@ void showPinCodeModal(BuildContext context) {
   final TextEditingController _newPinController = TextEditingController();
 
   showCupertinoModalPopup(
+    barrierDismissible: false,
     context: context,
     builder: (BuildContext context) {
       return Center(
@@ -289,6 +273,7 @@ void showPinCodeModal(BuildContext context) {
                   ), // Current PIN Input Field
                   PinCodeTextField(
                     blinkWhenObscuring: true,
+                    textInputAction: TextInputAction.next,
                     controller: _currentPinController,
                     autoDisposeControllers: false,
                     appContext: context,
@@ -445,12 +430,12 @@ void showPinCodeModal(BuildContext context) {
                             EdgeInsets.fromLTRB(0, 0, 0, 0),
                           ), */
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           // Get user inputs
                           String email = _emailController.text;
                           String currentPin = _currentPinController.text;
                           String newPin = _newPinController.text;
-
+                          String result = '';
                           // Validate inputs
                           if (email.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -469,11 +454,43 @@ void showPinCodeModal(BuildContext context) {
                             );
                           } else {
                             // Call the function to change the PIN
-                            changePin(context, email, currentPin, newPin);
-                          }
+                            final snackBar = SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              elevation: 3,
+                              content: Row(
+                                children: [
+                                  CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(child: Text('Processing....')),
+                                ],
+                              ),
+                              duration: Duration(
+                                  minutes:
+                                      1), // Keep it visible until dismissed
+                            );
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
 
+                            result = await changePin(
+                                context, email, currentPin, newPin);
+                          }
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                          if (result != '') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  elevation: 5,
+                                  backgroundColor: Colors.green,
+                                  duration: const Duration(seconds: 2),
+                                  content: Text(result)),
+                            );
+
+                            Navigator.pop(context);
+                          }
                           // Close the modal
-                          Navigator.pop(context);
                         },
                         child: Text(
                           'Change Pin',

@@ -19,6 +19,7 @@ class _FoodServingState extends State<FoodServing> {
   List<Map<String, dynamic>> _detectedItems = [];
   int idNum = 1;
   bool _isLoading = false;
+  var _firstPress = true;
 
   int _generateUniqueId() {
     idNum++;
@@ -179,7 +180,7 @@ class _FoodServingState extends State<FoodServing> {
               items: parts.map((part) {
                 return DropdownMenuItem<String>(
                   value: part,
-                  child: Text(part, style: GoogleFonts.readexPro()),
+                  child: Text(part, style: GoogleFonts.readexPro(fontSize: 14)),
                 );
               }).toList(),
               onChanged: (String? selectedPart) {
@@ -340,9 +341,7 @@ class _FoodServingState extends State<FoodServing> {
       final String currentTime =
           "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
       // Check if adding the current food serving will exceed the user's max intake
-      // Check the data structure of wrappedData
 
-      // Adjust according to the actual structure
       final bool canAdd = await _checkIfWithinMaxLimits(wrappedData['items']);
 
       if (canAdd) {
@@ -358,16 +357,92 @@ class _FoodServingState extends State<FoodServing> {
         await _updateUserMacros(wrappedData['items']);
 
         // Navigate to the EntryPoint page after confirming
-        Navigator.of(context).pop();
       } else {
         // Notify user that the food exceeds their daily max intake
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              behavior: SnackBarBehavior.floating,
-              elevation: 3,
-              duration: const Duration(seconds: 2),
-              content:
-                  Text('This food exceeds your daily macronutrient limits!')),
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              title: Text(
+                "Warning",
+                style: GoogleFonts.readexPro(
+                  fontSize: 20.0,
+                  textStyle: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+              ),
+              content: Text(
+                "You have exceeded your recommended daily macronutrients.\nDo you want to Continue?",
+                style: GoogleFonts.readexPro(
+                  fontSize: 14.0,
+                  textStyle: const TextStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () async {
+                    if (_firstPress) {
+                      _firstPress = false;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            elevation: 3,
+                            duration: const Duration(seconds: 2),
+                            content: Text('Processing....')),
+                      );
+
+                      Navigator.of(context).pop();
+                      await FirebaseFirestore.instance
+                          .collection('food_history')
+                          .doc(thisUser?.uid)
+                          .collection(currentDate)
+                          .doc(currentTime)
+                          .set(wrappedData); // Store the data
+
+                      // Now accumulate the macronutrients
+                      await _updateUserMacros(wrappedData['items']);
+
+                      setState(() {
+                        _firstPress = true;
+                      });
+                    }
+                  },
+                  child: Text(
+                    "Confirm",
+                    style: GoogleFonts.readexPro(
+                      fontSize: 15.0,
+                      textStyle: const TextStyle(
+                          color: Colors.green, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          elevation: 3,
+                          duration: const Duration(seconds: 2),
+                          content: Text(
+                              'This food exceeds your daily macronutrient limits!')),
+                    );
+                    Navigator.of(context).pop(); // Close dialog
+                  },
+                  child: Text(
+                    "No",
+                    style: GoogleFonts.readexPro(
+                      fontSize: 15.0,
+                      textStyle: const TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       }
     } catch (e) {
@@ -439,7 +514,12 @@ class _FoodServingState extends State<FoodServing> {
 
       final currentMacros = userMacrosDoc.exists
           ? userMacrosDoc.data()! as Map<String, dynamic>?
-          : {'carbs': 0, 'proteins': 0, 'fats': 0};
+          : {
+              'carbs': 0,
+              'proteins': 0,
+              'fats': 0,
+              'calories': 0,
+            };
       int TotalDailyCalories = _parseInt(currentMacros?['calories']);
       int totalCarbs = _parseInt(currentMacros?['carbs']);
       int totalProteins = _parseInt(currentMacros?['proteins']);
@@ -459,30 +539,14 @@ class _FoodServingState extends State<FoodServing> {
         totalProteins += _parseInt(item['proteins']) * quantity;
         totalFats += _parseInt(item['fats']) * quantity;
       }
-
-      // Update user macros document in Firebase
-      await FirebaseFirestore.instance
-          .collection('userMacros')
+      final userMaxDoc = await FirebaseFirestore.instance
+          .collection('user')
           .doc(thisUser?.uid)
-          .set({
-        'carbs': totalCarbs,
-        'proteins': totalProteins,
-        'fats': totalFats,
-        'calories': TotalDailyCalories,
-      }, SetOptions(merge: true));
+          .get();
 
-      // Update SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('dailyCarbs', totalCarbs);
-      await prefs.setInt('dailyProtein', totalProteins);
-      await prefs.setInt('dailyFats', totalFats);
-      await prefs.setInt('dailyCalories', TotalDailyCalories);
-
-      dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
-      dailyProtein = prefs.getInt('dailyProtein') ?? 0;
-      dailyFats = prefs.getInt('dailyFats') ?? 0;
-      dailyCalories = prefs.getInt('dailyCalories') ?? 0;
-
+      if (!userMaxDoc.exists || userMaxDoc.data() == null) {
+        print('Error: No max limits found for user or data is null.');
+      }
       final thisUserUid = thisUser?.uid;
       final String currentDate = DateTime.now().toIso8601String().split('T')[0];
       final dailyUserMacros = db
@@ -496,6 +560,56 @@ class _FoodServingState extends State<FoodServing> {
         'proteins': dailyProtein,
         'calories': TotalDailyCalories,
       });
+      final userMaxData = userMaxDoc.data()!;
+      final maxCarbs = _parseInt(userMaxData['gramCarbs']);
+      final maxProteins = _parseInt(userMaxData['gramProtein']);
+      final maxFats = _parseInt(userMaxData['gramFats']);
+      final maxCalories = _parseInt(userMaxData['TER']);
+      if (totalCarbs >= maxCarbs) {
+        totalCarbs = maxCarbs;
+      }
+      if (totalFats >= maxFats) {
+        totalFats = maxFats;
+      }
+
+      if (totalProteins >= maxProteins) {
+        totalProteins = maxProteins;
+      }
+      if (TotalDailyCalories >= maxCalories) {
+        TotalDailyCalories = maxCalories;
+      }
+      // Update user macros document in Firebase
+      await FirebaseFirestore.instance
+          .collection('userMacros')
+          .doc(thisUser?.uid)
+          .set({
+        'carbs': totalCarbs,
+        'proteins': totalProteins,
+        'fats': totalFats,
+        'calories': TotalDailyCalories,
+        'lastLogIn': currentDate,
+      }, SetOptions(merge: true));
+
+      // Update SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('dailyCarbs', totalCarbs);
+      await prefs.setInt('dailyProtein', totalProteins);
+      await prefs.setInt('dailyFats', totalFats);
+      await prefs.setInt('dailyCalories', TotalDailyCalories);
+
+      dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
+      dailyProtein = prefs.getInt('dailyProtein') ?? 0;
+      dailyFats = prefs.getInt('dailyFats') ?? 0;
+      dailyCalories = prefs.getInt('dailyCalories') ?? 0;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            behavior: SnackBarBehavior.floating,
+            elevation: 3,
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.green,
+            content: Text('Added successfully')),
+      );
+      Navigator.of(context).pop();
     } catch (e) {
       print('Error updating user macros: $e');
     }
@@ -546,86 +660,104 @@ class _FoodServingState extends State<FoodServing> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: ListView.builder(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                    itemCount: foodItems.length,
-                    itemBuilder: (context, index) {
-                      final item = foodItems[index]['item'];
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                        child: Material(
-                          elevation: 5,
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          child: ListTile(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  color: const Color.fromARGB(255, 95, 95, 95),
-                                  width: 1),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            isThreeLine: true,
-                            leading: Icon(Icons.restaurant_menu_outlined),
-                            title: Text(
-                              item,
-                              style: GoogleFonts.readexPro(
-                                fontSize: 18,
-                              ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildItemOptions(item),
-                                Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                          Icons.remove_circle_outline),
-                                      onPressed: () => decreaseQuantity(index),
+                (foodItems.isNotEmpty)
+                    ? Expanded(
+                        child: ListView.builder(
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          itemCount: foodItems.length,
+                          itemBuilder: (context, index) {
+                            final item = foodItems[index]['item'];
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                              child: Material(
+                                elevation: 5,
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(5),
+                                child: ListTile(
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                        color: const Color.fromARGB(
+                                            255, 95, 95, 95),
+                                        width: 1),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  isThreeLine: true,
+                                  leading: Icon(Icons.restaurant_menu_outlined),
+                                  title: Text(
+                                    item,
+                                    style: GoogleFonts.readexPro(
+                                      fontSize: 18,
                                     ),
-                                    Text('${foodItems[index]['quantity']}'),
-                                    IconButton(
-                                      icon:
-                                          const Icon(Icons.add_circle_outline),
-                                      onPressed: () => increaseQuantity(index),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        IconlyLight.delete,
-                                        color: Colors.red,
-                                      ),
-                                      onPressed: () => removeItem(index),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => separateItem(index),
-                                      child: Row(
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildItemOptions(item),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
                                         children: [
-                                          Icon(
-                                            Icons.arrow_downward_outlined,
-                                            size: 15,
+                                          IconButton(
+                                            icon: const Icon(
+                                                Icons.remove_circle_outline),
+                                            onPressed: () =>
+                                                decreaseQuantity(index),
                                           ),
                                           Text(
-                                            'Separate',
-                                            style: GoogleFonts.readexPro(
-                                                fontSize: 13),
+                                              '${foodItems[index]['quantity']}'),
+                                          IconButton(
+                                            icon: const Icon(
+                                                Icons.add_circle_outline),
+                                            onPressed: () =>
+                                                increaseQuantity(index),
                                           ),
+                                          IconButton(
+                                            icon: const Icon(
+                                              IconlyLight.delete,
+                                              color: Colors.red,
+                                            ),
+                                            onPressed: () => removeItem(index),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                separateItem(index),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.arrow_downward_outlined,
+                                                  size: 15,
+                                                ),
+                                                Text(
+                                                  'Separate',
+                                                  style: GoogleFonts.readexPro(
+                                                      fontSize: 13),
+                                                ),
+                                              ],
+                                            ),
+                                          )
                                         ],
                                       ),
-                                    )
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Container(
+                        height: (MediaQuery.sizeOf(context).height - 210),
+                        child: Center(
+                          child: Text(
+                            'No food scanned.\nUse the Add button to manually Add',
+                            style: GoogleFonts.readexPro(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(

@@ -1929,11 +1929,13 @@ class _SetupPageState extends State<SetupPage> {
                                       count: 5,
                                       axisDirection: Axis.horizontal,
                                       onDotClicked: (i) async {
+                                        null;
+                                        /* 
                                         _pageController.animateToPage(
                                           i,
                                           duration: Duration(milliseconds: 500),
                                           curve: Curves.ease,
-                                        );
+                                        ); */
                                       },
                                       effect: smooth_page_indicator
                                           .ExpandingDotsEffect(

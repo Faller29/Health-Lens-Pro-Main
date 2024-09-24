@@ -40,5 +40,15 @@ final List<Map<String, String>> faqItems = [
         'How do we ensure that the provided information such as macronutrients contents are accurate?',
     'answer':
         'Our Team collaborates with great professionals especially in the medical field. We interview and value every advice that they gave to our team providing an accurate data that the system will offer.',
-  }
+  },
+  {
+    'question': "What are the BMI classifications?",
+    'answer':
+        "BMI is classified into categories as follows:\n\n• Underweight: BMI < 18.5\nThis indicates that the person may have insufficient body weight for their height and might be at risk for nutritional deficiencies or other health issues.\n\n• Normal weight: BMI 18.5-24.9\nThis range is considered healthy, meaning the individual's weight is appropriate for their height, reducing the risk of health issues.\n\n• Overweight: BMI 25-29.9\nPeople in this category have more body weight than is generally considered healthy for their height, which may increase the risk of cardiovascular diseases and other health conditions.\n\n• Obesity Class 1 (Moderate obesity): BMI 30-34.9\nThis indicates excess body fat, and individuals are at higher risk for diseases like diabetes, hypertension, and heart disease.\n\n• Obesity Class 2 (Severe obesity): BMI 35-39.9\nPeople in this range have significant excess weight and are at a much higher risk for serious health problems.\n\n• Obesity Class 3 (Morbid obesity): BMI ≥ 40\nThis is also known as extreme or morbid obesity and presents the greatest risk of life-threatening conditions.",
+  },
+  {
+    'question': "What is desired body weight (DBW)?",
+    'answer':
+        "Desired body weight is the optimal weight calculated based on a person's height and is often used as a benchmark for health and medical purposes. It represents a weight that is associated with the lowest risk of health problems, such as heart disease and diabetes.\nFormula to compute DBW:\nDBW = (Height in cm - 100) - [10%(Height in cm - 100)]",
+  },
 ];

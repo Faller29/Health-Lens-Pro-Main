@@ -105,11 +105,4 @@ final List<Map<String, dynamic>> exercises = [
         'Perform a series of yoga poses and stretches, focusing on breath and alignment.', //description
     'calories': 85, //wag mo na to intindihin
   },
-  {
-    'name': 'Food', //yung excercise title
-    'image': 'assets/images/food.png', //wag mo na to intindihin
-    'instructions':
-        'Perform a series of yoga poses and stretches, focusing on breath and alignment.', //description
-    'calories': 85, //wag mo na to intindihin
-  },
 ];

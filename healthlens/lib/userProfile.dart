@@ -187,143 +187,292 @@ class _UserProfilePageState extends State<UserProfilePage> {
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
       ),
+      //backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              Column(
-                children: [
-                  CircleAvatar(
-                    radius: 75,
-                    backgroundColor: Color(0xff4b39ef),
-                    child: _profileImage != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: Image.file(
-                              _profileImage!,
-                              width: 140,
-                              height: 140,
-                              fit: BoxFit.cover,
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          elevation: 5,
+          color: Colors.white,
+          shadowColor: Color(0xff4b39ef),
+          child: Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 75,
+                          backgroundColor: Color(0xff4b39ef),
+                          child: _profileImage != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Image.file(
+                                    _profileImage!,
+                                    width: 140,
+                                    height: 140,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : _profileImageUrl.isNotEmpty
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: CachedNetworkImage(
+                                        imageUrl: _profileImageUrl,
+                                        placeholder: (context, url) =>
+                                            CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
+                                        fit: BoxFit.cover,
+                                        width: 140,
+                                        height: 140,
+                                      ),
+                                    )
+                                  : Icon(
+                                      Icons.account_circle,
+                                      size: 110,
+                                      color: Colors.grey,
+                                    ),
+                        ),
+                        ElevatedButton(
+                          onPressed: _pickImage,
+                          style: ElevatedButton.styleFrom(
+                            //padding: EdgeInsets.symmetric(vertical: 14.0),
+                            backgroundColor: Color(0xff4b39ef),
+                          ),
+                          child: Text(
+                            'Change Profile',
+                            style: GoogleFonts.readexPro(
+                              fontSize: 14.0,
+                              color: Colors.white,
                             ),
-                          )
-                        : _profileImageUrl.isNotEmpty
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(100),
-                                child: CachedNetworkImage(
-                                  imageUrl: _profileImageUrl,
-                                  placeholder: (context, url) =>
-                                      CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      Icon(Icons.error),
-                                  fit: BoxFit.cover,
-                                  width: 140,
-                                  height: 140,
-                                ),
-                              )
-                            : Icon(
-                                Icons.account_circle,
-                                size: 110,
-                                color: Colors.grey,
-                              ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _pickImage,
-                    style: ElevatedButton.styleFrom(
-                      //padding: EdgeInsets.symmetric(vertical: 14.0),
-                      backgroundColor: Color(0xff4b39ef),
+                          ),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      'Change Profile',
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _fNameController,
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.words,
                       style: GoogleFonts.readexPro(
-                        fontSize: 14.0,
-                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xffe0e3e7),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        labelText: 'First Name',
+                        labelStyle: GoogleFonts.readexPro(fontSize: 16),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your first name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.words,
+                      controller: _mNameController,
+                      style: GoogleFonts.readexPro(
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xffe0e3e7),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        labelText: 'Middle Name',
+                        labelStyle: GoogleFonts.readexPro(fontSize: 16),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your middle name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.words,
+                      controller: _lNameController,
+                      style: GoogleFonts.readexPro(
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xffe0e3e7),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        labelText: 'Last Name',
+                        labelStyle: GoogleFonts.readexPro(fontSize: 16),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your last name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      maxLength: 3,
+                      controller: _ageController,
+                      style: GoogleFonts.readexPro(
+                        fontSize: 16,
+                      ),
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        counterText: "",
+                        isDense: true,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xffe0e3e7),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xff4b39ef),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        labelText: 'Age',
+                        labelStyle: GoogleFonts.readexPro(fontSize: 16),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your age';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Please enter a valid number';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: _saveProfile,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        backgroundColor: Color(0xff4b39ef),
+                      ),
+                      child: Text(
+                        'Save',
+                        style: GoogleFonts.readexPro(
+                          fontSize: 16.0,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _fNameController,
-                decoration: InputDecoration(
-                  labelText: 'First Name',
-                  labelStyle: GoogleFonts.readexPro(fontSize: 16),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your first name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _mNameController,
-                decoration: InputDecoration(
-                  labelText: 'Middle Name',
-                  labelStyle: GoogleFonts.readexPro(fontSize: 16),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your middle name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _lNameController,
-                decoration: InputDecoration(
-                  labelText: 'Last Name',
-                  labelStyle: GoogleFonts.readexPro(fontSize: 16),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your last name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _ageController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Age',
-                  labelStyle: GoogleFonts.readexPro(fontSize: 16),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your age';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  backgroundColor: Color(0xff4b39ef),
-                ),
-                child: Text(
-                  'Save',
-                  style: GoogleFonts.readexPro(
-                    fontSize: 16.0,
-                    color: Colors.white,
-                  ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -58,6 +58,7 @@ class _CameraPageState extends State<CameraPage> {
   void _toggleDetection() {
     if (_isDetecting) {
       _stopDetection();
+      _detections.clear();
     } else {
       _startDetection();
     }
@@ -76,8 +77,8 @@ class _CameraPageState extends State<CameraPage> {
           imageHeight: image.height,
           imageWidth: image.width,
           iouThreshold: 0.4,
-          confThreshold: 0.5,
-          classThreshold: 0.5,
+          confThreshold: 0.6,
+          classThreshold: 0.6,
         );
 
         if (results.isNotEmpty) {
@@ -92,8 +93,8 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> _stopDetection() async {
     setState(() {
-      _isDetecting = false;
       _detections.clear();
+      _isDetecting = false;
     });
 
     await _cameraController.stopImageStream();

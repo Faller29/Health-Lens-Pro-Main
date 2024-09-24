@@ -70,8 +70,10 @@ class _FAQPageState extends State<FAQPage> {
                             child: Text(
                               faq['answer']!,
                               style: GoogleFonts.readexPro(
-                                  fontSize: 13,
-                                  color: Colors.black.withOpacity(.7)),
+                                fontSize: 13,
+                                color: Colors.black.withOpacity(.7),
+                              ),
+                              textAlign: TextAlign.justify,
                             ),
                           ),
                         ],

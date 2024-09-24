@@ -73,7 +73,8 @@ final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
   },
   'Fish (Daing na Bangus)': {
     //check
-    '1 Slice': {'fats': 5, 'carbs': 0, 'proteins': 13},
+    'Big - 1 Slice': {'fats': 25, 'carbs': 1, 'proteins': 43},
+    'Small - 1 Slice': {'fats': 5, 'carbs': 0, 'proteins': 13},
   },
   'Fish (Pan Fried Tilapia)': {
     //check
@@ -143,14 +144,14 @@ final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
   },
   'Potato': {
     //check
-    'Whole Cup, Diced': {'fats': 0, 'carbs': 26, 'proteins': 3},
-    'Half Cup, Diced': {'fats': 0, 'carbs': 13, 'proteins': 2},
+    '1 Cup, Diced': {'fats': 0, 'carbs': 26, 'proteins': 3},
+    '1/2 Cup, Diced': {'fats': 0, 'carbs': 13, 'proteins': 2},
     '1/3 of Cup, Diced': {'fats': 0, 'carbs': 9, 'proteins': 1},
   },
   'Onion': {
     //check
-    'Whole Cup, Diced': {'fats': 0, 'carbs': 16, 'proteins': 1},
-    'Half Cup, Diced': {'fats': 0, 'carbs': 8, 'proteins': 1},
+    '1 Cup, Diced': {'fats': 0, 'carbs': 16, 'proteins': 1},
+    '1/2 Cup, Diced': {'fats': 0, 'carbs': 8, 'proteins': 1},
     '1/3 of Cup, Diced': {'fats': 0, 'carbs': 5, 'proteins': 0},
   },
 };

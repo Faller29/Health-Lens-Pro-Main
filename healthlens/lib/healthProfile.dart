@@ -219,6 +219,29 @@ class _healthProfile extends State<healthProfile> {
 
         final String userId = thisUser!.uid;
 
+        final userMacros =
+            await db.collection("userMacros").doc(thisUser!.uid).get();
+
+        final macros = userMacros.data() as Map<String, dynamic>;
+        int userDailyCarbs = macros['carbs'];
+        int userDailyProteins = macros['proteins'];
+        int userDailyFats = macros['fats'];
+
+        // Exit early if condition is met
+        if (userDailyFats > gFats ||
+            userDailyProteins > gProtein ||
+            userDailyCarbs > gCarbs) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                behavior: SnackBarBehavior.floating,
+                elevation: 6,
+                duration: const Duration(seconds: 2),
+                content: Text(
+                    'Update Failed.\nYour current Macronutrients exceeds your new maximum Macronutrients.\nTry Again Tomorrow.')),
+          );
+          return;
+        }
+
         await FirebaseFirestore.instance.collection('user').doc(userId).update({
           'bmi': bmi,
           'TER': TER,
@@ -235,6 +258,7 @@ class _healthProfile extends State<healthProfile> {
           'weight': double.parse(_weightController.text),
           'chronicDisease': chronicDisease,
         });
+
         await prefs.setStringList(
             'chronicDisease', chronicDisease.cast<String>());
         await prefs.setDouble('desiredBW', desiredBodyWeight!);
@@ -246,7 +270,10 @@ class _healthProfile extends State<healthProfile> {
         await prefs.setInt('TER', TER!);
         await prefs.setDouble('height', double.parse(_heightController.text));
         await prefs.setDouble('weight', double.parse(_weightController.text));
-
+        gramCarbs = gCarbs;
+        gramProtein = gProtein;
+        gramFats = gFats;
+        TER = TER;
         saveData();
         Navigator.pop(context, true);
         // Show success message for Firestore update
@@ -279,101 +306,198 @@ class _healthProfile extends State<healthProfile> {
         foregroundColor: Colors.white,
       ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: EdgeInsets.all(16),
-            children: [
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _heightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Height',
-                  labelStyle: GoogleFonts.readexPro(fontSize: 16),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your age';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                controller: _weightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Weight',
-                  labelStyle: GoogleFonts.readexPro(fontSize: 16),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your age';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                child: Material(
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.black, width: 1),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Chronic Disease:',
-                          style: GoogleFonts.readexPro(
-                              fontSize: 18.0, fontWeight: FontWeight.bold),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: EdgeInsets.all(16),
+          children: [
+            Card(
+              elevation: 5,
+              color: Colors.white,
+              shadowColor: Color(0xff4b39ef),
+              child: Material(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Height and Weight',
+                        style: GoogleFonts.readexPro(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      TextFormField(
+                        controller: _heightController,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        maxLength: 3,
+                        style: GoogleFonts.readexPro(
+                          fontSize: 16,
                         ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: categories.map((disease) {
-                            return CheckboxListTile(
-                              title: Text(disease['name']),
-                              checkboxShape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              value: disease['isChecked'],
-                              onChanged: (val) {
-                                setState(() {
-                                  disease['isChecked'] = val;
-                                  getCheckedDiseases();
-                                });
-                              },
-                            );
-                          }).toList(),
+                        decoration: InputDecoration(
+                          counterText: "",
+                          isDense: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xff4b39ef),
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xff4b39ef),
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          labelText: 'Height',
+                          labelStyle: GoogleFonts.readexPro(fontSize: 16),
+                          border: OutlineInputBorder(),
                         ),
-                      ],
-                    ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your age';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return 'Please enter a valid number';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _weightController,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        maxLength: 3,
+                        style: GoogleFonts.readexPro(
+                          fontSize: 16,
+                        ),
+                        decoration: InputDecoration(
+                          counterText: "",
+                          isDense: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xff4b39ef),
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xff4b39ef),
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          labelText: 'Weight',
+                          labelStyle: GoogleFonts.readexPro(fontSize: 16),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your age';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return 'Please enter a valid number';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
-              SizedBox(height: 10),
-              Material(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.black, width: 1),
-                  borderRadius: BorderRadius.circular(5),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Card(
+              elevation: 5,
+              color: Colors.white,
+              shadowColor: Color(0xff4b39ef),
+              child: Material(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Chronic Disease:',
+                        style: GoogleFonts.readexPro(
+                            fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: categories.map((disease) {
+                          return CheckboxListTile(
+                            title: Text(
+                              disease['name'],
+                              style: GoogleFonts.readexPro(
+                                  fontWeight: FontWeight.w400, fontSize: 14),
+                            ),
+                            checkboxShape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            value: disease['isChecked'],
+                            onChanged: (val) {
+                              setState(() {
+                                disease['isChecked'] = val;
+                                getCheckedDiseases();
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
                 ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Card(
+              elevation: 5,
+              color: Colors.white,
+              shadowColor: Color(0xff4b39ef),
+              child: Material(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
                 child: Column(
                   children: [
                     Padding(
@@ -416,23 +540,23 @@ class _healthProfile extends State<healthProfile> {
                   ],
                 ),
               ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  backgroundColor: Color(0xff4b39ef),
-                ),
-                child: Text(
-                  'Save',
-                  style: GoogleFonts.readexPro(
-                    fontSize: 16.0,
-                    color: Colors.white,
-                  ),
+            ),
+            SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: _saveProfile,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                backgroundColor: Color(0xff4b39ef),
+              ),
+              child: Text(
+                'Save',
+                style: GoogleFonts.readexPro(
+                  fontSize: 16.0,
+                  color: Colors.white,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/aboutUs_page.dart';
 import 'package:healthlens/backend_firebase/firestore_provider.dart';
 import 'package:healthlens/calendar_history.dart';
@@ -124,6 +125,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        textTheme: GoogleFonts.readexProTextTheme(
+          Theme.of(context).textTheme,
+        ),
         scaffoldBackgroundColor: Color(0xfff1f4f8),
       ),
       // Initial route will be determined by authentication status and user registration
@@ -225,10 +229,11 @@ class Auth {
           final userMacros =
               await db.collection("userMacros").doc(thisUserUid).get();
 
+          final macros = userMacros.data() as Map<String, dynamic>;
+
           //get user data
           final theUser = await db.collection("user").doc(thisUserUid).get();
 
-          final macros = userMacros.data() as Map<String, dynamic>;
           final data = theUser.data() as Map<String, dynamic>;
 
           await prefs.setString('firstName', data['firstName']);
@@ -288,28 +293,23 @@ class Auth {
           //profileImageUrl = prefs.getString('profileImageUrl') ?? '';
           currentUserEmail = prefs.getString('currentUserEmail') ?? '';
           currentUserPincode = prefs.getString('currentUserPincode') ?? '';
-          dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
-          dailyProtein = prefs.getInt('dailyProtein') ?? 0;
-          dailyFats = prefs.getInt('dailyFats') ?? 0;
-          dailyCalories = prefs.getInt('dailyCalories') ?? 0;
-          lastLogIn = prefs.getString('lastLogIn') ?? '';
-
-          if (document.exists) {
+          /* if (document.exists) {
             await dailyUserMacros.set({
               'carbs': dailyCarbs,
               'fats': dailyFats,
               'proteins': dailyProtein,
               'calories': dailyCalories,
             });
-          } else {
+          }  else {
             await dailyUserMacros.set({
               'carbs': 0,
               'fats': 0,
               'proteins': 0,
               'calories': 0,
             });
-          }
+          } */
           if (lastLogIn != currentDate) {
+            print('not tru sa current date vs last');
             await FirebaseFirestore.instance
                 .collection('userMacros')
                 .doc(thisUser?.uid)
@@ -330,7 +330,85 @@ class Auth {
             dailyFats = prefs.getInt('dailyFats') ?? 0;
             dailyCalories = prefs.getInt('dailyCalories') ?? 0;
           }
+          dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
+          dailyProtein = prefs.getInt('dailyProtein') ?? 0;
+          dailyFats = prefs.getInt('dailyFats') ?? 0;
+          dailyCalories = prefs.getInt('dailyCalories') ?? 0;
+          lastLogIn = prefs.getString('lastLogIn') ?? '';
+
           fetchMacrosData();
+          print(currentDate);
+          print('Chronic Disease: ${prefs.getStringList('chronicDisease')}');
+          print('User Full Name: ${prefs.getString('userFullName') ?? ''}');
+          print('Age: ${prefs.getInt('age') ?? 0}');
+          print('Gender: ${prefs.getString('gender') ?? ''}');
+          print('Email: ${prefs.getString('userEmail') ?? ''}');
+          print('TER: ${prefs.getInt('TER') ?? 0}');
+          print('Lifestyle: ${prefs.getString('lifestyle') ?? ''}');
+          print('Height: ${prefs.getDouble('height') ?? 0.0}');
+          print('Weight: ${prefs.getDouble('weight') ?? 0.0}');
+          print('Gram Carbs: ${prefs.getInt('gramCarbs') ?? 0}');
+          print('Gram Protein: ${prefs.getInt('gramProtein') ?? 0}');
+          print('Gram Fats: ${prefs.getInt('gramFats') ?? 0}');
+          print(
+              'Physical Activity: ${prefs.getString('physicalActivity') ?? ''}');
+          print('User BMI: ${prefs.getString('userBMI') ?? ''}');
+          print('First Name: ${prefs.getString('firstName') ?? ''}');
+          print('Middle Name: ${prefs.getString('middleName') ?? ''}');
+          print('Last Name: ${prefs.getString('lastName') ?? ''}');
+          print('Middle Initial: ${prefs.getString('middleInitial') ?? ''}');
+// print('Profile Image URL: ${prefs.getString('profileImageUrl') ?? ''}');
+          print(
+              'Current User Email: ${prefs.getString('currentUserEmail') ?? ''}');
+          print(
+              'Current User Pincode: ${prefs.getString('currentUserPincode') ?? ''}');
+          print('Daily Carbs: ${prefs.getInt('dailyCarbs') ?? 0}');
+          print('Daily Protein: ${prefs.getInt('dailyProtein') ?? 0}');
+          print('Daily Fats: ${prefs.getInt('dailyFats') ?? 0}');
+          print('Daily Calories: ${prefs.getInt('dailyCalories') ?? 0}');
+          print('Last Login: ${prefs.getString('lastLogIn') ?? ''}');
+
+          print(
+              '--------------------------------------------------------------------------------------------\n\n\n\n\n\n\n');
+          print('Current User Document Reference: $currentUserDoc');
+          print('User Full Name: $userFullName');
+          print('Age: $age');
+          print('Gender: $gender');
+          print('Email: $email');
+          print('TER: $TER');
+          print('Lifestyle: $lifestyle');
+          print('Height: $height');
+          print('Weight: $weight');
+          print('Chronic Disease: $chronicDisease');
+          print('Gram Carbs: $gramCarbs');
+          print('Gram Protein: $gramProtein');
+          print('Gram Fats: $gramFats');
+          print('Physical Activity: $physicalActivity');
+          print('User BMI: $userBMI');
+          print('Timestamp: $timestamp');
+          print('First Name: $firstName');
+          print('Middle Name: $middleName');
+          print('Last Name: $lastName');
+          print('Middle Initial: $middleInitial');
+          print('Profile Image URL: $profileImageUrl');
+          print('Current User Email: $currentUserEmail');
+          print('Current User Pincode: $currentUserPincode');
+          print('Desired Body Weight: $desiredBodyWeight');
+          print('Daily Carbs: $dailyCarbs');
+          print('Daily Protein: $dailyProtein');
+          print('Daily Fats: $dailyFats');
+          print('Daily Calories: $dailyCalories');
+          print('Error: $error');
+          print('Average Fat: $avrgFat');
+          print('Average Proteins: $avrgProteins');
+          print('Average Carbs: $avrgCarbs');
+          print('7-Day Average Fat: $avrg7Fat');
+          print('7-Day Average Proteins: $avrg7Proteins');
+          print('7-Day Average Carbs: $avrg7Carbs');
+          print('30-Day Average Fat: $avrg30Fat');
+          print('30-Day Average Proteins: $avrg30Proteins');
+          print('30-Day Average Carbs: $avrg30Carbs');
+          print('Last Login: $lastLogIn');
         }
       }
     } on SocketException catch (_) {

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/food_data_history.dart';
 import 'package:healthlens/graph_data.dart';
@@ -46,7 +47,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       body: ListView(
         children: [
           Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
@@ -66,16 +67,51 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   ),
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 14, 0, 8),
-                        child: Text(
-                          'Macronutrients',
-                          style: GoogleFonts.outfit(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 14, 0, 8),
+                              child: Text(
+                                'Macronutrients',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 50),
+                            child: Tooltip(
+                              child: Icon(
+                                Icons.info,
+                                size: 20,
+                                color: Colors.black87,
+                              ),
+                              triggerMode: TooltipTriggerMode.tap,
+                              message:
+                                  "Swipe or pan left and right to explore more data, or pinch in and out to zoom in and out of the chart for a better view.\nYou can remove a Bar or Line by tapping the Legends icon on top of the graph",
+                              padding: EdgeInsets.all(20),
+                              margin: EdgeInsets.all(20),
+                              showDuration: Duration(seconds: 10),
+                              decoration: BoxDecoration(
+                                color: Color(0xff4b39ef).withOpacity(0.9),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(10)),
+                              ),
+                              textStyle: TextStyle(color: Colors.white),
+                              preferBelow: true,
+                              verticalOffset: 20,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: 45,
@@ -724,12 +760,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               enablePanning: true,
             ),
             primaryXAxis: const CategoryAxis(
+              initialVisibleMaximum: 5,
               minimum: 0,
             ),
-            primaryYAxis: const CategoryAxis(
-              rangePadding: ChartRangePadding.none,
-              minimum: 0,
-            ),
+            primaryYAxis: const NumericAxis(
+                rangePadding: ChartRangePadding.none,
+                minimum: 0,
+                anchorRangeToVisiblePoints: false),
             legend: const Legend(
               isVisible: true,
             ),
@@ -740,11 +777,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     isVisible: true,
                     margin: EdgeInsets.all(3),
                     labelPosition: ChartDataLabelPosition.outside,
-                    textStyle:
-                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                    labelAlignment: ChartDataLabelAlignment.middle,
+                    textStyle: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 22, 104, 94)),
+                    labelAlignment: ChartDataLabelAlignment.top,
                     alignment: ChartAlignment.center,
-                    useSeriesColor: true,
+                    useSeriesColor: false,
                   ),
                   groupName: 'Fats',
                   name: 'Fats',
@@ -759,11 +798,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     isVisible: true,
                     margin: EdgeInsets.all(3),
                     labelPosition: ChartDataLabelPosition.inside,
-                    textStyle:
-                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                    labelAlignment: ChartDataLabelAlignment.middle,
+                    textStyle: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 136, 21, 28)),
+                    labelAlignment: ChartDataLabelAlignment.top,
                     alignment: ChartAlignment.center,
-                    useSeriesColor: true,
+                    useSeriesColor: false,
                   ),
                   groupName: 'Protein',
                   name: 'Protein',
@@ -778,11 +819,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     isVisible: true,
                     margin: EdgeInsets.all(3),
                     labelPosition: ChartDataLabelPosition.inside,
-                    useSeriesColor: true,
-                    textStyle:
-                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                    labelAlignment: ChartDataLabelAlignment.middle,
+                    textStyle: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 36, 26, 121)),
+                    labelAlignment: ChartDataLabelAlignment.top,
                     alignment: ChartAlignment.center,
+                    useSeriesColor: false,
                   ),
                   groupName: 'Carbohydrates',
                   name: 'Carbohydrates',
@@ -1041,7 +1084,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               zoomMode: ZoomMode.x,
               enablePanning: true,
             ),
-            primaryXAxis: const CategoryAxis(),
+            primaryXAxis: const CategoryAxis(
+                labelIntersectAction: AxisLabelIntersectAction.multipleRows),
             primaryYAxis: const CategoryAxis(
               rangePadding: ChartRangePadding.none,
               minimum: 0,
@@ -1350,9 +1394,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               enablePanning: true,
             ),
             primaryXAxis: const CategoryAxis(
+              labelIntersectAction: AxisLabelIntersectAction.multipleRows,
               maximum: 8,
             ),
-            primaryYAxis: const CategoryAxis(
+            primaryYAxis: const NumericAxis(
+              anchorRangeToVisiblePoints: true,
               rangePadding: ChartRangePadding.none,
             ),
             legend: const Legend(isVisible: true),

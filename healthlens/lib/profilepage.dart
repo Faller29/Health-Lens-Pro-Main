@@ -34,7 +34,6 @@ Future<> class backend_firebase async{
 class _ProfilePageState extends State<ProfilePage> {
   late ProfilePage _model;
   bool dataNeedsRefresh = false;
-
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -67,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: Color(0xFFF1F4F8),
+      backgroundColor: Colors.white,
       body: ListView(
         children: [
           Column(
@@ -482,7 +481,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             Icon(
-                              Icons.settings_outlined,
+                              Icons.chat_bubble,
                               color: Color(0xFF57636C),
                               size: 24.0,
                             ),

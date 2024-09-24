@@ -18,6 +18,7 @@ class EntryPoint extends StatefulWidget {
 
 class _EntryPointState extends State<EntryPoint> {
   int _selectedIndex = 0;
+  late UniqueKey _pageKey; // Add a key to refresh the page
 
   final List<String> pageTitles = [
     'Dashboard',
@@ -26,9 +27,16 @@ class _EntryPointState extends State<EntryPoint> {
     'Profile',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _pageKey = UniqueKey(); // Initialize the key
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _pageKey = UniqueKey(); // Generate a new key when item is tapped
     });
   }
 
@@ -46,15 +54,19 @@ class _EntryPointState extends State<EntryPoint> {
           ),
         ),
         foregroundColor: Colors.white,
-        backgroundColor: Color(0xff4b39ef),
+        backgroundColor: const Color(0xff4b39ef),
       ),
       body: Center(
-        child: [
-          const HomePage(),
-          CameraPage(),
-          AnalyticsPage(),
-          ProfilePage(),
-        ][_selectedIndex],
+        // Add a Key to the widget tree to force rebuild
+        child: KeyedSubtree(
+          key: _pageKey,
+          child: [
+            const HomePage(),
+            CameraPage(),
+            AnalyticsPage(),
+            ProfilePage(),
+          ][_selectedIndex],
+        ),
       ),
       bottomNavigationBar: CustomNavigationBar(
         currentIndex: _selectedIndex,
@@ -100,8 +112,8 @@ class CustomNavigationBar extends StatelessWidget {
         color: Colors.black.withOpacity(0.3),
         borderRadius: BorderRadius.circular(50),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-      margin: EdgeInsets.only(bottom: 20, left: 50, right: 50),
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+      margin: const EdgeInsets.only(bottom: 20, left: 50, right: 50),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: items.asMap().entries.map((entry) {
@@ -121,17 +133,18 @@ class CustomNavigationBar extends StatelessWidget {
                   Icon(
                     item.icon,
                     color: isSelected
-                        ? Color(0xff4b39ef)
-                        : Color.fromARGB(255, 255, 255, 255),
+                        ? const Color(0xff4b39ef)
+                        : const Color.fromARGB(255, 255, 255, 255),
                   ),
                   Text(
                     item.label,
                     style: TextStyle(
-                        color: isSelected
-                            ? Color(0xff4b39ef)
-                            : Color.fromARGB(255, 255, 255, 255),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold),
+                      color: isSelected
+                          ? const Color(0xff4b39ef)
+                          : const Color.fromARGB(255, 255, 255, 255),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),

@@ -227,23 +227,32 @@ class _HistoryPageState extends State<HistoryPage> {
                         buildMacronutrientCard(
                           'Carbohydrates',
                           historyCarbs,
+                          historyCarbs,
                           (gramCarbs ?? 0),
                           const Color(0xff4b39ef),
-                          historyCarbs / (gramCarbs ?? 1),
+                          ((historyCarbs >= gramCarbs!)
+                              ? (gramCarbs! / gramCarbs!)
+                              : (historyCarbs / (gramCarbs ?? 1))),
                         ),
                         buildMacronutrientCard(
                           'Protein',
                           historyProtein,
+                          historyProtein,
                           (gramProtein ?? 0),
                           const Color(0xffff5963),
-                          historyProtein / (gramProtein ?? 1),
+                          ((historyProtein >= gramProtein!)
+                              ? (gramProtein! / gramProtein!)
+                              : (historyProtein / (gramProtein ?? 1))),
                         ),
                         buildMacronutrientCard(
                           'Fats',
                           historyFats,
+                          historyFats,
                           (gramFats ?? 0),
                           const Color(0xff249689),
-                          historyFats / (gramFats ?? 1),
+                          ((historyFats >= gramFats!)
+                              ? (gramFats! / gramFats!)
+                              : (historyFats / (gramFats ?? 1))),
                         ),
                       ],
                     ),
@@ -459,8 +468,17 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
-Widget buildMacronutrientCard(
-    String title, double current, int limit, Color color, double percent) {
+Widget buildMacronutrientCard(String title, double limitCurrent, double current,
+    int limit, Color color, double percent) {
+  if (current >= limit) {
+    String thislimitation = limit.toString();
+    current = double.tryParse(thislimitation)!;
+    //limitCurrent = current;
+  } /* else {
+    String thislimitation = limit.toString();
+    limitCurrent = double.tryParse(thislimitation)!;
+  } */
+
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     mainAxisSize: MainAxisSize.min,
@@ -489,7 +507,7 @@ Widget buildMacronutrientCard(
         progressColor: color,
       ),
       Text(
-        '${current}/${limit}',
+        '${limitCurrent.toStringAsFixed(0)}/${limit}',
         style: GoogleFonts.readexPro(
           fontSize: 12.0,
           fontWeight: FontWeight.bold,

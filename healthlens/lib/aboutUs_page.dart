@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:healthlens/backend_firebase/faq_data.dart';
 import 'package:healthlens/main.dart'; // Assuming you have a main.dart file
 
 class AboutUs extends StatefulWidget {
@@ -51,9 +50,12 @@ class _AboutUs extends State<AboutUs> {
             Padding(
               padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
               child: RichText(
+                textAlign: TextAlign.justify,
                 text: TextSpan(
                   style: GoogleFonts.readexPro(
-                      fontSize: 12, color: Colors.black87),
+                    fontSize: 12,
+                    color: Colors.black87,
+                  ),
                   children: [
                     TextSpan(
                       text: '     HealthLens Pro ',
@@ -363,7 +365,7 @@ class _AboutUs extends State<AboutUs> {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              'Renzy Guitierrez',
+                              'Renzy Gutierrez',
                               style: GoogleFonts.readexPro(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -386,7 +388,9 @@ class _AboutUs extends State<AboutUs> {
                                   style: GoogleFonts.readexPro(
                                       fontWeight: FontWeight.bold),
                                 ),
-                                TextSpan(text: 'Programmer & Data Researcher')
+                                TextSpan(
+                                    text:
+                                        'Documentation, Data Researcher & Programmer')
                               ],
                             ),
                           ),
@@ -588,7 +592,7 @@ class _AboutUs extends State<AboutUs> {
                                   style: GoogleFonts.readexPro(
                                       fontWeight: FontWeight.bold),
                                 ),
-                                TextSpan(text: 'dvvgarino@ccc.edu.ph'),
+                                TextSpan(text: 'dvgarino@ccc.edu.ph'),
                               ],
                             ),
                           ),
