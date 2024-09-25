@@ -39,8 +39,9 @@ class _CameraPageState extends State<CameraPage> {
       labels: 'assets/labels.txt',
       modelPath: 'assets/model.tflite',
       modelVersion: 'yolov8',
-      numThreads: 1,
-      useGpu: false,
+      numThreads: 2,
+      useGpu: true,
+      quantization: false,
     );
 
     setState(() {
@@ -77,8 +78,8 @@ class _CameraPageState extends State<CameraPage> {
           imageHeight: image.height,
           imageWidth: image.width,
           iouThreshold: 0.4,
-          confThreshold: 0.6,
-          classThreshold: 0.6,
+          confThreshold: 0.5,
+          classThreshold: 0.5,
         );
 
         if (results.isNotEmpty) {

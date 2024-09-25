@@ -47,8 +47,8 @@ class _SetupPageState extends State<SetupPage> {
       lName;
   late String pinCode;
   int genderIndex = 0;
-  late int age;
-  late double height, weight;
+  late int age = 0;
+  late double height = 0, weight = 0;
   final emailRegex =
       RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
   String? validateEmail(String? value) {
@@ -897,8 +897,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                 initialValue:
                                                                     (age == 0)
                                                                         ? ''
-                                                                        : age
-                                                                            .toString(),
+                                                                        : age.toStringAsFixed(
+                                                                            0),
                                                                 maxLength: 3,
                                                                 textInputAction:
                                                                     TextInputAction
@@ -1032,7 +1032,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             0)
                                                                         ? ''
                                                                         : height
-                                                                            .toString(),
+                                                                            .toStringAsFixed(0),
                                                                 maxLength: 3,
                                                                 textInputAction:
                                                                     TextInputAction
@@ -1165,7 +1165,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             0)
                                                                         ? ''
                                                                         : weight
-                                                                            .toString(),
+                                                                            .toStringAsFixed(0),
                                                                 maxLength: 3,
                                                                 textInputAction:
                                                                     TextInputAction

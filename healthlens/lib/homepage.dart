@@ -1190,7 +1190,7 @@ class _HomePage extends State<HomePage> {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    "${(weight?.toInt()).toString()}cm",
+                                                                    "${(weight?.toInt()).toString()}Kg",
                                                                     style: GoogleFonts
                                                                         .readexPro(
                                                                       color: const Color(
@@ -1203,7 +1203,7 @@ class _HomePage extends State<HomePage> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "${(height?.toInt()).toString()}Kg",
+                                                                    "${(height?.toInt()).toString()}cm",
                                                                     style: GoogleFonts
                                                                         .readexPro(
                                                                       color: const Color(
