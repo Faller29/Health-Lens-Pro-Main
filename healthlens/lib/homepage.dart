@@ -676,7 +676,27 @@ class _HomePage extends State<HomePage> {
                             ),
                           ),
                           onPressed: () async {
+                            final snackBar = SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              elevation: 3,
+                              content: Row(
+                                children: [
+                                  CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(child: Text('Collecting Data...')),
+                                ],
+                              ),
+                              duration: Duration(
+                                  seconds:
+                                      5), // Keep it visible until dismissed
+                            );
+
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
                             await _fetchWeightData();
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
                             // Show modal on tap
                             showCupertinoModalPopup(
@@ -954,7 +974,7 @@ class _HomePage extends State<HomePage> {
                                                                                 ),
                                                                               ),
                                                                               Text(
-                                                                                '${weeklyWeight!.length} days',
+                                                                                '${weeklyWeight!.length} Weeks',
                                                                                 style: GoogleFonts.readexPro(
                                                                                   textStyle: TextStyle(
                                                                                     color: Colors.black,
@@ -962,7 +982,7 @@ class _HomePage extends State<HomePage> {
                                                                                 ),
                                                                               ),
                                                                               Text(
-                                                                                '${monthlyWeight!.length} days',
+                                                                                '${monthlyWeight!.length} Months',
                                                                                 style: GoogleFonts.readexPro(
                                                                                   textStyle: TextStyle(
                                                                                     color: Colors.black,

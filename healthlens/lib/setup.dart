@@ -767,10 +767,15 @@ class _SetupPageState extends State<SetupPage> {
                                                                         ),
                                                                       ),
                                                                       RadioButtonGroup(
+                                                                          textStyle: TextStyle(
+                                                                              fontSize:
+                                                                                  14,
+                                                                              color: Colors
+                                                                                  .white),
                                                                           buttonHeight:
                                                                               30,
                                                                           buttonWidth:
-                                                                              102,
+                                                                              100,
                                                                           circular:
                                                                               true,
                                                                           mainColor: Colors
@@ -889,6 +894,11 @@ class _SetupPageState extends State<SetupPage> {
                                                                           0.0),
                                                               child:
                                                                   TextFormField(
+                                                                initialValue:
+                                                                    (age == 0)
+                                                                        ? ''
+                                                                        : age
+                                                                            .toString(),
                                                                 maxLength: 3,
                                                                 textInputAction:
                                                                     TextInputAction
@@ -1017,6 +1027,12 @@ class _SetupPageState extends State<SetupPage> {
                                                                           0.0),
                                                               child:
                                                                   TextFormField(
+                                                                initialValue:
+                                                                    (height ==
+                                                                            0)
+                                                                        ? ''
+                                                                        : height
+                                                                            .toString(),
                                                                 maxLength: 3,
                                                                 textInputAction:
                                                                     TextInputAction
@@ -1144,6 +1160,12 @@ class _SetupPageState extends State<SetupPage> {
                                                                           0.0),
                                                               child:
                                                                   TextFormField(
+                                                                initialValue:
+                                                                    (weight ==
+                                                                            0)
+                                                                        ? ''
+                                                                        : weight
+                                                                            .toString(),
                                                                 maxLength: 3,
                                                                 textInputAction:
                                                                     TextInputAction
@@ -1494,7 +1516,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                           buttonHeight: 30,
                                                                           buttonWidth: 115,
                                                                           circular: true,
-                                                                          textStyle: TextStyle(fontSize: 14, color: Colors.white),
+                                                                          textStyle: TextStyle(fontSize: 13, color: Colors.white),
                                                                           mainColor: Colors.grey,
                                                                           selectedColor: Color(0xff4b39ef),
                                                                           selectedBorderSide: BorderSide(width: 1, color: Color(0xff4b39ef)),

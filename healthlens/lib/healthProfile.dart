@@ -25,6 +25,7 @@ class _healthProfile extends State<healthProfile> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   double? thisWeight, thisHeight;
+  int? finalTER;
   // Controllers for the form fields
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
@@ -43,7 +44,6 @@ class _healthProfile extends State<healthProfile> {
     super.initState();
     _heightController.text = heightHere.toString();
     _weightController.text = weightHere.toString();
-    fetchPhysicalLifestyle();
     _loadChronicDiseasesFromFirestore();
   }
 
@@ -67,6 +67,7 @@ class _healthProfile extends State<healthProfile> {
     DocumentSnapshot userDoc =
         await FirebaseFirestore.instance.collection('user').doc(userId).get();
 
+    lifeStyle = userDoc.get('lifestyle');
     if (userDoc.exists) {
       setState(() {
         lifestyle = userDoc.get('lifestyle');
@@ -126,7 +127,7 @@ class _healthProfile extends State<healthProfile> {
       try {
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        desiredBodyWeight = desiredBW(thisHeight!);
+        double thisDesiredBodyWeight = desiredBW(thisHeight!);
         double? doubleWeight = thisWeight;
         String strWeight = doubleWeight!.toStringAsFixed(0);
         int intWeight = int.parse(strWeight);
@@ -135,6 +136,7 @@ class _healthProfile extends State<healthProfile> {
         double bodyMass = (intWeight / pow(height! / 100, 2));
         String roundedString = bodyMass.toStringAsFixed(1);
         double totalBMI = double.parse(roundedString);
+
         String bmi;
 
         if (totalBMI < 18.5) {
@@ -169,11 +171,11 @@ class _healthProfile extends State<healthProfile> {
           default:
             PA = 0;
         }
-        double thisTER = (desiredBodyWeight! * PA);
+        double thisTER = (thisDesiredBodyWeight! * PA);
 
         String strThisTER = thisTER.toStringAsFixed(0);
         int intTER = int.parse(strThisTER);
-        TER = roundUp50s(intTER);
+        finalTER = roundUp50s(intTER);
 
         int carbs = 0, protein = 0, fats = 0;
         double doubleCarbs = 0, doubleProtein = 0, doubleFats = 0;
@@ -181,23 +183,23 @@ class _healthProfile extends State<healthProfile> {
         //required TER per chronic disease
         if (chronicDisease.length == 1 &&
             chronicDisease.contains('Hypertension')) {
-          carbs = (TER! * 0.60).round();
-          protein = (TER! * 0.15).round();
-          fats = (TER! * 0.25).round();
+          carbs = (finalTER! * 0.60).round();
+          protein = (finalTER! * 0.15).round();
+          fats = (finalTER! * 0.25).round();
         } else if (chronicDisease.length == 2 &&
             chronicDisease.contains('Obesity') &&
             chronicDisease.contains('Hypertension')) {
-          carbs = (TER! * 0.65).round();
-          protein = (TER! * 0.15).round();
-          fats = (TER! * 0.20).round();
+          carbs = (finalTER! * 0.65).round();
+          protein = (finalTER! * 0.15).round();
+          fats = (finalTER! * 0.20).round();
         } else if (chronicDisease.isEmpty) {
-          carbs = (TER! * 0.60).round();
-          protein = (TER! * 0.15).round();
-          fats = (TER! * 0.25).round();
+          carbs = (finalTER! * 0.60).round();
+          protein = (finalTER! * 0.15).round();
+          fats = (finalTER! * 0.25).round();
         } else {
-          carbs = (TER! * 0.55).round();
-          protein = (TER! * 0.20).round();
-          fats = (TER! * 0.25).round();
+          carbs = (finalTER! * 0.55).round();
+          protein = (finalTER! * 0.20).round();
+          fats = (finalTER! * 0.25).round();
         }
 
         //required daily grams of macronutrients
@@ -206,7 +208,7 @@ class _healthProfile extends State<healthProfile> {
         doubleFats = fats / 9;
         doubleProtein = protein / 4;
 
-        //parsing double to interget no need to pay attention
+        //parsing double to infinalTERget no need to pay attention
         String strCarbs = doubleCarbs.toStringAsFixed(0);
         String strProtein = doubleProtein.toStringAsFixed(0);
         String strFats = doubleFats.toStringAsFixed(0);
@@ -241,10 +243,11 @@ class _healthProfile extends State<healthProfile> {
           );
           return;
         }
-
+        print(lifeStyle);
+        lifeStyle = lifestyle;
         await FirebaseFirestore.instance.collection('user').doc(userId).update({
           'bmi': bmi,
-          'TER': TER,
+          'TER': finalTER,
           'physicalActivity': PA,
           'reqCarbs': carbs,
           'reqProtein': protein,
@@ -252,8 +255,8 @@ class _healthProfile extends State<healthProfile> {
           'gramCarbs': gCarbs,
           'gramProtein': gProtein,
           'gramFats': gFats,
-          'desiredBodyWeight': desiredBodyWeight,
-          'lifestyle': lifestyle,
+          'desiredBodyWeight': thisDesiredBodyWeight,
+          'lifestyle': lifeStyle,
           'height': double.parse(_heightController.text),
           'weight': double.parse(_weightController.text),
           'chronicDisease': chronicDisease,
@@ -261,19 +264,21 @@ class _healthProfile extends State<healthProfile> {
 
         await prefs.setStringList(
             'chronicDisease', chronicDisease.cast<String>());
-        await prefs.setDouble('desiredBW', desiredBodyWeight!);
+        await prefs.setDouble('desiredBW', thisDesiredBodyWeight!);
         await prefs.setInt('gramCarbs', gCarbs);
         await prefs.setInt('gramProtein', gProtein);
         await prefs.setInt('gramFats', gFats);
-        await prefs.setString('lifestyle', lifestyle!);
+        await prefs.setString('lifestyle', lifeStyle!);
         await prefs.setString('userBMI', bmi);
-        await prefs.setInt('TER', TER!);
+        await prefs.setInt('TER', finalTER!);
         await prefs.setDouble('height', double.parse(_heightController.text));
         await prefs.setDouble('weight', double.parse(_weightController.text));
         gramCarbs = gCarbs;
         gramProtein = gProtein;
         gramFats = gFats;
-        TER = TER;
+        TER = finalTER;
+        lifestyle = lifeStyle;
+        print(lifestyle);
         saveData();
         Navigator.pop(context, true);
         // Show success message for Firestore update
@@ -517,7 +522,7 @@ class _healthProfile extends State<healthProfile> {
                         buttonHeight: 30,
                         buttonWidth: 115,
                         circular: true,
-                        textStyle: TextStyle(fontSize: 14, color: Colors.white),
+                        textStyle: TextStyle(fontSize: 13, color: Colors.white),
                         mainColor: Colors.grey,
                         selectedColor: Color(0xff4b39ef),
                         selectedBorderSide:

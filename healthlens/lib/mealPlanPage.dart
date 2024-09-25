@@ -259,6 +259,46 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                     ),
                   ],
                 ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 50),
+                    child: Tooltip(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(
+                            Icons.info,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'Help',
+                            style: GoogleFonts.readexPro(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      triggerMode: TooltipTriggerMode.tap,
+                      message:
+                          "Create your own Meal Plan by Selecting the Foods on the List while paying attention to the Macronutrients Counter to manage what you eat.\n\nWarning Icon indicates that the food is bad for your Health Condition",
+                      padding: EdgeInsets.all(20),
+                      margin: EdgeInsets.all(20),
+                      showDuration: Duration(seconds: 10),
+                      decoration: BoxDecoration(
+                        color: Color(0xff4b39ef).withOpacity(0.9),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                      ),
+                      textStyle: TextStyle(color: Colors.white),
+                      preferBelow: true,
+                      verticalOffset: 20,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -280,93 +320,101 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                 return Card(
                   elevation: 2,
                   margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                  child: Theme(
-                    data: Theme.of(context)
-                        .copyWith(dividerColor: Colors.transparent),
-                    child: ExpansionTile(
-                      title: Row(
-                        children: [
-                          if (hasSelectedItems)
-                            Icon(Icons.check, color: Colors.green),
-                          SizedBox(width: 8),
-                          Text(
-                            food,
-                            style: GoogleFonts.readexPro(
-                              textStyle: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.bold),
+                  shadowColor: Color(0xff4b39ef),
+                  child: Material(
+                    elevation: 3,
+                    color: Colors.white,
+                    shadowColor: Color(0xff4b39ef),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Theme(
+                      data: Theme.of(context)
+                          .copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        title: Row(
+                          children: [
+                            if (hasSelectedItems)
+                              Icon(Icons.check, color: Colors.green),
+                            SizedBox(width: 8),
+                            Text(
+                              food,
+                              style: GoogleFonts.readexPro(
+                                textStyle: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              textScaler: TextScaler.linear(1.15),
                             ),
-                            textScaler: TextScaler.linear(1.15),
-                          ),
-                        ],
-                      ),
-                      children: itemMacronutrients[food]!.keys.map((serving) {
-                        String key = '$food ($serving)';
-                        bool hasWarning = itemMacronutrients[food]![serving]!
-                            .containsKey('warnings');
-                        Map<String, int> macronutrients =
-                            itemMacronutrients[food]![serving]!;
+                          ],
+                        ),
+                        children: itemMacronutrients[food]!.keys.map((serving) {
+                          String key = '$food ($serving)';
+                          bool hasWarning = itemMacronutrients[food]![serving]!
+                              .containsKey('warnings');
+                          Map<String, int> macronutrients =
+                              itemMacronutrients[food]![serving]!;
 
-                        return CheckboxListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  key,
+                          return CheckboxListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    key,
+                                    style: GoogleFonts.readexPro(
+                                      textStyle: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                                if (hasWarning)
+                                  Icon(IconlyBold.danger, color: Colors.red),
+                              ],
+                            ),
+                            subtitle: Column(
+                              children: [
+                                Text(
+                                  'Carbs: ${macronutrients['carbs']} g, Fats: ${macronutrients['fats']} g, Proteins: ${macronutrients['proteins']} g',
                                   style: GoogleFonts.readexPro(
                                     textStyle: TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold),
+                                      color: Colors.black54,
+                                      fontSize: 11,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              if (hasWarning)
-                                Icon(IconlyBold.danger, color: Colors.red),
-                            ],
-                          ),
-                          subtitle: Column(
-                            children: [
-                              Text(
-                                'Carbs: ${macronutrients['carbs']} g, Fats: ${macronutrients['fats']} g, Proteins: ${macronutrients['proteins']} g',
-                                style: GoogleFonts.readexPro(
-                                  textStyle: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 11,
-                                  ),
+                                // Quantity buttons
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.remove),
+                                      onPressed: selectedItems.contains(key)
+                                          ? () =>
+                                              updateQuantity(food, serving, -1)
+                                          : null,
+                                    ),
+                                    Text('${selectedQuantities[key] ?? 1}'),
+                                    IconButton(
+                                      icon: Icon(Icons.add),
+                                      onPressed: selectedItems.contains(key)
+                                          ? () =>
+                                              updateQuantity(food, serving, 1)
+                                          : null,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              // Quantity buttons
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.remove),
-                                    onPressed: selectedItems.contains(key)
-                                        ? () =>
-                                            updateQuantity(food, serving, -1)
-                                        : null,
-                                  ),
-                                  Text('${selectedQuantities[key] ?? 1}'),
-                                  IconButton(
-                                    icon: Icon(Icons.add),
-                                    onPressed: selectedItems.contains(key)
-                                        ? () => updateQuantity(food, serving, 1)
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          value: selectedItems.contains(key),
-                          onChanged: (bool? value) {
-                            toggleSelection(food, serving);
-                          },
-                        );
-                      }).toList(),
+                              ],
+                            ),
+                            value: selectedItems.contains(key),
+                            onChanged: (bool? value) {
+                              toggleSelection(food, serving);
+                            },
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 );
