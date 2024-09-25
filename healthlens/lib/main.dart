@@ -253,6 +253,7 @@ class Auth {
           await prefs.setString('userBMI', data['bmi']);
           await prefs.setStringList(
               'chronicDisease', data['chronicDisease'].cast<String>());
+          await prefs.setDouble('desiredBW', data['desiredBodyWeight']);
 
           await prefs.setInt('dailyCarbs', macros['carbs']);
           await prefs.setInt('dailyProtein', macros['proteins']);
@@ -283,6 +284,7 @@ class Auth {
           lifestyle = prefs.getString('lifestyle') ?? '';
           height = prefs.getDouble('height') ?? 0.0;
           weight = prefs.getDouble('weight') ?? 0.0;
+          desiredBodyWeight = prefs.getDouble('desiredBW');
           gramCarbs = prefs.getInt('gramCarbs') ?? 0;
           gramProtein = prefs.getInt('gramProtein') ?? 0;
           gramFats = prefs.getInt('gramFats') ?? 0;

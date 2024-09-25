@@ -847,7 +847,7 @@ class _HomePage extends State<HomePage> {
                                                                 .fromLTRB(10, 0,
                                                                     10, 10),
                                                             child: Text(
-                                                              'Ideal Body Weight: ${desiredBodyWeight?.toInt()}Kg',
+                                                              'Desired Body Weight: ${desiredBodyWeight?.toInt()}Kg',
                                                               style: GoogleFonts
                                                                   .readexPro(
                                                                 textStyle:
@@ -911,7 +911,7 @@ class _HomePage extends State<HomePage> {
                                                                             20),
                                                                         child:
                                                                             Text(
-                                                                          'Estimated Days, Weeks, and Months to achieve Ideal Body Weight.',
+                                                                          'Estimated Days, Weeks, and Months to achieve Desired Body Weight.',
                                                                           style:
                                                                               GoogleFonts.readexPro(
                                                                             textStyle:
@@ -1102,6 +1102,7 @@ class _HomePage extends State<HomePage> {
                                                         ),
                                                         SizedBox(
                                                           height: 30,
+                                                          width: 100,
                                                         ),
                                                         Row(
                                                           mainAxisAlignment:
@@ -1121,6 +1122,19 @@ class _HomePage extends State<HomePage> {
                                                                     CrossAxisAlignment
                                                                         .start,
                                                                 children: [
+                                                                  Text(
+                                                                    'Desired Body Weight:',
+                                                                    style: GoogleFonts
+                                                                        .readexPro(
+                                                                      color: const Color(
+                                                                          0xFF57636C),
+                                                                      fontSize:
+                                                                          14.0,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                    ),
+                                                                  ),
                                                                   Text(
                                                                     'Weight:',
                                                                     style: GoogleFonts
@@ -1183,12 +1197,25 @@ class _HomePage extends State<HomePage> {
                                                                       20,
                                                                       0,
                                                                       5,
-                                                                      10),
+                                                                      0),
                                                               child: Column(
                                                                 crossAxisAlignment:
                                                                     CrossAxisAlignment
                                                                         .start,
                                                                 children: [
+                                                                  Text(
+                                                                    "${desiredBodyWeight?.toInt()}Kg",
+                                                                    style: GoogleFonts
+                                                                        .readexPro(
+                                                                      color: const Color(
+                                                                          0xFF57636C),
+                                                                      fontSize:
+                                                                          14.0,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                    ),
+                                                                  ),
                                                                   Text(
                                                                     "${(weight?.toInt()).toString()}Kg",
                                                                     style: GoogleFonts

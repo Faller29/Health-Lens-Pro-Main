@@ -32,16 +32,15 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> _initializeCameraAndModel() async {
     final cameras = await availableCameras();
-    _cameraController = CameraController(cameras[0], ResolutionPreset.medium);
+    _cameraController = CameraController(cameras[0], ResolutionPreset.high);
 
     await _cameraController.initialize();
     await _flutterVision.loadYoloModel(
       labels: 'assets/labels.txt',
       modelPath: 'assets/model.tflite',
       modelVersion: 'yolov8',
-      numThreads: 2,
+      numThreads: 1,
       useGpu: true,
-      quantization: false,
     );
 
     setState(() {
@@ -59,7 +58,6 @@ class _CameraPageState extends State<CameraPage> {
   void _toggleDetection() {
     if (_isDetecting) {
       _stopDetection();
-      _detections.clear();
     } else {
       _startDetection();
     }
@@ -77,9 +75,9 @@ class _CameraPageState extends State<CameraPage> {
           bytesList: image.planes.map((plane) => plane.bytes).toList(),
           imageHeight: image.height,
           imageWidth: image.width,
-          iouThreshold: 0.4,
-          confThreshold: 0.5,
-          classThreshold: 0.5,
+          iouThreshold: 0.5,
+          confThreshold: 0.6,
+          classThreshold: 0.75,
         );
 
         if (results.isNotEmpty) {
@@ -94,8 +92,8 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> _stopDetection() async {
     setState(() {
-      _detections.clear();
       _isDetecting = false;
+      _detections.clear();
     });
 
     await _cameraController.stopImageStream();
@@ -123,6 +121,14 @@ class _CameraPageState extends State<CameraPage> {
     setState(() {
       _detectedObjectCounts.addAll(newDetectedObjectCounts);
     });
+  }
+
+  Future<void> _pauseCamera() async {
+    await _cameraController.pausePreview(); // Pause the camera preview
+  }
+
+  Future<void> _resumeCamera() async {
+    await _cameraController.resumePreview(); // Resume the camera preview
   }
 
   @override
@@ -204,6 +210,7 @@ class _CameraPageState extends State<CameraPage> {
                   ElevatedButton(
                     onPressed: () {
                       _stopDetection();
+                      _pauseCamera();
                       Navigator.pushNamed(
                         context,
                         '/foodServing',
@@ -213,12 +220,9 @@ class _CameraPageState extends State<CameraPage> {
                                   'quantity': entry.value,
                                 })
                             .toList(), // Convert to list of maps with quantity
-                      );
-                      print(
-                          'Passing data to FoodServing: ${_detectedObjectCounts.entries.map((entry) => {
-                                'tag': entry.key,
-                                'quantity': entry.value,
-                              }).toList()}');
+                      ).then((_) {
+                        _resumeCamera(); // Resume the camera when coming back
+                      });
                     },
                     child: Text(
                       'Eat Food',
@@ -250,8 +254,9 @@ class _CameraPageState extends State<CameraPage> {
                 ElevatedButton(
                   onPressed: _toggleDetection,
                   style: ElevatedButton.styleFrom(
+                    elevation: 5,
                     backgroundColor: _isDetecting
-                        ? Colors.red
+                        ? Colors.redAccent
                         : Colors.green, // Color based on state
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
@@ -268,8 +273,9 @@ class _CameraPageState extends State<CameraPage> {
                 ElevatedButton(
                   onPressed: _clearIngredients,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.red, // Custom color for the clear button
+                    elevation: 5,
+                    backgroundColor: Colors
+                        .lightBlueAccent, // Custom color for the clear button
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                   child: Text(

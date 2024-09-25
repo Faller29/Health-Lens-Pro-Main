@@ -429,7 +429,7 @@ class _AboutUs extends State<AboutUs> {
                                   size: 15,
                                   color: Colors.white,
                                 )),
-                                TextSpan(text: '/StarryTrabeller')
+                                TextSpan(text: '/StarryTraveller')
                               ],
                             ),
                           ),
