@@ -51,6 +51,10 @@ class _SetupPageState extends State<SetupPage> {
   late double height = 0, weight = 0;
   final emailRegex =
       RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+
+  bool _isPrivacyChecked = false;
+  var _firstPress = true;
+
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter an email';
@@ -135,44 +139,89 @@ class _SetupPageState extends State<SetupPage> {
       });
       print(_currentPageIndex);
     } else if (_currentPageIndex == 4) {
-      final snackBar = SnackBar(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 10),
-            Expanded(child: Text('Signing up...')),
-          ],
-        ),
+      if (_isPrivacyChecked) {
+        _firstPress = false;
+        print(_firstPress);
+        final snackBar = SnackBar(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 10),
+              Expanded(child: Text('Signing up...')),
+            ],
+          ),
 
-        behavior: SnackBarBehavior.floating,
-        elevation: 3,
-        duration: Duration(minutes: 1), // Keep it visible until dismissed
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      try {
-        bool signUpSuccess = await signUp(
-          email!,
-          pinCode,
-          gender!,
-          lifeStyle!,
-          fName!,
-          mName!,
-          lName!,
-          age,
-          height,
-          weight,
-          chronicDisease,
+          behavior: SnackBarBehavior.floating,
+          elevation: 3,
+          duration: Duration(minutes: 1), // Keep it visible until dismissed
         );
-
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        if (signUpSuccess) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => EntryPoint()),
-            (route) => false, // Remove all previous routes
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        try {
+          print('success');
+          bool signUpSuccess = await signUp(
+            email!,
+            pinCode,
+            gender!,
+            lifeStyle!,
+            fName!,
+            mName!,
+            lName!,
+            age,
+            height,
+            weight,
+            chronicDisease,
           );
-        } else {
-          // Generic sign-up failed message
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+          setState(() {
+            _firstPress = !_firstPress;
+          });
+          if (signUpSuccess) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => EntryPoint()),
+              (route) => false, // Remove all previous routes
+            );
+          } else {
+            // Generic sign-up failed message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  elevation: 3,
+                  duration: const Duration(seconds: 2),
+                  content: Text('Sign up failed. Please try again.')),
+            );
+            setState(() {
+              _firstPress = !_firstPress;
+            });
+          }
+        } on WeakPasswordException {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                behavior: SnackBarBehavior.floating,
+                elevation: 3,
+                duration: const Duration(seconds: 2),
+                content: Text('Weak password. Please choose a stronger one.')),
+          );
+          setState(() {
+            _firstPress = !_firstPress;
+          });
+        } on EmailAlreadyInUseException {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                behavior: SnackBarBehavior.floating,
+                elevation: 3,
+                duration: const Duration(seconds: 2),
+                content: Text(
+                    'Email already in use. Please use a different email.')),
+          );
+          setState(() {
+            _firstPress = !_firstPress;
+          });
+        } catch (e) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 behavior: SnackBarBehavior.floating,
@@ -180,35 +229,21 @@ class _SetupPageState extends State<SetupPage> {
                 duration: const Duration(seconds: 2),
                 content: Text('Sign up failed. Please try again.')),
           );
+          setState(() {
+            _firstPress = !_firstPress;
+          });
         }
-      } on WeakPasswordException {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               behavior: SnackBarBehavior.floating,
               elevation: 3,
               duration: const Duration(seconds: 2),
-              content: Text('Weak password. Please choose a stronger one.')),
+              content: Text('Agree to the Data Privacy Policy to Continue.')),
         );
-      } on EmailAlreadyInUseException {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              behavior: SnackBarBehavior.floating,
-              elevation: 3,
-              duration: const Duration(seconds: 2),
-              content:
-                  Text('Email already in use. Please use a different email.')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              behavior: SnackBarBehavior.floating,
-              elevation: 3,
-              duration: const Duration(seconds: 2),
-              content: Text('Sign up failed. Please try again.')),
-        );
+        setState(() {
+          _firstPress = !_firstPress;
+        });
       }
     }
   }
@@ -1927,7 +1962,111 @@ class _SetupPageState extends State<SetupPage> {
                                                             TextAlign.center,
                                                       ),
                                                       SizedBox(
-                                                        height: 50,
+                                                        height: 10,
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Checkbox(
+                                                            value:
+                                                                _isPrivacyChecked,
+                                                            onChanged: (bool?
+                                                                newValue) {
+                                                              setState(() {
+                                                                _isPrivacyChecked =
+                                                                    newValue ??
+                                                                        false;
+                                                              });
+                                                            },
+                                                          ),
+                                                          Expanded(
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () {
+                                                                showCupertinoModalPopup(
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return StatefulBuilder(builder: (BuildContext
+                                                                              context,
+                                                                          StateSetter
+                                                                              setState) {
+                                                                        return Center(
+                                                                          child:
+                                                                              Card(
+                                                                            color: const Color.fromARGB(
+                                                                                234,
+                                                                                255,
+                                                                                255,
+                                                                                255),
+                                                                            elevation:
+                                                                                0,
+                                                                            margin: const EdgeInsets.fromLTRB(
+                                                                                10,
+                                                                                150,
+                                                                                10,
+                                                                                150),
+                                                                            child:
+                                                                                Container(
+                                                                              height: 200,
+                                                                              child: Column(
+                                                                                children: [
+                                                                                  Center(
+                                                                                    child: Padding(
+                                                                                      padding: const EdgeInsets.all(15.0),
+                                                                                      child: Text(
+                                                                                        "Data Privacy Policy",
+                                                                                        style: GoogleFonts.readexPro(
+                                                                                          fontSize: 20.0,
+                                                                                          textStyle: const TextStyle(
+                                                                                            color: Color.fromARGB(255, 0, 0, 0),
+                                                                                            fontWeight: FontWeight.bold,
+                                                                                          ),
+                                                                                        ),
+                                                                                        textAlign: TextAlign.center,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Padding(
+                                                                                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                                                                    child: SizedBox(
+                                                                                      width: MediaQuery.of(context).size.width - 20,
+                                                                                      height: 100,
+                                                                                      child: Center(
+                                                                                        child: Text(
+                                                                                          'By checking this, I agree to use all the information I provided for the system purposes that will help me in any way that the system may offer. Also, all information that I will provide will be protected by the Data Privacy Act of 2012 and will only be served for the benefit of the intended purpose of the researchers. Furthermore, all the data I present is true and nothing but the truth. If in any case I provide wrong information, the system and the researchers will not be held liable for any miscalculation of the system because of ignorance.',
+                                                                                          style: GoogleFonts.readexPro(
+                                                                                            fontSize: MediaQuery.of(context).textScaler.scale(14),
+                                                                                          ),
+                                                                                          textAlign: TextAlign.justify,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      });
+                                                                    });
+                                                              },
+                                                              child: Text(
+                                                                "I agree to the Data Privacy Policy.",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .blue,
+                                                                  fontSize: 13,
+                                                                  decoration:
+                                                                      TextDecoration
+                                                                          .underline,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),

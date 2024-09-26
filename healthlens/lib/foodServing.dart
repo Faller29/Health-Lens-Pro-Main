@@ -342,9 +342,9 @@ class _FoodServingState extends State<FoodServing> {
           "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
       // Check if adding the current food serving will exceed the user's max intake
 
-      final bool canAdd = await _checkIfWithinMaxLimits(wrappedData['items']);
+      final String canAdd = await _checkIfWithinMaxLimits(wrappedData['items']);
 
-      if (canAdd) {
+      if (canAdd == 'canAdd') {
         // Save the food serving data in 'food_history'
         await FirebaseFirestore.instance
             .collection('food_history')
@@ -357,7 +357,7 @@ class _FoodServingState extends State<FoodServing> {
         await _updateUserMacros(wrappedData['items']);
 
         // Navigate to the EntryPoint page after confirming
-      } else {
+      } else if (canAdd == 'allowed') {
         // Notify user that the food exceeds their daily max intake
         showDialog(
           context: context,
@@ -373,13 +373,14 @@ class _FoodServingState extends State<FoodServing> {
                 ),
               ),
               content: Text(
-                "You have exceeded your recommended daily macronutrients.\nDo you want to Continue?",
+                "You have reached your recommended daily macronutrients and You are only allowed to exceed upto 20%.\n\nDo you want to Continue?",
                 style: GoogleFonts.readexPro(
                   fontSize: 14.0,
                   textStyle: const TextStyle(
                     color: Colors.black54,
                   ),
                 ),
+                textAlign: TextAlign.justify,
               ),
               actions: [
                 TextButton(
@@ -444,13 +445,22 @@ class _FoodServingState extends State<FoodServing> {
             );
           },
         );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              behavior: SnackBarBehavior.floating,
+              elevation: 3,
+              duration: const Duration(seconds: 2),
+              content:
+                  Text('This food exceeds your daily macronutrient limits!')),
+        );
       }
     } catch (e) {
       print("Error submitting data to Firebase: $e");
     }
   }
 
-  Future<bool> _checkIfWithinMaxLimits(
+  Future<String> _checkIfWithinMaxLimits(
       List<Map<String, dynamic>> newMacrosList) async {
     try {
       // Retrieve the user's maximum macronutrient limits
@@ -461,7 +471,7 @@ class _FoodServingState extends State<FoodServing> {
 
       if (!userMaxDoc.exists || userMaxDoc.data() == null) {
         print('Error: No max limits found for user or data is null.');
-        return false;
+        return 'error';
       }
 
       final userMaxData = userMaxDoc.data()!;
@@ -493,13 +503,28 @@ class _FoodServingState extends State<FoodServing> {
         totalFats += _parseInt(item['fats']) * quantity;
       }
 
+      //add 20%
+      final double adjustedMaxCarbs = maxCarbs + (maxCarbs * 0.20);
+      final double adjustedMaxProteins = maxProteins + (maxProteins * 0.20);
+      final double adjustedMaxFats = maxFats + (maxFats * 0.20);
+
       // Check if adding the new macronutrients exceeds the user's max daily limits
-      return totalCarbs <= maxCarbs &&
+      if (totalCarbs <= maxCarbs &&
           totalProteins <= maxProteins &&
-          totalFats <= maxFats;
+          totalFats <= maxFats) {
+        return 'canAdd';
+      }
+
+      if (totalCarbs <= adjustedMaxCarbs &&
+          totalProteins <= adjustedMaxProteins &&
+          totalFats <= adjustedMaxFats) {
+        return 'allowed';
+      }
+
+      return 'error';
     } catch (e) {
       print("Error checking macronutrient limits: $e");
-      return false;
+      return 'error';
     }
   }
 
@@ -547,6 +572,7 @@ class _FoodServingState extends State<FoodServing> {
       if (!userMaxDoc.exists || userMaxDoc.data() == null) {
         print('Error: No max limits found for user or data is null.');
       }
+
       final thisUserUid = thisUser?.uid;
       final String currentDate = DateTime.now().toIso8601String().split('T')[0];
       final dailyUserMacros = db
@@ -555,11 +581,13 @@ class _FoodServingState extends State<FoodServing> {
           .collection('MacrosIntakeHistory')
           .doc(currentDate);
       await dailyUserMacros.set({
-        'carbs': dailyCarbs,
-        'fats': dailyFats,
-        'proteins': dailyProtein,
+        'carbs': totalCarbs,
+        'fats': totalFats,
+        'proteins': totalProteins,
         'calories': TotalDailyCalories,
       });
+
+      /* 
       final userMaxData = userMaxDoc.data()!;
       final maxCarbs = _parseInt(userMaxData['gramCarbs']);
       final maxProteins = _parseInt(userMaxData['gramProtein']);
@@ -577,8 +605,9 @@ class _FoodServingState extends State<FoodServing> {
       }
       if (TotalDailyCalories >= maxCalories) {
         TotalDailyCalories = maxCalories;
-      }
+      } */
       // Update user macros document in Firebase
+
       await FirebaseFirestore.instance
           .collection('userMacros')
           .doc(thisUser?.uid)

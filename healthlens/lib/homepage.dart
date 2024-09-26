@@ -58,6 +58,8 @@ List<WeightData>? weeklyWeight;
 List<WeightData>? monthlyWeight;
 
 class _HomePage extends State<HomePage> {
+  var _firstPress = true;
+
   final List<Item> _data = generateItems(1);
   bool isVisible = false, inverseVisible = true;
   bool dataNeedsRefresh = false;
@@ -423,9 +425,41 @@ class _HomePage extends State<HomePage> {
               ),
               child: Column(
                 children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Tooltip(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(
+                          Icons.question_mark,
+                          size: 16,
+                          color: Colors.black54,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    ),
+                    triggerMode: TooltipTriggerMode.tap,
+                    message:
+                        "You're advised to meet at least 75% of your daily macronutrient needs.\n\nYou can exceed your target by up to 120%, but going beyond that may be harmful to your health.",
+                    padding: EdgeInsets.all(20),
+                    margin: EdgeInsets.all(20),
+                    showDuration: Duration(seconds: 10),
+                    decoration: BoxDecoration(
+                      color: Color(0xff4b39ef).withOpacity(0.9),
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    ),
+                    textStyle: TextStyle(color: Colors.white),
+                    preferBelow: true,
+                    verticalOffset: 20,
+                  ),
                   const Padding(
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 14.0, 0.0, 14.0),
+                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 14.0),
                     child: Text(
                       "Macronutrients",
                       style:
@@ -437,46 +471,77 @@ class _HomePage extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // First division or column
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 0.0, 0.0, 8.0),
-                                child: Text(
-                                  'Carbohydrates',
-                                  style: GoogleFonts.readexPro(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    textStyle: const TextStyle(
-                                      color: Color(0xff4b39ef),
-                                    ),
-                                  ),
-                                ),
+                      CircularPercentIndicator(
+                        radius: 40.0,
+                        lineWidth: 14.0,
+                        animation: true,
+                        percent: ((dailyProtein! >= gramProtein!)
+                            ? (gramProtein! / gramProtein!)
+                            : (dailyProtein! / (gramProtein ?? 1))),
+                        center: Text(
+                          '${((dailyProtein ?? 0) / (gramProtein ?? 0) * 100).toStringAsFixed(0)}%',
+                          style: new TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        header: Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 10.0, 0.0, 10.0),
+                          child: Text(
+                            'Protein',
+                            style: GoogleFonts.readexPro(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              textStyle: const TextStyle(
+                                color: Color(0xffff5963),
                               ),
-                              CircularPercentIndicator(
-                                radius: 40.0,
-                                lineWidth: 14.0,
-                                animation: true,
-                                percent: (dailyCarbs ?? 0) / (gramCarbs ?? 0),
-                                center: Text(
-                                  '${((dailyCarbs ?? 0) / (gramCarbs ?? 0) * 100).toStringAsFixed(0)}%',
-                                  style: new TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                header: const Padding(
-                                  padding: EdgeInsets.only(bottom: 10.0),
-                                ),
-                                circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: const Color(0xff4b39ef),
-                              ),
-                            ],
+                            ),
                           ),
-                          Text(
+                        ),
+                        footer: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                          child: Text(
+                            '${(dailyProtein ?? 0)}/${gramProtein}',
+                            style: GoogleFonts.readexPro(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                              textStyle: const TextStyle(
+                                color: Color(0xffff5963),
+                              ),
+                            ),
+                          ),
+                        ),
+                        circularStrokeCap: CircularStrokeCap.round,
+                        progressColor: const Color(0xffff5963),
+                      ),
+
+                      // Second division or column
+                      CircularPercentIndicator(
+                        radius: 40.0,
+                        lineWidth: 14.0,
+                        animation: true,
+                        percent: ((dailyCarbs! >= gramCarbs!)
+                            ? (gramCarbs! / gramCarbs!)
+                            : (dailyCarbs! / (gramCarbs ?? 1))),
+                        center: Text(
+                          '${((dailyCarbs ?? 0) / (gramCarbs ?? 0) * 100).toStringAsFixed(0)}%',
+                          style: new TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        header: Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 10.0, 0.0, 10.0),
+                          child: Text(
+                            'Carbohydrates',
+                            style: GoogleFonts.readexPro(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              textStyle: const TextStyle(
+                                color: Color(0xff4b39ef),
+                              ),
+                            ),
+                          ),
+                        ),
+                        footer: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                          child: Text(
                             '${(dailyCarbs ?? 0)}/${gramCarbs}',
                             style: GoogleFonts.readexPro(
                               fontSize: 12.0,
@@ -486,118 +551,52 @@ class _HomePage extends State<HomePage> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
-
-                      // Second division or column
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 0.0, 0.0, 8.0),
-                                child: Text(
-                                  'Protein',
-                                  style: GoogleFonts.readexPro(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    textStyle: const TextStyle(
-                                      color: Color(0xffff5963),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              CircularPercentIndicator(
-                                radius: 40.0,
-                                lineWidth: 14.0,
-                                animation: true,
-                                percent:
-                                    (dailyProtein ?? 0) / (gramProtein ?? 0),
-                                center: Text(
-                                  '${((dailyProtein ?? 0) / (gramProtein ?? 0) * 100).toStringAsFixed(0)}%',
-                                  style: new TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                header: const Padding(
-                                  padding: EdgeInsets.only(
-                                      bottom:
-                                          10.0), // Adjust bottom padding as needed
-                                ),
-                                circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: const Color(0xffff5963),
-                              ),
-                              Text(
-                                '${(dailyProtein ?? 0)}/${gramProtein}',
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  textStyle: const TextStyle(
-                                    color: Color(0xffff5963),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
+                        ),
+                        circularStrokeCap: CircularStrokeCap.round,
+                        progressColor: const Color(0xff4b39ef),
                       ),
 
                       // Third division or column
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 0.0, 0.0, 8.0),
-                                child: Text(
-                                  'Fats',
-                                  style: GoogleFonts.readexPro(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    textStyle: const TextStyle(
-                                      color: Color(0xff249689),
-                                    ),
-                                  ),
-                                ),
+                      CircularPercentIndicator(
+                        radius: 40.0,
+                        lineWidth: 14.0,
+                        animation: true,
+                        percent: ((dailyFats! >= gramFats!)
+                            ? (gramFats! / gramFats!)
+                            : (dailyFats! / (gramFats ?? 1))),
+                        center: Text(
+                          '${((dailyFats ?? 0) / (gramFats ?? 0) * 100).toStringAsFixed(0)}%',
+                          style: new TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        header: Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 10.0, 0.0, 10.0),
+                          child: Text(
+                            'Fats',
+                            style: GoogleFonts.readexPro(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              textStyle: const TextStyle(
+                                color: Color(0xff249689),
                               ),
-                              CircularPercentIndicator(
-                                radius: 40.0,
-                                lineWidth: 14.0,
-                                animation: true,
-                                percent: (dailyFats ?? 0) / (gramFats ?? 0),
-                                center: Text(
-                                  '${((dailyFats ?? 0) / (gramFats ?? 0) * 100).toStringAsFixed(0)}%',
-                                  style: new TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                header: const Padding(
-                                  padding: EdgeInsets.only(
-                                      bottom:
-                                          10.0), // Adjust bottom padding as needed
-                                ),
-                                circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: const Color(0xff249689),
-                              ),
-                              Text(
-                                '${(dailyFats ?? 0)}/${gramFats}',
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  textStyle: const TextStyle(
-                                    color: Color(0xff249689),
-                                  ),
-                                ),
-                              )
-                            ],
+                            ),
                           ),
-                        ],
+                        ),
+                        footer: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                          child: Text(
+                            '${(dailyFats ?? 0)}/${gramFats}',
+                            style: GoogleFonts.readexPro(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                              textStyle: const TextStyle(
+                                color: Color(0xff249689),
+                              ),
+                            ),
+                          ),
+                        ),
+                        circularStrokeCap: CircularStrokeCap.round,
+                        progressColor: const Color(0xff249689),
                       ),
                     ],
                   ),
@@ -659,6 +658,9 @@ class _HomePage extends State<HomePage> {
                       ),
                     ),
                   ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -676,66 +678,409 @@ class _HomePage extends State<HomePage> {
                             ),
                           ),
                           onPressed: () async {
-                            final snackBar = SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              elevation: 3,
-                              content: Row(
-                                children: [
-                                  CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(child: Text('Collecting Data...')),
-                                ],
-                              ),
-                              duration: Duration(
-                                  seconds:
-                                      5), // Keep it visible until dismissed
-                            );
+                            if (_firstPress) {
+                              _firstPress = false;
+                              final snackBar = SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                elevation: 3,
+                                content: Row(
+                                  children: [
+                                    CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(child: Text('Collecting Data...')),
+                                  ],
+                                ),
+                                duration: Duration(
+                                    seconds:
+                                        5), // Keep it visible until dismissed
+                              );
 
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                            await _fetchWeightData();
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-                            // Show modal on tap
-                            showCupertinoModalPopup(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return StatefulBuilder(builder:
-                                    (BuildContext context,
-                                        StateSetter setState) {
-                                  return Center(
-                                    child: Card(
-                                      color: Colors.white,
-                                      elevation: 0,
-                                      margin: const EdgeInsets.fromLTRB(
-                                          10, 150, 10, 150),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 10, 0, 10),
-                                                child: Text(
-                                                  'Health Information',
-                                                  style: GoogleFonts.readexPro(
-                                                    fontSize: 20.0,
-                                                    textStyle: const TextStyle(
-                                                      color: Color.fromARGB(
-                                                          255, 0, 0, 0),
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                              await _fetchWeightData();
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+                              setState(() {
+                                _firstPress = !_firstPress;
+                              });
+                              // Show modal on tap
+                              showCupertinoModalPopup(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return StatefulBuilder(builder:
+                                      (BuildContext context,
+                                          StateSetter setState) {
+                                    return Center(
+                                      child: Card(
+                                        color: Colors.white,
+                                        elevation: 0,
+                                        margin: const EdgeInsets.fromLTRB(
+                                            10, 150, 10, 150),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 10, 0, 10),
+                                                  child: Text(
+                                                    'Health Information',
+                                                    style:
+                                                        GoogleFonts.readexPro(
+                                                      fontSize: 20.0,
+                                                      textStyle:
+                                                          const TextStyle(
+                                                        color: Color.fromARGB(
+                                                            255, 0, 0, 0),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        5, 10, 5, 2),
-                                                child: Card(
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          5, 10, 5, 2),
+                                                  child: Card(
+                                                    elevation: 3,
+                                                    color: Colors.white,
+                                                    shadowColor: Colors.blue,
+                                                    child: Material(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(12.0),
+                                                        child: Column(
+                                                          children: [
+                                                            SfCartesianChart(
+                                                              title: ChartTitle(
+                                                                  text:
+                                                                      'Predicted Weight',
+                                                                  textStyle: GoogleFonts.readexPro(
+                                                                      color: const Color(
+                                                                          0xFF57636C),
+                                                                      fontSize:
+                                                                          12),
+                                                                  alignment:
+                                                                      ChartAlignment
+                                                                          .near),
+                                                              zoomPanBehavior:
+                                                                  ZoomPanBehavior(
+                                                                enablePinching:
+                                                                    true,
+                                                                zoomMode:
+                                                                    ZoomMode.x,
+                                                                enablePanning:
+                                                                    true,
+                                                              ),
+                                                              primaryXAxis:
+                                                                  const CategoryAxis(
+                                                                initialVisibleMaximum:
+                                                                    5,
+                                                              ),
+                                                              primaryYAxis: const NumericAxis(
+                                                                  decimalPlaces:
+                                                                      2,
+                                                                  labelStyle:
+                                                                      TextStyle(
+                                                                          fontSize:
+                                                                              10),
+                                                                  anchorRangeToVisiblePoints:
+                                                                      true),
+                                                              legend: const Legend(
+                                                                  itemPadding:
+                                                                      0,
+                                                                  isVisible:
+                                                                      true,
+                                                                  position:
+                                                                      LegendPosition
+                                                                          .top,
+                                                                  alignment:
+                                                                      ChartAlignment
+                                                                          .far),
+                                                              series: <CartesianSeries>[
+                                                                ColumnSeries<
+                                                                        WeightData,
+                                                                        String>(
+                                                                    color: const Color(
+                                                                        0xff4b39ef),
+                                                                    dataLabelSettings:
+                                                                        const DataLabelSettings(
+                                                                      isVisible:
+                                                                          true,
+                                                                      showZeroValue:
+                                                                          true,
+                                                                      labelPosition:
+                                                                          ChartDataLabelPosition
+                                                                              .inside,
+                                                                      textStyle: TextStyle(
+                                                                          fontSize:
+                                                                              10,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                      labelAlignment:
+                                                                          ChartDataLabelAlignment
+                                                                              .top,
+                                                                      alignment:
+                                                                          ChartAlignment
+                                                                              .center,
+                                                                    ),
+                                                                    name:
+                                                                        'Weight',
+                                                                    dataSource:
+                                                                        dailyWeight,
+                                                                    xValueMapper:
+                                                                        (WeightData data, _) =>
+                                                                            data
+                                                                                .x,
+                                                                    yValueMapper: (WeightData
+                                                                                data,
+                                                                            _) =>
+                                                                        data.y1,
+                                                                    pointColorMapper: (WeightData
+                                                                                data,
+                                                                            _) =>
+                                                                        const Color(
+                                                                            0xff4b39ef)),
+                                                              ],
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .fromLTRB(
+                                                                          10,
+                                                                          0,
+                                                                          10,
+                                                                          10),
+                                                              child: Text(
+                                                                'Desired Body Weight: ${desiredBodyWeight?.toInt()}Kg',
+                                                                style: GoogleFonts
+                                                                    .readexPro(
+                                                                  textStyle:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            (dailyWeight!
+                                                                            .length ==
+                                                                        1 ||
+                                                                    weeklyWeight!
+                                                                            .length ==
+                                                                        1 ||
+                                                                    monthlyWeight!
+                                                                            .length ==
+                                                                        1)
+                                                                ? Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        horizontal:
+                                                                            20,
+                                                                        vertical:
+                                                                            20),
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Text(
+                                                                        "Congrats! You've reached your desired body weight. Keep it up!",
+                                                                        style: GoogleFonts
+                                                                            .readexPro(
+                                                                          color:
+                                                                              Colors.green,
+                                                                          fontSize:
+                                                                              14.0,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                : Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(
+                                                                            15.0),
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .fromLTRB(
+                                                                              10,
+                                                                              10,
+                                                                              10,
+                                                                              20),
+                                                                          child:
+                                                                              Text(
+                                                                            'Estimated Days, Weeks, and Months to achieve Desired Body Weight.',
+                                                                            style:
+                                                                                GoogleFonts.readexPro(
+                                                                              textStyle: TextStyle(
+                                                                                color: Colors.black,
+                                                                              ),
+                                                                              fontWeight: FontWeight.bold,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.spaceEvenly,
+                                                                          children: [
+                                                                            Column(
+                                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                                              children: [
+                                                                                Text(
+                                                                                  'Days: ',
+                                                                                  style: GoogleFonts.readexPro(
+                                                                                    textStyle: TextStyle(
+                                                                                      color: Colors.black,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                Text(
+                                                                                  'Weeks: ',
+                                                                                  style: GoogleFonts.readexPro(
+                                                                                    textStyle: TextStyle(
+                                                                                      color: Colors.black,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                Text(
+                                                                                  'Months: ',
+                                                                                  style: GoogleFonts.readexPro(
+                                                                                    textStyle: TextStyle(
+                                                                                      color: Colors.black,
+                                                                                    ),
+                                                                                  ),
+                                                                                )
+                                                                              ],
+                                                                            ),
+                                                                            Column(
+                                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                                              children: [
+                                                                                Text(
+                                                                                  '${dailyWeight!.length} days',
+                                                                                  style: GoogleFonts.readexPro(
+                                                                                    textStyle: TextStyle(
+                                                                                      color: Colors.black,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                Text(
+                                                                                  '${weeklyWeight!.length} Weeks',
+                                                                                  style: GoogleFonts.readexPro(
+                                                                                    textStyle: TextStyle(
+                                                                                      color: Colors.black,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                Text(
+                                                                                  '${monthlyWeight!.length} Months',
+                                                                                  style: GoogleFonts.readexPro(
+                                                                                    textStyle: TextStyle(
+                                                                                      color: Colors.black,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                            ElevatedButton(
+                                                              onPressed: () => {
+                                                                Navigator.pushNamed(
+                                                                    context,
+                                                                    '/editHealth')
+                                                              },
+                                                              style:
+                                                                  ButtonStyle(
+                                                                overlayColor: MaterialStateColor
+                                                                    .resolveWith(
+                                                                        (states) =>
+                                                                            Colors.white30),
+                                                                backgroundColor:
+                                                                    const MaterialStatePropertyAll<
+                                                                        Color>(
+                                                                  Colors
+                                                                      .blueAccent,
+                                                                ),
+                                                                side:
+                                                                    const MaterialStatePropertyAll(
+                                                                  BorderSide(
+                                                                    color: Color(
+                                                                        0xFFE0E3E7),
+                                                                    width: 1.0,
+                                                                  ),
+                                                                ),
+                                                                shape: MaterialStateProperty
+                                                                    .all<
+                                                                        OutlinedBorder>(
+                                                                  RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            50.0),
+                                                                  ),
+                                                                ),
+                                                                padding:
+                                                                    MaterialStateProperty
+                                                                        .all<
+                                                                            EdgeInsets>(
+                                                                  const EdgeInsets
+                                                                      .fromLTRB(
+                                                                      10,
+                                                                      5,
+                                                                      10,
+                                                                      5),
+                                                                ),
+                                                              ),
+                                                              child: Text(
+                                                                'Update Weight',
+                                                                style: GoogleFonts
+                                                                    .readexPro(
+                                                                  fontSize:
+                                                                      11.0,
+                                                                  textStyle:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 20,
+                                                ),
+                                                Card(
                                                   elevation: 3,
                                                   color: Colors.white,
                                                   shadowColor: Colors.blue,
@@ -747,312 +1092,19 @@ class _HomePage extends State<HomePage> {
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
-                                                              12.0),
+                                                              10),
                                                       child: Column(
                                                         children: [
-                                                          SfCartesianChart(
-                                                            title: ChartTitle(
-                                                                text:
-                                                                    'Predicted Weight',
-                                                                textStyle: GoogleFonts
-                                                                    .readexPro(
-                                                                        color: const Color(
-                                                                            0xFF57636C),
-                                                                        fontSize:
-                                                                            12),
-                                                                alignment:
-                                                                    ChartAlignment
-                                                                        .near),
-                                                            zoomPanBehavior:
-                                                                ZoomPanBehavior(
-                                                              enablePinching:
-                                                                  true,
-                                                              zoomMode:
-                                                                  ZoomMode.x,
-                                                              enablePanning:
-                                                                  true,
-                                                            ),
-                                                            primaryXAxis:
-                                                                const CategoryAxis(
-                                                              initialVisibleMaximum:
-                                                                  5,
-                                                            ),
-                                                            primaryYAxis: const NumericAxis(
-                                                                decimalPlaces:
-                                                                    2,
-                                                                labelStyle:
-                                                                    TextStyle(
-                                                                        fontSize:
-                                                                            10),
-                                                                anchorRangeToVisiblePoints:
-                                                                    true),
-                                                            legend: const Legend(
-                                                                itemPadding: 0,
-                                                                isVisible: true,
-                                                                position:
-                                                                    LegendPosition
-                                                                        .top,
-                                                                alignment:
-                                                                    ChartAlignment
-                                                                        .far),
-                                                            series: <CartesianSeries>[
-                                                              ColumnSeries<
-                                                                      WeightData,
-                                                                      String>(
-                                                                  color: const Color(
-                                                                      0xff4b39ef),
-                                                                  dataLabelSettings:
-                                                                      const DataLabelSettings(
-                                                                    isVisible:
-                                                                        true,
-                                                                    showZeroValue:
-                                                                        true,
-                                                                    labelPosition:
-                                                                        ChartDataLabelPosition
-                                                                            .inside,
-                                                                    textStyle: TextStyle(
-                                                                        fontSize:
-                                                                            10,
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                    labelAlignment:
-                                                                        ChartDataLabelAlignment
-                                                                            .top,
-                                                                    alignment:
-                                                                        ChartAlignment
-                                                                            .center,
-                                                                  ),
-                                                                  name:
-                                                                      'Weight',
-                                                                  dataSource:
-                                                                      dailyWeight,
-                                                                  xValueMapper:
-                                                                      (WeightData data, _) =>
-                                                                          data
-                                                                              .x,
-                                                                  yValueMapper:
-                                                                      (WeightData data,
-                                                                              _) =>
-                                                                          data
-                                                                              .y1,
-                                                                  pointColorMapper: (WeightData
-                                                                              data,
-                                                                          _) =>
-                                                                      const Color(
-                                                                          0xff4b39ef)),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding: EdgeInsets
-                                                                .fromLTRB(10, 0,
-                                                                    10, 10),
+                                                          Center(
                                                             child: Text(
-                                                              'Desired Body Weight: ${desiredBodyWeight?.toInt()}Kg',
+                                                              'Health Details',
                                                               style: GoogleFonts
                                                                   .readexPro(
-                                                                textStyle:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                ),
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          (dailyWeight!
-                                                                          .length ==
-                                                                      1 ||
-                                                                  weeklyWeight!
-                                                                          .length ==
-                                                                      1 ||
-                                                                  monthlyWeight!
-                                                                          .length ==
-                                                                      1)
-                                                              ? Padding(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          20),
-                                                                  child: Center(
-                                                                    child: Text(
-                                                                      "Congrats! You've reached your desired body weight. Keep it up!",
-                                                                      style: GoogleFonts
-                                                                          .readexPro(
-                                                                        color: Colors
-                                                                            .green,
-                                                                        fontSize:
-                                                                            14.0,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                      ),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                    ),
-                                                                  ),
-                                                                )
-                                                              : Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(
-                                                                          15.0),
-                                                                  child: Column(
-                                                                    children: [
-                                                                      Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .fromLTRB(
-                                                                            10,
-                                                                            10,
-                                                                            10,
-                                                                            20),
-                                                                        child:
-                                                                            Text(
-                                                                          'Estimated Days, Weeks, and Months to achieve Desired Body Weight.',
-                                                                          style:
-                                                                              GoogleFonts.readexPro(
-                                                                            textStyle:
-                                                                                TextStyle(
-                                                                              color: Colors.black,
-                                                                            ),
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height:
-                                                                            10,
-                                                                      ),
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.spaceEvenly,
-                                                                        children: [
-                                                                          Column(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.start,
-                                                                            children: [
-                                                                              Text(
-                                                                                'Days: ',
-                                                                                style: GoogleFonts.readexPro(
-                                                                                  textStyle: TextStyle(
-                                                                                    color: Colors.black,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              Text(
-                                                                                'Weeks: ',
-                                                                                style: GoogleFonts.readexPro(
-                                                                                  textStyle: TextStyle(
-                                                                                    color: Colors.black,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              Text(
-                                                                                'Months: ',
-                                                                                style: GoogleFonts.readexPro(
-                                                                                  textStyle: TextStyle(
-                                                                                    color: Colors.black,
-                                                                                  ),
-                                                                                ),
-                                                                              )
-                                                                            ],
-                                                                          ),
-                                                                          Column(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.start,
-                                                                            children: [
-                                                                              Text(
-                                                                                '${dailyWeight!.length} days',
-                                                                                style: GoogleFonts.readexPro(
-                                                                                  textStyle: TextStyle(
-                                                                                    color: Colors.black,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              Text(
-                                                                                '${weeklyWeight!.length} Weeks',
-                                                                                style: GoogleFonts.readexPro(
-                                                                                  textStyle: TextStyle(
-                                                                                    color: Colors.black,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              Text(
-                                                                                '${monthlyWeight!.length} Months',
-                                                                                style: GoogleFonts.readexPro(
-                                                                                  textStyle: TextStyle(
-                                                                                    color: Colors.black,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                          ElevatedButton(
-                                                            onPressed: () => {
-                                                              Navigator.pushNamed(
-                                                                  context,
-                                                                  '/editHealth')
-                                                            },
-                                                            style: ButtonStyle(
-                                                              overlayColor: MaterialStateColor
-                                                                  .resolveWith(
-                                                                      (states) =>
-                                                                          Colors
-                                                                              .white30),
-                                                              backgroundColor:
-                                                                  const MaterialStatePropertyAll<
-                                                                      Color>(
-                                                                Colors
-                                                                    .blueAccent,
-                                                              ),
-                                                              side:
-                                                                  const MaterialStatePropertyAll(
-                                                                BorderSide(
-                                                                  color: Color(
-                                                                      0xFFE0E3E7),
-                                                                  width: 1.0,
-                                                                ),
-                                                              ),
-                                                              shape: MaterialStateProperty
-                                                                  .all<
-                                                                      OutlinedBorder>(
-                                                                RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              50.0),
-                                                                ),
-                                                              ),
-                                                              padding:
-                                                                  MaterialStateProperty
-                                                                      .all<
-                                                                          EdgeInsets>(
-                                                                const EdgeInsets
-                                                                    .fromLTRB(
-                                                                    10,
-                                                                    5,
-                                                                    10,
-                                                                    5),
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              'Update Weight',
-                                                              style: GoogleFonts
-                                                                  .readexPro(
-                                                                fontSize: 11.0,
+                                                                fontSize: 18.0,
                                                                 textStyle:
                                                                     const TextStyle(
                                                                   color: Colors
-                                                                      .white,
+                                                                      .black,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
@@ -1060,310 +1112,270 @@ class _HomePage extends State<HomePage> {
                                                               ),
                                                             ),
                                                           ),
+                                                          SizedBox(
+                                                            height: 30,
+                                                            width: 100,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .fromLTRB(
+                                                                        20,
+                                                                        0,
+                                                                        5,
+                                                                        0),
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Text(
+                                                                      'Desired Body Weight:',
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      'Weight:',
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      'Height:',
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      'BMI:',
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      'Lifestyle:',
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .fromLTRB(
+                                                                        20,
+                                                                        0,
+                                                                        5,
+                                                                        0),
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Text(
+                                                                      "${desiredBodyWeight?.toInt()}Kg",
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      "${(weight?.toInt()).toString()}Kg",
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      "${(height?.toInt()).toString()}cm",
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      userBMI!,
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      lifestyle!,
+                                                                      style: GoogleFonts
+                                                                          .readexPro(
+                                                                        color: const Color(
+                                                                            0xFF57636C),
+                                                                        fontSize:
+                                                                            14.0,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .fromLTRB(
+                                                                    20,
+                                                                    0,
+                                                                    0,
+                                                                    10),
+                                                            child: Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .topLeft,
+                                                              child: Text(
+                                                                'Chronic Disease:',
+                                                                style: GoogleFonts
+                                                                    .readexPro(
+                                                                  color: const Color(
+                                                                      0xFF57636C),
+                                                                  fontSize:
+                                                                      14.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .fromLTRB(
+                                                                    20,
+                                                                    0,
+                                                                    0,
+                                                                    30),
+                                                            child: Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .topRight,
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .end,
+                                                                children:
+                                                                    chronicDisease!
+                                                                        .map((e) =>
+                                                                            Text(
+                                                                              e,
+                                                                              style: GoogleFonts.readexPro(
+                                                                                color: const Color(0xFF57636C),
+                                                                                fontSize: 14.0,
+                                                                                fontWeight: FontWeight.normal,
+                                                                              ),
+                                                                            ))
+                                                                        .toList(),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        10),
+                                                            child: Align(
+                                                              alignment: Alignment
+                                                                  .centerLeft,
+                                                              child: Text(
+                                                                'Foods Not allowed',
+                                                                style: GoogleFonts
+                                                                    .readexPro(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize:
+                                                                      14.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ), // Optional spacing
+                                                          ..._getFoodRestrictions(),
+                                                          SizedBox(
+                                                              height:
+                                                                  20), // Optional spacing
                                                         ],
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                              Card(
-                                                elevation: 3,
-                                                color: Colors.white,
-                                                shadowColor: Colors.blue,
-                                                child: Material(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child: Column(
-                                                      children: [
-                                                        Center(
-                                                          child: Text(
-                                                            'Health Details',
-                                                            style: GoogleFonts
-                                                                .readexPro(
-                                                              fontSize: 18.0,
-                                                              textStyle:
-                                                                  const TextStyle(
-                                                                color: Colors
-                                                                    .black,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 30,
-                                                          width: 100,
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .fromLTRB(
-                                                                      20,
-                                                                      0,
-                                                                      5,
-                                                                      0),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    'Desired Body Weight:',
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    'Weight:',
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    'Height:',
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    'BMI:',
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    'Lifestyle:',
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .fromLTRB(
-                                                                      20,
-                                                                      0,
-                                                                      5,
-                                                                      0),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    "${desiredBodyWeight?.toInt()}Kg",
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    "${(weight?.toInt()).toString()}Kg",
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    "${(height?.toInt()).toString()}cm",
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    userBMI!,
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    lifestyle!,
-                                                                    style: GoogleFonts
-                                                                        .readexPro(
-                                                                      color: const Color(
-                                                                          0xFF57636C),
-                                                                      fontSize:
-                                                                          14.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .fromLTRB(
-                                                                  20, 0, 0, 10),
-                                                          child: Align(
-                                                            alignment: Alignment
-                                                                .topLeft,
-                                                            child: Text(
-                                                              'Chronic Disease:',
-                                                              style: GoogleFonts
-                                                                  .readexPro(
-                                                                color: const Color(
-                                                                    0xFF57636C),
-                                                                fontSize: 14.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .fromLTRB(
-                                                                  20, 0, 0, 30),
-                                                          child: Align(
-                                                            alignment: Alignment
-                                                                .topRight,
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .end,
-                                                              children:
-                                                                  chronicDisease!
-                                                                      .map((e) =>
-                                                                          Text(
-                                                                            e,
-                                                                            style:
-                                                                                GoogleFonts.readexPro(
-                                                                              color: const Color(0xFF57636C),
-                                                                              fontSize: 14.0,
-                                                                              fontWeight: FontWeight.normal,
-                                                                            ),
-                                                                          ))
-                                                                      .toList(),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      10),
-                                                          child: Align(
-                                                            alignment: Alignment
-                                                                .centerLeft,
-                                                            child: Text(
-                                                              'Foods Not allowed',
-                                                              style: GoogleFonts
-                                                                  .readexPro(
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize: 14.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ), // Optional spacing
-                                                        ..._getFoodRestrictions(),
-                                                        SizedBox(
-                                                            height:
-                                                                20), // Optional spacing
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            ],
+                                                )
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                });
-                              },
-                            );
+                                    );
+                                  });
+                                },
+                              );
+                            }
                           },
                           icon: const Icon(
                             FontAwesomeIcons.info,

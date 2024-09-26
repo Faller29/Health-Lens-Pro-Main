@@ -26,7 +26,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final Auth _authService = Auth();
   final AuthService forgotPassword = AuthService();
-
+  var _firstPress = true;
   String _userName = '';
   String _email = ''; // Add this to store the email
   bool _isChangingAccount = false;
@@ -100,7 +100,9 @@ class _LoginPageState extends State<LoginPage> {
 
     // Perform login
     User? user = await _authService.signInWithEmailAndPincode(email, pincode);
-
+    setState(() {
+      _firstPress = !_firstPress;
+    });
     // Dismiss the Snackbar after login attempt
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
@@ -357,7 +359,12 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     TextButton(
-                      onPressed: _onLogin,
+                      onPressed: () async {
+                        if (_firstPress) {
+                          _firstPress = false;
+                          _onLogin();
+                        }
+                      },
                       child: Text(
                         'Log In',
                         style: GoogleFonts.urbanist(

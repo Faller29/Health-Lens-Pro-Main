@@ -107,6 +107,30 @@ class Auth {
           Calories: $dailyCalories kcal
       ''');
       print('success Log in');
+
+      if (currentDate != lastLogIn) {
+        print('not tru sa current date vs last');
+        await FirebaseFirestore.instance
+            .collection('userMacros')
+            .doc(thisUser?.uid)
+            .set({
+          'carbs': 0,
+          'proteins': 0,
+          'fats': 0,
+          'calories': 0,
+          'lastLogIn': currentDate,
+        }, SetOptions(merge: true));
+
+        await prefs.setInt('dailyCarbs', 0);
+        await prefs.setInt('dailyProtein', 0);
+        await prefs.setInt('dailyFats', 0);
+        await prefs.setInt('dailyCalories', 0);
+        dailyCarbs = prefs.getInt('dailyCarbs') ?? 0;
+        dailyProtein = prefs.getInt('dailyProtein') ?? 0;
+        dailyFats = prefs.getInt('dailyFats') ?? 0;
+        dailyCalories = prefs.getInt('dailyCalories') ?? 0;
+      }
+
       return thisUser;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -133,6 +157,16 @@ class Auth {
 
   // Sign out
   Future<void> signOut() async {
+    final String currentDate = DateTime.now().toIso8601String().split('T')[0];
+
+    await FirebaseFirestore.instance
+        .collection('userMacros')
+        .doc(thisUser?.uid)
+        .update(
+      {
+        'lastLogIn': currentDate,
+      },
+    );
     await _auth.signOut();
     thisUser = null;
     SharedPreferences prefs = await SharedPreferences.getInstance();

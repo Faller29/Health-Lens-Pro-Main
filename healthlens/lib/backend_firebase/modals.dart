@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 void mealPlanGeneratorSelector(BuildContext context) async {
@@ -510,5 +511,55 @@ void showPinCodeModal(BuildContext context) {
         ),
       );
     },
+  );
+}
+
+Widget buildMacronutrientCard(
+    String title, double current, int limit, Color color, double percent) {
+  /* if (current >= limit) {
+    String thislimitation = limit.toString();
+    current = double.tryParse(thislimitation)!;
+    //limitCurrent = current;
+  } /* else {
+    String thislimitation = limit.toString();
+    limitCurrent = double.tryParse(thislimitation)!;
+  } */ */
+
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 8.0),
+        child: Text(
+          title,
+          style: GoogleFonts.readexPro(
+            fontSize: 14.0,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ),
+      CircularPercentIndicator(
+        radius: 40.0,
+        lineWidth: 14.0,
+        animation: true,
+        percent: percent,
+        center: Text(
+          '${(current / limit * 100).toStringAsFixed(0)}%',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        circularStrokeCap: CircularStrokeCap.round,
+        progressColor: color,
+      ),
+      Text(
+        '${current.toStringAsFixed(0)}/${limit}',
+        style: GoogleFonts.readexPro(
+          fontSize: 12.0,
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
+      ),
+    ],
   );
 }

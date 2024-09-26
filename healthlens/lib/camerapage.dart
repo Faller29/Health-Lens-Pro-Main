@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vision/flutter_vision.dart';
@@ -19,6 +19,7 @@ class _CameraPageState extends State<CameraPage> {
   CameraImage? _cameraImage;
   bool _isInitialized = false;
   bool _isDetecting = false;
+  Timer? _detectionTimer;
 
   // Track the detected objects with their counts
   Map<String, int> _detectedObjectCounts = {};
@@ -68,6 +69,48 @@ class _CameraPageState extends State<CameraPage> {
       _isDetecting = true;
     });
 
+    // Start a 10-second timer
+    _detectionTimer = Timer(Duration(seconds: 10), () {
+      if (_detections.isEmpty) {
+        // Show a dialog or any other UI feedback
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.white.withOpacity(.8),
+              shadowColor: Colors.black,
+              elevation: 5,
+              title: Text(
+                "No food Detected",
+                style: GoogleFonts.readexPro(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              content: Text(
+                "No food detected within 10 seconds.\n\nKeep your Camera Steady and Make sure that the Food is within the Scope of the app",
+                style: GoogleFonts.readexPro(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.justify,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _stopDetection(); // Stop detection when closing the dialog
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+
     _cameraController.startImageStream((image) async {
       if (_isDetecting) {
         _cameraImage = image;
@@ -81,6 +124,7 @@ class _CameraPageState extends State<CameraPage> {
         );
 
         if (results.isNotEmpty) {
+          _detectionTimer?.cancel();
           _updateDetectedObjectCounts(results);
           setState(() {
             _detections = results;
@@ -95,6 +139,9 @@ class _CameraPageState extends State<CameraPage> {
       _isDetecting = false;
       _detections.clear();
     });
+
+    // Cancel the timer when detection is stopped
+    _detectionTimer?.cancel();
 
     await _cameraController.stopImageStream();
   }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/backend_firebase/modals.dart';
 import 'package:healthlens/main.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -225,18 +226,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         buildMacronutrientCard(
-                          'Carbohydrates',
-                          historyCarbs,
-                          historyCarbs,
-                          (gramCarbs ?? 0),
-                          const Color(0xff4b39ef),
-                          ((historyCarbs >= gramCarbs!)
-                              ? (gramCarbs! / gramCarbs!)
-                              : (historyCarbs / (gramCarbs ?? 1))),
-                        ),
-                        buildMacronutrientCard(
                           'Protein',
-                          historyProtein,
                           historyProtein,
                           (gramProtein ?? 0),
                           const Color(0xffff5963),
@@ -245,8 +235,16 @@ class _HistoryPageState extends State<HistoryPage> {
                               : (historyProtein / (gramProtein ?? 1))),
                         ),
                         buildMacronutrientCard(
+                          'Carbohydrates',
+                          historyCarbs,
+                          (gramCarbs ?? 0),
+                          const Color(0xff4b39ef),
+                          ((historyCarbs >= gramCarbs!)
+                              ? (gramCarbs! / gramCarbs!)
+                              : (historyCarbs / (gramCarbs ?? 1))),
+                        ),
+                        buildMacronutrientCard(
                           'Fats',
-                          historyFats,
                           historyFats,
                           (gramFats ?? 0),
                           const Color(0xff249689),
@@ -466,54 +464,4 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
     );
   }
-}
-
-Widget buildMacronutrientCard(String title, double limitCurrent, double current,
-    int limit, Color color, double percent) {
-  if (current >= limit) {
-    String thislimitation = limit.toString();
-    current = double.tryParse(thislimitation)!;
-    //limitCurrent = current;
-  } /* else {
-    String thislimitation = limit.toString();
-    limitCurrent = double.tryParse(thislimitation)!;
-  } */
-
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 8.0),
-        child: Text(
-          title,
-          style: GoogleFonts.readexPro(
-            fontSize: 14.0,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      ),
-      CircularPercentIndicator(
-        radius: 40.0,
-        lineWidth: 14.0,
-        animation: true,
-        percent: percent,
-        center: Text(
-          '${(current / limit * 100).toStringAsFixed(0)}%',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        circularStrokeCap: CircularStrokeCap.round,
-        progressColor: color,
-      ),
-      Text(
-        '${limitCurrent.toStringAsFixed(0)}/${limit}',
-        style: GoogleFonts.readexPro(
-          fontSize: 12.0,
-          fontWeight: FontWeight.bold,
-          color: color,
-        ),
-      ),
-    ],
-  );
 }
