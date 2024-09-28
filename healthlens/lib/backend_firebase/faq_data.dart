@@ -51,4 +51,9 @@ final List<Map<String, String>> faqItems = [
     'answer':
         "Desired body weight is the optimal weight calculated based on a person's height and is often used as a benchmark for health and medical purposes. It represents a weight that is associated with the lowest risk of health problems, such as heart disease and diabetes.\nFormula to compute DBW:\nDBW = (Height in cm - 100) - [10%(Height in cm - 100)]",
   },
+  {
+    'question': 'What Filipino dishes can the application detect?',
+    'answer':
+        "The application can currently detect the following Filipino dishes:\n\n-Boiled Egg\n-Chicken (Adobong Iga)\n-Chicken (Chicken Inasal)\n-Chicken (Fried Chicken)\n-Fish (Daing na Bangus)\n-Fish (Pan Fried Tilapia)\n-Fish (Sinaing na Tulingan)\n-Pork (Breaded Pork Chop)\n-Pork (Lechon Kawali)\n-Pork (Pork Bistek)\n-Scrambled Egg\n-Sunny Side Up Egg\n-White Rice (Boiled Rice)\n-White Rice (Fried Rice)",
+  }
 ];

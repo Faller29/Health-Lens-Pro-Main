@@ -27,15 +27,17 @@ Future<Map<String, List<WeightData>>> predictWeightChange() async {
     throw Exception("Ideal body weight or current weight is unavailable");
   }
 
-  double weightGainRate = 0.2;
-  double weightLossRate = 0.1;
+  double weightGainRate =
+      0.06; //Assuming you are consuming at least 500 more calories than your required intake.
+  double weightLossRate =
+      0.03; //Assuming you are doing at least 30 minutes of moderate exercise per day.
 
   double formatWeight(double value) {
     return double.parse(value.toStringAsFixed(1));
   }
 
   DateTime currentDate = DateTime.now();
-  DateFormat dateFormat = DateFormat('dd/MM');
+  DateFormat dateFormat = DateFormat('dd/MM/yy');
 
   if (currentWeight < idealBodyWeight) {
     while (currentWeight < idealBodyWeight) {

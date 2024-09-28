@@ -27,16 +27,38 @@ class _FAQPageState extends State<FAQPage> {
         children: [
           Container(
             color: Color(0xff4b39ef),
-            height: 50,
             width: MediaQuery.sizeOf(context).width,
-            child: Center(
-              child: Text(
-                'Frequently Asked Questions',
-                style: GoogleFonts.readexPro(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
+            padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    'Frequently Asked Questions',
+                    style: GoogleFonts.readexPro(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Need Help? Contact our developers:",
+                  style: GoogleFonts.readexPro(
+                    fontSize: 12,
+                    color: Colors.white70,
+                  ),
+                ),
+                Text(
+                  "jpfaller@ccc.edu.ph or 09057206375",
+                  style: GoogleFonts.readexPro(
+                    fontSize: 12,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(

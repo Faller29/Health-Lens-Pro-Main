@@ -552,14 +552,47 @@ Widget buildMacronutrientCard(
         circularStrokeCap: CircularStrokeCap.round,
         progressColor: color,
       ),
-      Text(
+      RichText(
+        textAlign: TextAlign.center,
+        text: TextSpan(
+          style: GoogleFonts.readexPro(
+            fontSize: 12.0,
+            fontWeight: FontWeight.bold,
+            textStyle: const TextStyle(),
+          ),
+          children: [
+            WidgetSpan(
+              child: SizedBox(
+                width: 20,
+              ),
+            ),
+            TextSpan(
+                text: '${(current.toStringAsFixed(0))}/${limit} ',
+                style: GoogleFonts.readexPro(
+                  color: color,
+                )),
+            WidgetSpan(
+              child: Transform.translate(
+                offset: const Offset(0.0, -5.0),
+                child: Text(
+                  '+${(limit! * 0.20).toStringAsFixed(0)}',
+                  style: GoogleFonts.readexPro(
+                      fontSize: 11, color: Color(0xFF009C51)),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+
+      /* Text(
         '${current.toStringAsFixed(0)}/${limit}',
         style: GoogleFonts.readexPro(
           fontSize: 12.0,
           fontWeight: FontWeight.bold,
           color: color,
         ),
-      ),
+      ), */
     ],
   );
 }

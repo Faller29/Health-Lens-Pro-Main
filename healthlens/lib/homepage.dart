@@ -410,8 +410,8 @@ class _HomePage extends State<HomePage> {
               width: 350.0,
               decoration: BoxDecoration(
                 color: const Color(0xffffffff),
-                boxShadow: [
-                  const BoxShadow(
+                boxShadow: const [
+                  BoxShadow(
                     blurRadius: 4.0,
                     color: Color(0x33000000),
                     offset: Offset(
@@ -429,20 +429,6 @@ class _HomePage extends State<HomePage> {
                     height: 10,
                   ),
                   Tooltip(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(
-                          Icons.question_mark,
-                          size: 16,
-                          color: Colors.black54,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                      ],
-                    ),
                     triggerMode: TooltipTriggerMode.tap,
                     message:
                         "You're advised to meet at least 75% of your daily macronutrient needs.\n\nYou can exceed your target by up to 120%, but going beyond that may be harmful to your health.",
@@ -456,6 +442,20 @@ class _HomePage extends State<HomePage> {
                     textStyle: TextStyle(color: Colors.white),
                     preferBelow: true,
                     verticalOffset: 20,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: const [
+                        Icon(
+                          FontAwesomeIcons.circleQuestion,
+                          size: 16,
+                          color: Colors.black54,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    ),
                   ),
                   const Padding(
                     padding:
@@ -498,14 +498,37 @@ class _HomePage extends State<HomePage> {
                         ),
                         footer: Padding(
                           padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                          child: Text(
-                            '${(dailyProtein ?? 0)}/${gramProtein}',
-                            style: GoogleFonts.readexPro(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                              textStyle: const TextStyle(
-                                color: Color(0xffff5963),
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: GoogleFonts.readexPro(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
+                                textStyle: const TextStyle(
+                                  color: Color(0xffff5963),
+                                ),
                               ),
+                              children: [
+                                WidgetSpan(
+                                  child: SizedBox(
+                                    width: 20,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '${(dailyProtein ?? 0)}/${gramProtein}',
+                                ),
+                                WidgetSpan(
+                                  child: Transform.translate(
+                                    offset: const Offset(0.0, -5.0),
+                                    child: Text(
+                                      '+${(gramProtein! * 0.20).toStringAsFixed(0)}',
+                                      style: GoogleFonts.readexPro(
+                                          fontSize: 11,
+                                          color: Color(0xFF009C51)),
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
@@ -541,14 +564,37 @@ class _HomePage extends State<HomePage> {
                         ),
                         footer: Padding(
                           padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                          child: Text(
-                            '${(dailyCarbs ?? 0)}/${gramCarbs}',
-                            style: GoogleFonts.readexPro(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                              textStyle: const TextStyle(
-                                color: Color(0xff4b39ef),
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: GoogleFonts.readexPro(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
+                                textStyle: const TextStyle(
+                                  color: Color(0xff4b39ef),
+                                ),
                               ),
+                              children: [
+                                WidgetSpan(
+                                  child: SizedBox(
+                                    width: 20,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '${(dailyCarbs ?? 0)}/${gramCarbs} ',
+                                ),
+                                WidgetSpan(
+                                  child: Transform.translate(
+                                    offset: const Offset(0.0, -5.0),
+                                    child: Text(
+                                      '+${(gramCarbs! * 0.20).toStringAsFixed(0)}',
+                                      style: GoogleFonts.readexPro(
+                                          fontSize: 11,
+                                          color: Color(0xFF009C51)),
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
@@ -584,14 +630,37 @@ class _HomePage extends State<HomePage> {
                         ),
                         footer: Padding(
                           padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                          child: Text(
-                            '${(dailyFats ?? 0)}/${gramFats}',
-                            style: GoogleFonts.readexPro(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                              textStyle: const TextStyle(
-                                color: Color(0xff249689),
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: GoogleFonts.readexPro(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
+                                textStyle: const TextStyle(
+                                  color: Color(0xff249689),
+                                ),
                               ),
+                              children: [
+                                WidgetSpan(
+                                  child: SizedBox(
+                                    width: 20,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '${(dailyFats ?? 0)}/${gramFats}',
+                                ),
+                                WidgetSpan(
+                                  child: Transform.translate(
+                                    offset: const Offset(0.0, -5.0),
+                                    child: Text(
+                                      '+${(gramFats! * 0.20).toStringAsFixed(0)}',
+                                      style: GoogleFonts.readexPro(
+                                          fontSize: 11,
+                                          color: Color(0xFF009C51)),
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
@@ -684,7 +753,7 @@ class _HomePage extends State<HomePage> {
                                 behavior: SnackBarBehavior.floating,
                                 elevation: 3,
                                 content: Row(
-                                  children: [
+                                  children: const [
                                     CircularProgressIndicator(
                                       strokeWidth: 2,
                                     ),
@@ -782,8 +851,13 @@ class _HomePage extends State<HomePage> {
                                                               ),
                                                               primaryXAxis:
                                                                   const CategoryAxis(
+                                                                labelRotation:
+                                                                    90,
                                                                 initialVisibleMaximum:
-                                                                    5,
+                                                                    7,
+                                                                maximumLabels:
+                                                                    DateTime
+                                                                        .daysPerWeek,
                                                               ),
                                                               primaryYAxis: const NumericAxis(
                                                                   decimalPlaces:
@@ -822,7 +896,7 @@ class _HomePage extends State<HomePage> {
                                                                               .inside,
                                                                       textStyle: TextStyle(
                                                                           fontSize:
-                                                                              10,
+                                                                              8,
                                                                           fontWeight:
                                                                               FontWeight.bold),
                                                                       labelAlignment:
@@ -856,7 +930,7 @@ class _HomePage extends State<HomePage> {
                                                                   EdgeInsets
                                                                       .fromLTRB(
                                                                           10,
-                                                                          0,
+                                                                          10,
                                                                           10,
                                                                           10),
                                                               child: Text(
@@ -894,7 +968,7 @@ class _HomePage extends State<HomePage> {
                                                                         Center(
                                                                       child:
                                                                           Text(
-                                                                        "Congrats! You've reached your desired body weight. Keep it up!",
+                                                                        "Congratulations! You've reached your desired body weight, which is associated with a lower risk of health complications and a reduced mortality rate.",
                                                                         style: GoogleFonts
                                                                             .readexPro(
                                                                           color:
@@ -920,20 +994,23 @@ class _HomePage extends State<HomePage> {
                                                                         Padding(
                                                                           padding: const EdgeInsets
                                                                               .fromLTRB(
+                                                                              5,
                                                                               10,
-                                                                              10,
-                                                                              10,
-                                                                              20),
+                                                                              5,
+                                                                              10),
                                                                           child:
                                                                               Text(
-                                                                            'Estimated Days, Weeks, and Months to achieve Desired Body Weight.',
+                                                                            'Estimated Days, Weeks, and Months to achieve Desired Body Weight:',
                                                                             style:
                                                                                 GoogleFonts.readexPro(
+                                                                              fontSize: 12,
                                                                               textStyle: TextStyle(
                                                                                 color: Colors.black,
                                                                               ),
                                                                               fontWeight: FontWeight.bold,
                                                                             ),
+                                                                            textAlign:
+                                                                                TextAlign.justify,
                                                                           ),
                                                                         ),
                                                                         SizedBox(
@@ -1007,6 +1084,37 @@ class _HomePage extends State<HomePage> {
                                                                       ],
                                                                     ),
                                                                   ),
+                                                            if (desiredBodyWeight! <
+                                                                weight!)
+                                                              Text(
+                                                                'Note: Assuming you are deficiting or burning atleast 250 calories a day',
+                                                                style: GoogleFonts
+                                                                    .readexPro(
+                                                                  color: Colors
+                                                                      .black38,
+                                                                  fontSize: 12,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .justify,
+                                                              ),
+                                                            if (desiredBodyWeight! >
+                                                                weight!)
+                                                              Text(
+                                                                'Note: Assuming you are consuming at least 500 more calories than your required intake',
+                                                                style: GoogleFonts
+                                                                    .readexPro(
+                                                                  color: Colors
+                                                                      .black38,
+                                                                  fontSize: 12,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .justify,
+                                                              ),
+                                                            SizedBox(
+                                                              height: 20,
+                                                            ),
                                                             ElevatedButton(
                                                               onPressed: () => {
                                                                 Navigator.pushNamed(
@@ -1135,7 +1243,7 @@ class _HomePage extends State<HomePage> {
                                                                           .start,
                                                                   children: [
                                                                     Text(
-                                                                      'Desired Body Weight:',
+                                                                      'DBW:',
                                                                       style: GoogleFonts
                                                                           .readexPro(
                                                                         color: const Color(
@@ -1145,6 +1253,8 @@ class _HomePage extends State<HomePage> {
                                                                         fontWeight:
                                                                             FontWeight.normal,
                                                                       ),
+                                                                      semanticsLabel:
+                                                                          "Desired Body Weight",
                                                                     ),
                                                                     Text(
                                                                       'Weight:',

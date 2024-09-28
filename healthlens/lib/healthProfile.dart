@@ -238,6 +238,7 @@ class _healthProfile extends State<healthProfile> {
                 behavior: SnackBarBehavior.floating,
                 elevation: 6,
                 duration: const Duration(seconds: 2),
+                backgroundColor: Colors.red,
                 content: Text(
                     'Update Failed.\nYour current Macronutrients exceeds your new maximum Macronutrients.\nTry Again Tomorrow.')),
           );
@@ -287,15 +288,17 @@ class _healthProfile extends State<healthProfile> {
               behavior: SnackBarBehavior.floating,
               elevation: 3,
               duration: const Duration(seconds: 2),
-              content: Text('Profile updated successfully in Firestore!')),
+              backgroundColor: Colors.green,
+              content: Text('Profile updated successfully!')),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               behavior: SnackBarBehavior.floating,
               elevation: 3,
+              backgroundColor: Colors.red,
               duration: const Duration(seconds: 2),
-              content: Text('Error updating profile in Firestore: $e')),
+              content: Text("Error updating profile\n$e")),
         );
       }
     }

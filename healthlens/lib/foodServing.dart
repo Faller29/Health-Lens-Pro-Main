@@ -426,6 +426,7 @@ class _FoodServingState extends State<FoodServing> {
                       SnackBar(
                           behavior: SnackBarBehavior.floating,
                           elevation: 3,
+                          backgroundColor: Colors.red,
                           duration: const Duration(seconds: 2),
                           content: Text(
                               'This food exceeds your daily macronutrient limits!')),
@@ -450,6 +451,7 @@ class _FoodServingState extends State<FoodServing> {
           SnackBar(
               behavior: SnackBarBehavior.floating,
               elevation: 3,
+              backgroundColor: Colors.red,
               duration: const Duration(seconds: 2),
               content:
                   Text('This food exceeds your daily macronutrient limits!')),
@@ -640,7 +642,7 @@ class _FoodServingState extends State<FoodServing> {
       );
       Navigator.of(context).pop();
     } catch (e) {
-      print('Error updating user macros: $e');
+      print('Error updating user macros\n$e');
     }
   }
 
@@ -704,11 +706,12 @@ class _FoodServingState extends State<FoodServing> {
                                 borderRadius: BorderRadius.circular(5),
                                 child: ListTile(
                                   shape: RoundedRectangleBorder(
+                                    /* 
                                     side: BorderSide(
                                         color: const Color.fromARGB(
                                             255, 95, 95, 95),
-                                        width: 1),
-                                    borderRadius: BorderRadius.circular(5),
+                                        width: 1), */
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   isThreeLine: true,
                                   leading: Icon(Icons.restaurant_menu_outlined),

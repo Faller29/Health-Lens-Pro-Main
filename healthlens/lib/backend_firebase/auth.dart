@@ -71,7 +71,11 @@ class Auth {
       await prefs.setInt('dailyFats', _parseInt(userMacros['fats']));
       await prefs.setInt('dailyCalories', _parseInt(userMacros['calories']));
       await prefs.setString('lastLogIn', currentDate);
-
+      dailyCalories = userMacros['calories'];
+      dailyCarbs = userMacros['carbs'];
+      dailyProtein = userMacros['proteins'];
+      dailyFats = userMacros['fats'];
+      lastLogIn = userMacros['lastLogIn'];
       print("signIn success");
       saveData();
       print('''
@@ -107,7 +111,9 @@ class Auth {
           Calories: $dailyCalories kcal
       ''');
       print('success Log in');
-
+      print(currentDate);
+      print(lastLogIn);
+      print("log in state: ${(currentDate != lastLogIn)}");
       if (currentDate != lastLogIn) {
         print('not tru sa current date vs last');
         await FirebaseFirestore.instance
@@ -162,10 +168,11 @@ class Auth {
     await FirebaseFirestore.instance
         .collection('userMacros')
         .doc(thisUser?.uid)
-        .update(
+        .set(
       {
         'lastLogIn': currentDate,
       },
+      SetOptions(merge: true),
     );
     await _auth.signOut();
     thisUser = null;

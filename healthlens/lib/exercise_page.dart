@@ -97,6 +97,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                         behavior: SnackBarBehavior.floating,
                                         elevation: 3,
                                         duration: const Duration(seconds: 2),
+                                        backgroundColor: Colors.green,
                                         content:
                                             Text('Exercise activity saved!')),
                                   );
@@ -107,6 +108,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                         behavior: SnackBarBehavior.floating,
                                         elevation: 3,
                                         duration: const Duration(seconds: 2),
+                                        backgroundColor: Colors.red,
                                         content:
                                             Text('Failed to save activity.')),
                                   );

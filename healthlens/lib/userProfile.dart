@@ -117,8 +117,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
             SnackBar(
                 behavior: SnackBarBehavior.floating,
                 elevation: 3,
+                backgroundColor: Colors.red,
                 duration: const Duration(seconds: 2),
-                content: Text('Error uploading profile picture: $e')),
+                content: Text('Error uploading profile picture\n$e')),
           );
         }
       }
@@ -163,7 +164,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
             behavior: SnackBarBehavior.floating,
             elevation: 3,
             duration: const Duration(seconds: 2),
-            content: Text('Profile updated successfully in Firestore!'),
+            backgroundColor: Colors.green,
+            content: Text('Profile updated successfully!'),
           ),
         );
         Navigator.pop(context, true);
@@ -173,7 +175,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
               behavior: SnackBarBehavior.floating,
               elevation: 3,
               duration: const Duration(seconds: 2),
-              content: Text('Error updating profile in Firestore: $e')),
+              backgroundColor: Colors.red,
+              content: Text('Error updating profile\n$e')),
         );
       }
     }

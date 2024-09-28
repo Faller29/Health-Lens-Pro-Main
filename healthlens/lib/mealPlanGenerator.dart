@@ -300,151 +300,157 @@ class _MealPlanPageState extends State<MealPlanPage> {
                   List<Map<String, dynamic>> mealPlan =
                       mealPlans[index]['mealPlan'];
                   return Card(
-                    elevation: 4,
+                    elevation: 3,
                     margin: EdgeInsets.symmetric(vertical: 8),
-                    child: Theme(
-                      data: Theme.of(context)
-                          .copyWith(dividerColor: Colors.transparent),
-                      child: ExpansionTile(
-                        title: Text(
-                          'Meal Plan ${index + 1}',
-                          style: GoogleFonts.readexPro(
-                            textStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
+                    child: Material(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          dividerColor: Colors.transparent,
                         ),
-                        subtitle: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: ExpansionTile(
+                          title: Text(
+                            'Meal Plan ${index + 1}',
+                            style: GoogleFonts.readexPro(
+                              textStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          subtitle: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Total Macronutrients:',
+                                style: GoogleFonts.readexPro(
+                                  textStyle: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                'Carbs: ${mealPlans[index]['totalCarbs']}g, '
+                                'Fats: ${mealPlans[index]['totalFats']}g, '
+                                'Proteins: ${mealPlans[index]['totalProteins']}g',
+                                style: GoogleFonts.readexPro(
+                                  textStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                           children: [
-                            Text(
-                              'Total Macronutrients:',
-                              style: GoogleFonts.readexPro(
-                                textStyle: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                ),
+                            Column(
+                              children: mealPlan.map((meal) {
+                                return ListTile(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 8.0),
+                                  title: Text(
+                                    '${meal['meal']} - ${meal['part']}',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text(
+                                    'Quantity: x${meal['quantity']}, '
+                                    'Carbs: ${meal['carbs']}g, '
+                                    'Fats: ${meal['fats']}g, '
+                                    'Proteins: ${meal['proteins']}g',
+                                  ),
+                                  trailing:
+                                      Icon(Icons.fastfood, color: Colors.teal),
+                                );
+                              }).toList(),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.greenAccent,
                               ),
-                            ),
-                            Text(
-                              'Carbs: ${mealPlans[index]['totalCarbs']}g, '
-                              'Fats: ${mealPlans[index]['totalFats']}g, '
-                              'Proteins: ${mealPlans[index]['totalProteins']}g',
-                              style: GoogleFonts.readexPro(
-                                textStyle: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        children: [
-                          Column(
-                            children: mealPlan.map((meal) {
-                              return ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 8.0),
-                                title: Text(
-                                  '${meal['meal']} - ${meal['part']}',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text(
-                                  'Quantity: x${meal['quantity']}, '
-                                  'Carbs: ${meal['carbs']}g, '
-                                  'Fats: ${meal['fats']}g, '
-                                  'Proteins: ${meal['proteins']}g',
-                                ),
-                                trailing:
-                                    Icon(Icons.fastfood, color: Colors.teal),
-                              );
-                            }).toList(),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.greenAccent,
-                            ),
-                            onPressed: () {
-                              // Show confirmation dialog
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Center(
-                                      child: Text(
-                                        'Confirm Save',
+                              onPressed: () {
+                                // Show confirmation dialog
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Center(
+                                        child: Text(
+                                          'Confirm Save',
+                                          style: GoogleFonts.readexPro(
+                                            color: Colors.black,
+                                            fontSize: 20.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      content: Text(
+                                        'Do you want to save this meal plan?',
                                         style: GoogleFonts.readexPro(
-                                          color: Colors.black,
-                                          fontSize: 20.0,
+                                          color: Colors.black54,
+                                          fontSize: 14.0,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    ),
-                                    content: Text(
-                                      'Do you want to save this meal plan?',
-                                      style: GoogleFonts.readexPro(
-                                        color: Colors.black54,
-                                        fontSize: 14.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text(
-                                          'Cancel',
-                                          style: GoogleFonts.readexPro(
-                                            color: Colors.red,
-                                            fontSize: 14.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.bold,
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text(
+                                            'Cancel',
+                                            style: GoogleFonts.readexPro(
+                                              color: Colors.red,
+                                              fontSize: 14.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () async {
-                                          // Save all meals to Firestore with context
-                                          await saveMealsToFirestore(
-                                              context, mealPlan);
+                                        TextButton(
+                                          onPressed: () async {
+                                            // Save all meals to Firestore with context
+                                            await saveMealsToFirestore(
+                                                context, mealPlan);
 
-                                          Navigator.of(context)
-                                              .pop(); // Close the dialog
-                                        },
-                                        child: Text(
-                                          'Confirm',
-                                          style: GoogleFonts.readexPro(
-                                            color: Colors.green,
-                                            fontSize: 14.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.bold,
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                          },
+                                          child: Text(
+                                            'Confirm',
+                                            style: GoogleFonts.readexPro(
+                                              color: Colors.green,
+                                              fontSize: 14.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            child: Text(
-                              'Save Meal Plan',
-                              style: GoogleFonts.readexPro(
-                                fontSize: 14.0,
-                                textStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text(
+                                'Save Meal Plan',
+                                style: GoogleFonts.readexPro(
+                                  fontSize: 14.0,
+                                  textStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                        ],
+                            SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );

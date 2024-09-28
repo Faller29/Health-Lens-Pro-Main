@@ -117,7 +117,7 @@ final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
   'Pork (Pork Bistek)': {
     //1 slice ng tenderloin
     //Warning lang na iwasan yung matatabang part (para sa lahat ng sakit toh hyper, obesity, diabetes)
-    'Pork Chop': {'fats': 22, 'carbs': 10, 'proteins': 79},
+    'Pork Chop': {'fats': 7, 'carbs': 3, 'proteins': 26},
   },
   'Boiled Egg': {
     //check

@@ -189,6 +189,7 @@ class _SetupPageState extends State<SetupPage> {
                   behavior: SnackBarBehavior.floating,
                   elevation: 3,
                   duration: const Duration(seconds: 2),
+                  backgroundColor: Colors.red,
                   content: Text('Sign up failed. Please try again.')),
             );
             setState(() {
@@ -306,10 +307,11 @@ class _SetupPageState extends State<SetupPage> {
                                                   .fromSTEB(
                                                       0.0, 4.0, 0.0, 15.0),
                                               child: Text(
-                                                'HealthLens Pro is an Application to Help Manage Macronutrients intake.........',
+                                                'HealthLens Pro is a mobile application designed to raise awareness and guide individuals about their chronic illnesses. This is to help them reduce health-risk-related issues.',
                                                 style: GoogleFonts.readexPro(
                                                   fontSize: 14.0,
                                                 ),
+                                                textAlign: TextAlign.justify,
                                               ),
                                             ),
                                           ),
