@@ -466,6 +466,75 @@ class _ProfilePageState extends State<ProfilePage> {
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     child: InkWell(
                       onTap: () async {
+                        appTutorial(context);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Icon(
+                              Icons.question_mark,
+                              color: Color(0xFF57636C),
+                              size: 24.0,
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    12.0, 0.0, 0.0, 0.0),
+                                child: Text(
+                                  'How To Use',
+                                  style: GoogleFonts.readexPro(
+                                    color: Color(0xFF14181B),
+                                    fontSize: 16.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: AlignmentDirectional(0.9, 0.0),
+                              child: Icon(
+                                Icons.arrow_forward_ios,
+                                color: Color(0xFF57636C),
+                                size: 18.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(16.0, 12.0, 16.0, 0.0),
+                child: Container(
+                  width: double.infinity,
+                  height: 60.0,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 5.0,
+                        color: Color(0x3416202A),
+                        offset: Offset(
+                          0.0,
+                          2.0,
+                        ),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(12.0),
+                    shape: BoxShape.rectangle,
+                  ),
+                  child: Material(
+                    color: Colors.white,
+                    elevation: 2,
+                    borderRadius: BorderRadius.circular(10),
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    child: InkWell(
+                      onTap: () async {
                         final result =
                             await Navigator.pushNamed(context, '/faqPage');
                         if (result == true) {

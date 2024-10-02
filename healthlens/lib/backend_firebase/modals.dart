@@ -2,9 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlens/setup.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+
+import 'package:smooth_page_indicator/smooth_page_indicator.dart'
+    as smooth_page_indicator;
 
 void mealPlanGeneratorSelector(BuildContext context) async {
   showCupertinoModalPopup(
@@ -595,4 +600,1226 @@ Widget buildMacronutrientCard(
       ), */
     ],
   );
+}
+
+Future<void> appTutorial(BuildContext context) {
+  int _currentPageIndex = 0;
+
+  return showCupertinoModalPopup(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          PageController _pageController = PageController(initialPage: 0);
+          String nextText = "Next";
+          setState(() {
+            if (_currentPageIndex == 4) {
+              nextText = "Finish";
+            }
+          });
+          void _handlePageChange(int index) {
+            setState(() {
+              _currentPageIndex = index;
+              if (_currentPageIndex == 4) {
+                nextText = "Finish";
+              } else {
+                nextText = "Next";
+              }
+            });
+          }
+
+          void _nextPage() {
+            if (_currentPageIndex < 4) {
+              _pageController.nextPage(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.ease,
+              );
+            }
+            print(_currentPageIndex);
+            print((_currentPageIndex >= 4));
+            if (_currentPageIndex >= 4) {
+              Navigator.of(context).pop(); // Close the modal on "Finish"
+            }
+          }
+
+          void _previousPage() {
+            _pageController.previousPage(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.ease,
+            );
+          }
+
+          return Center(
+            child: Card(
+              color: Colors.white,
+              margin: EdgeInsets.fromLTRB(10, 70, 10, 70),
+              child: Theme(
+                data: ThemeData(
+                  textTheme: GoogleFonts.readexProTextTheme(),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Text(
+                        'How To use',
+                        style: GoogleFonts.readexPro(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          PageView(
+                            controller: _pageController,
+                            scrollDirection: Axis.horizontal,
+                            physics: NeverScrollableScrollPhysics(),
+                            onPageChanged: _handlePageChange,
+                            children: [
+                              PageViewPage(
+                                children: [
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Understanding Dashboard',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          RichText(
+                                              textAlign: TextAlign.justify,
+                                              text: TextSpan(
+                                                  style: GoogleFonts.readexPro(
+                                                      color: Colors.black),
+                                                  children: [
+                                                    TextSpan(
+                                                      text: "Dashboard ",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    TextSpan(
+                                                        text:
+                                                            "contains utilities that will help user in their daily management of macronutrients intake. It consists of Macronutrients section which shows the user's current Macronutrients Count and Calories. "),
+                                                  ])),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Card(
+                                            color: Colors.white,
+                                            shadowColor: Colors.black,
+                                            elevation: 3,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                children: [
+                                                  RichText(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    text: TextSpan(
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                              color:
+                                                                  Colors.black),
+                                                      children: [
+                                                        TextSpan(text: "The "),
+                                                        TextSpan(
+                                                          text: "Dashboard ",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        TextSpan(
+                                                            text:
+                                                                "consists of Macronutrients section which shows the User's current Macronutrients Count and Calories.")
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  InkWell(
+                                                      onTap: () {
+                                                        // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                        showCupertinoDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return FullImageModal(
+                                                                imagePath:
+                                                                    'assets/images/sum.jpg');
+                                                          },
+                                                        );
+                                                      },
+                                                      child: Image.asset(
+                                                        'assets/images/sum.jpg',
+                                                        height: 200,
+                                                        width:
+                                                            MediaQuery.sizeOf(
+                                                                    context)
+                                                                .width,
+                                                        fit: BoxFit.cover,
+                                                      )),
+                                                  Text(
+                                                    'Click image to full view',
+                                                    style: TextStyle(
+                                                        fontSize: 11,
+                                                        color: Colors.black54),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(
+                                                    "1. Shows the Macronutrients count in percentage and your current macronutrients count as well as the maximum macronutrients that you must fill.\n\n2. Represents the additional 20% from your maximum macronutrients giving you a total of 120% of macronutrients that you can fill daily. Once the system detects that the user will exceed the120% of macronutrients consumption, it will not let the user to add more as the system warns the user that it will be harmful for their health.",
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          //HealthInfo
+                                          Card(
+                                            elevation: 3,
+                                            color: Colors.white,
+                                            shadowColor: Colors.black,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                children: [
+                                                  InkWell(
+                                                      onTap: () {
+                                                        // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                        showCupertinoDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return FullImageModal(
+                                                                imagePath:
+                                                                    'assets/images/2.jpg');
+                                                          },
+                                                        );
+                                                      },
+                                                      child: Card(
+                                                        elevation: 3,
+                                                        child: Image.asset(
+                                                          'assets/images/2.jpg',
+                                                          height: 200,
+                                                          width:
+                                                              MediaQuery.sizeOf(
+                                                                      context)
+                                                                  .width,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      )),
+                                                  Text(
+                                                    'Click image to full view',
+                                                    style: TextStyle(
+                                                        fontSize: 11,
+                                                        color: Colors.black54),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  RichText(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    text: TextSpan(
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                              color:
+                                                                  Colors.black),
+                                                      children: [
+                                                        TextSpan(text: "The"),
+                                                        TextSpan(
+                                                          text:
+                                                              " Health Information ",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        TextSpan(
+                                                            text:
+                                                                "button contains information about the User's Health and Weight Prediction. It depicts the predicted estimation of weight in Days, Weeks, and Months as well as the user’s summary of health details. This also contains the harmful food that the user should avoid or be aware. ")
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              PageViewPage(
+                                children: [
+                                  Expanded(
+                                      child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Understanding Dashboard',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        RichText(
+                                            textAlign: TextAlign.justify,
+                                            text: TextSpan(
+                                                style: GoogleFonts.readexPro(
+                                                    color: Colors.black),
+                                                children: [
+                                                  TextSpan(
+                                                    text:
+                                                        "HealthLens Pro also provides user to help in creating their  ",
+                                                  ),
+                                                  TextSpan(
+                                                    text: "Meal Plan ",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        "by clicking the Meal Plan button and selecting between creating on your own or letting the application create Meal Plan options that you can select.",
+                                                  ),
+                                                ])),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        InkWell(
+                                            onTap: () {
+                                              // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                              showCupertinoDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return FullImageModal(
+                                                      imagePath:
+                                                          'assets/images/3.jpg');
+                                                },
+                                              );
+                                            },
+                                            child: Image.asset(
+                                              'assets/images/3.jpg',
+                                              height: 200,
+                                              width: MediaQuery.sizeOf(context)
+                                                  .width,
+                                              fit: BoxFit.cover,
+                                            )),
+                                        Text(
+                                          'Click image to full view',
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.black54),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Card(
+                                          color: Colors.white,
+                                          shadowColor: Colors.black,
+                                          elevation: 3,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: [
+                                                RichText(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    text: TextSpan(
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                                color: Colors
+                                                                    .black),
+                                                        children: [
+                                                          TextSpan(
+                                                            text:
+                                                                "1. Manual Button  ",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "will let the user create their own meal plan that they see fit for their diet. The user can choose to the variety of food present in the application.",
+                                                          ),
+                                                        ])),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                InkWell(
+                                                    onTap: () {
+                                                      // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FullImageModal(
+                                                              imagePath:
+                                                                  'assets/images/4.jpg');
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Image.asset(
+                                                      'assets/images/4.jpg',
+                                                      height: 200,
+                                                      width: MediaQuery.sizeOf(
+                                                              context)
+                                                          .width,
+                                                      fit: BoxFit.cover,
+                                                    )),
+                                                Text(
+                                                  'Click image to full view',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.black54),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                RichText(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    text: TextSpan(
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                                color: Colors
+                                                                    .black),
+                                                        children: [
+                                                          TextSpan(
+                                                            text: " 1.1  ",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "Once the user clicked on a certain food, there are instance where the user will see a ",
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "Warning Icon ",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "This indicated that specific food is harmful to the user and advised to not include it in their Meal Plan.",
+                                                          ),
+                                                        ])),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                InkWell(
+                                                    onTap: () {
+                                                      // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FullImageModal(
+                                                              imagePath:
+                                                                  'assets/images/5.jpg');
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Image.asset(
+                                                      'assets/images/5.jpg',
+                                                      height: 200,
+                                                      width: MediaQuery.sizeOf(
+                                                              context)
+                                                          .width,
+                                                      fit: BoxFit.cover,
+                                                    )),
+                                                Text(
+                                                  'Click image to full view',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.black54),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        //HealthInfo
+                                        Card(
+                                          elevation: 3,
+                                          color: Colors.white,
+                                          shadowColor: Colors.black,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: [
+                                                RichText(
+                                                  textAlign: TextAlign.justify,
+                                                  text: TextSpan(
+                                                    style:
+                                                        GoogleFonts.readexPro(
+                                                            color:
+                                                                Colors.black),
+                                                    children: [
+                                                      TextSpan(
+                                                        text:
+                                                            "Auto Generate Button ",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      TextSpan(
+                                                          text:
+                                                              "offers a range of predetermined list of meal plan for the user. The system will create an automatic meal plan for the user considering their health which means that the system will not provide a food that will be harmful to the user.")
+                                                    ],
+                                                  ),
+                                                ),
+                                                InkWell(
+                                                    onTap: () {
+                                                      // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FullImageModal(
+                                                              imagePath:
+                                                                  'assets/images/6.jpg');
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Card(
+                                                      elevation: 3,
+                                                      child: Image.asset(
+                                                        'assets/images/6.jpg',
+                                                        height: 200,
+                                                        width:
+                                                            MediaQuery.sizeOf(
+                                                                    context)
+                                                                .width,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    )),
+                                                Text(
+                                                  'Click image to full view',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.black54),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ))
+                                ],
+                              ),
+                              PageViewPage(
+                                children: [
+                                  Expanded(
+                                      child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Understanding Camera Page',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        RichText(
+                                            textAlign: TextAlign.justify,
+                                            text: TextSpan(
+                                                style: GoogleFonts.readexPro(
+                                                    color: Colors.black),
+                                                children: [
+                                                  TextSpan(
+                                                    text: "Camera Page ",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        " uses object detection for you to scan Food that you are about to eat.",
+                                                  ),
+                                                ])),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+
+                                        Card(
+                                          color: Colors.white,
+                                          shadowColor: Colors.black,
+                                          elevation: 3,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: [
+                                                RichText(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    text: TextSpan(
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                                color: Colors
+                                                                    .black),
+                                                        children: [
+                                                          TextSpan(
+                                                              text:
+                                                                  "Once you click"),
+                                                          TextSpan(
+                                                            text:
+                                                                " Start Detection ",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "It will start scanning for food for 10 seconds. If the Application does not detect any food within 10 seconds, it will prompt the user to rescan again.",
+                                                          ),
+                                                        ])),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                InkWell(
+                                                    onTap: () {
+                                                      // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FullImageModal(
+                                                              imagePath:
+                                                                  'assets/images/8.jpg');
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Image.asset(
+                                                      'assets/images/8.jpg',
+                                                      height: 200,
+                                                      width: MediaQuery.sizeOf(
+                                                              context)
+                                                          .width,
+                                                      fit: BoxFit.cover,
+                                                    )),
+                                                Text(
+                                                  'Click image to full view',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.black54),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        //HealthInfo
+                                        Card(
+                                          elevation: 3,
+                                          color: Colors.white,
+                                          shadowColor: Colors.black,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: [
+                                                RichText(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    text: TextSpan(
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                                color: Colors
+                                                                    .black),
+                                                        children: [
+                                                          TextSpan(
+                                                            text:
+                                                                "If the application Detected a Food, it will List the scan Food in the ",
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "Foods Detected Section ",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ])),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                InkWell(
+                                                    onTap: () {
+                                                      // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FullImageModal(
+                                                              imagePath:
+                                                                  'assets/images/9.jpg');
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Image.asset(
+                                                      'assets/images/9.jpg',
+                                                      height: 200,
+                                                      width: MediaQuery.sizeOf(
+                                                              context)
+                                                          .width,
+                                                      fit: BoxFit.cover,
+                                                    )),
+                                                Text(
+                                                  'Click image to full view',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.black54),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                RichText(
+                                                  textAlign: TextAlign.justify,
+                                                  text: TextSpan(
+                                                    style:
+                                                        GoogleFonts.readexPro(
+                                                            color:
+                                                                Colors.black),
+                                                    children: [
+                                                      TextSpan(
+                                                          text:
+                                                              "If the you are satisfied in the results/foods detected, the click the "),
+                                                      TextSpan(
+                                                        text:
+                                                            "Eat Food Button ",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      TextSpan(
+                                                          text:
+                                                              "to continue to the next page where you are to confirm the details.")
+                                                    ],
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        Card(
+                                          elevation: 3,
+                                          color: Colors.white,
+                                          shadowColor: Colors.black,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: [
+                                                RichText(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    text: TextSpan(
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                                color: Colors
+                                                                    .black),
+                                                        children: [
+                                                          TextSpan(
+                                                            text:
+                                                                "This is the ",
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "Food Serving Page",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                " where you will be reviewing the details or serving and quantity of the food detected by the application. If there are any Missing foods, you can Click the ",
+                                                          ),
+                                                          TextSpan(
+                                                            text: "Add button ",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "to add a food that is not detected by the Application.\n",
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "The user has also the power to edit the food such as adding quantity by clicking the plus (+) and minus (-) button as well as delete the food by clicking the delete button if in any case the food detected is wrong.",
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "Once done and completed, the user can click ",
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "Confirm button ",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                                "to add this in your data and to update your Macronutrients",
+                                                          ),
+                                                        ])),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                InkWell(
+                                                    onTap: () {
+                                                      // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FullImageModal(
+                                                              imagePath:
+                                                                  'assets/images/10.jpg');
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Image.asset(
+                                                      'assets/images/10.jpg',
+                                                      height: 200,
+                                                      width: MediaQuery.sizeOf(
+                                                              context)
+                                                          .width,
+                                                      fit: BoxFit.cover,
+                                                    )),
+                                                Text(
+                                                  'Click image to full view',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.black54),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                InkWell(
+                                                    onTap: () {
+                                                      // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FullImageModal(
+                                                              imagePath:
+                                                                  'assets/images/11.jpg');
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Image.asset(
+                                                      'assets/images/11.jpg',
+                                                      width: MediaQuery.sizeOf(
+                                                              context)
+                                                          .width,
+                                                      fit: BoxFit.fill,
+                                                    )),
+                                                Text(
+                                                  'Click image to full view',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.black54),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ))
+                                ],
+                              ),
+                              PageViewPage(
+                                children: [
+                                  Expanded(
+                                      child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Understanding Analytics Page',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        RichText(
+                                            textAlign: TextAlign.justify,
+                                            text: TextSpan(
+                                                style: GoogleFonts.readexPro(
+                                                    color: Colors.black),
+                                                children: [
+                                                  TextSpan(
+                                                    text:
+                                                        "This page will show the users progress in terms of consumption of the Macronutrients. The user can view their progress for the last 24 hours, 7 Days, and 30 Days by just swiping left or right the arrow. The user can also view individual Macronutrients by just clicking the Fats, Protein, and Carbohydrates. Lastly in the Analytics Page, the user can view their history by just clicking the ",
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        "Check History Button ",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ])),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        InkWell(
+                                            onTap: () {
+                                              // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                              showCupertinoDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return FullImageModal(
+                                                      imagePath:
+                                                          'assets/images/12.jpg');
+                                                },
+                                              );
+                                            },
+                                            child: Image.asset(
+                                              'assets/images/12.jpg',
+                                              height: 200,
+                                              width: MediaQuery.sizeOf(context)
+                                                  .width,
+                                              fit: BoxFit.cover,
+                                            )),
+                                        Text(
+                                          'Click image to full view',
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.black54),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        InkWell(
+                                            onTap: () {
+                                              // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                              showCupertinoDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return FullImageModal(
+                                                      imagePath:
+                                                          'assets/images/13.jpg');
+                                                },
+                                              );
+                                            },
+                                            child: Image.asset(
+                                              'assets/images/13.jpg',
+                                              width: MediaQuery.sizeOf(context)
+                                                  .width,
+                                              fit: BoxFit.fill,
+                                            )),
+                                        Text(
+                                          'Click image to full view',
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.black54),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                      ],
+                                    ),
+                                  ))
+                                ],
+                              ),
+                              PageViewPage(
+                                children: [
+                                  Expanded(
+                                      child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Understanding Profile Page',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        RichText(
+                                            textAlign: TextAlign.justify,
+                                            text: TextSpan(
+                                                style: GoogleFonts.readexPro(
+                                                    color: Colors.black),
+                                                children: [
+                                                  TextSpan(
+                                                    text:
+                                                        "Users can edit different information by just clicking the buttons such as ",
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        "Edit User Profile and Edit Health Profile.",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        "The user can also change their pin code in this page. Lastly, the user can view general information such as Frequently Asked Questions by clicking the ",
+                                                  ),
+                                                  TextSpan(
+                                                    text: "FAQs ",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        "and get to know the amazing team behind the HealthLens Pro by just clicking the ",
+                                                  ),
+                                                  TextSpan(
+                                                    text: "About Us.",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ])),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        InkWell(
+                                            onTap: () {
+                                              // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                              showCupertinoDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return FullImageModal(
+                                                      imagePath:
+                                                          'assets/images/14.jpg');
+                                                },
+                                              );
+                                            },
+                                            child: Image.asset(
+                                              'assets/images/14.jpg',
+                                              height: 200,
+                                              width: MediaQuery.sizeOf(context)
+                                                  .width,
+                                              fit: BoxFit.cover,
+                                            )),
+                                        Text(
+                                          'Click image to full view',
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.black54),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                      ],
+                                    ),
+                                  ))
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Align(
+                      alignment: AlignmentDirectional(-1.0, 1.0),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            24.0, 0.0, 0.0, 16.0),
+                        child: smooth_page_indicator.SmoothPageIndicator(
+                          controller: _pageController,
+                          count: 5,
+                          axisDirection: Axis.horizontal,
+                          effect: smooth_page_indicator.ExpandingDotsEffect(
+                            expansionFactor: 3.0,
+                            spacing: 8.0,
+                            radius: 16.0,
+                            dotWidth: 30.0,
+                            dotHeight: 10.0,
+                            dotColor: Color.fromARGB(40, 75, 57, 239),
+                            activeDotColor: Color(0xff4b39ef),
+                            paintStyle: PaintingStyle.fill,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 10.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _previousPage,
+                            child: Text('Back'),
+                            style: TextButton.styleFrom(
+                              backgroundColor: Color(0xff4b39ef),
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 50,
+                          ),
+                          ElevatedButton(
+                            onPressed: _nextPage,
+                            child: Text(nextText),
+                            style: TextButton.styleFrom(
+                              backgroundColor: Color(0xff4b39ef),
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+class FullImageModal extends StatelessWidget {
+  final String imagePath;
+
+  FullImageModal({required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Close the modal when tapped
+        Navigator.pop(context);
+      },
+      child: Container(
+        /*  margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
+        height: (MediaQuery.sizeOf(context).height - 100),
+        width: (MediaQuery.sizeOf(context).width -
+            (MediaQuery.sizeOf(context).width * 0.1)), */
+        color: Colors.black.withOpacity(0.5),
+        child: Center(
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.contain, // Make sure the image fits within the screen
+            height: (MediaQuery.sizeOf(context).height -
+                (MediaQuery.sizeOf(context).height * 0.2)),
+            width: (MediaQuery.sizeOf(context).width -
+                (MediaQuery.sizeOf(context).width * 0.2)),
+          ),
+        ),
+      ),
+    );
+  }
 }

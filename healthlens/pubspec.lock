@@ -25,22 +25,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.1"
-  animated_text_kit:
-    dependency: "direct main"
-    description:
-      name: animated_text_kit
-      sha256: "37392a5376c9a1a503b02463c38bc0342ef814ddbb8f9977bc90f2a84b22fa92"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.2.2"
-  archive:
-    dependency: transitive
-    description:
-      name: archive
-      sha256: cb6a278ef2dbb298455e1a713bda08524a175630ec643a242c399c932a0a1f7d
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.6.1"
   args:
     dependency: transitive
     description:
@@ -129,14 +113,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.5"
-  carousel_slider:
-    dependency: "direct main"
-    description:
-      name: carousel_slider
-      sha256: "9c695cc963bf1d04a47bd6021f68befce8970bcd61d24938e1fb0918cf5d9c42"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.2.1"
   characters:
     dependency: transitive
     description:
@@ -185,22 +161,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
-  community_charts_common:
-    dependency: transitive
-    description:
-      name: community_charts_common
-      sha256: d997ade57f15490346de46efbe23805d378a672aafbf5e47e19517964b671009
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.4"
-  community_charts_flutter:
-    dependency: transitive
-    description:
-      name: community_charts_flutter
-      sha256: "4614846b99782ab79b613687704865e5468ecada3f0ad1afe1cdc3ff5b727f72"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.4"
   convert:
     dependency: transitive
     description:
@@ -241,62 +201,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
-  crystal_navigation_bar:
-    dependency: "direct main"
-    description:
-      name: crystal_navigation_bar
-      sha256: db915a537321978f674ab65b0aef44a7be728589a79923da9a7176dde9b12327
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.8"
-  curved_navigation_bar:
-    dependency: "direct main"
-    description:
-      name: curved_navigation_bar
-      sha256: bb4ab128fcb6f4a9f0f1f72d227db531818b20218984789777f049fcbf919279
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.6"
-  curved_navigation_bar_with_label:
-    dependency: "direct main"
-    description:
-      name: curved_navigation_bar_with_label
-      sha256: "8535749430690991f55ecf6d5987059048bb3ee00f5779dda2c34eb4199c12dc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.4"
-  d_chart:
-    dependency: "direct main"
-    description:
-      name: d_chart
-      sha256: ca46ca94058075591150bd6c4b93541112d58314bb843873f39e820ee7005d01
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.6.9"
-  device_info_plus:
-    dependency: "direct main"
-    description:
-      name: device_info_plus
-      sha256: a7fd703482b391a87d60b6061d04dfdeab07826b96f9abd8f5ed98068acc0074
-      url: "https://pub.dev"
-    source: hosted
-    version: "10.1.2"
-  device_info_plus_platform_interface:
-    dependency: transitive
-    description:
-      name: device_info_plus_platform_interface
-      sha256: "282d3cf731045a2feb66abfe61bbc40870ae50a3ed10a4d3d217556c35c8c2ba"
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.0.1"
   equatable:
     dependency: "direct main"
     description:
@@ -441,14 +345,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  fl_chart:
-    dependency: "direct main"
-    description:
-      name: fl_chart
-      sha256: d0f0d49112f2f4b192481c16d05b6418bd7820e021e265a3c22db98acf7ed7fb
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.68.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -462,54 +358,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.1"
-  flutter_keyboard_visibility:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility
-      sha256: "98664be7be0e3ffca00de50f7f6a287ab62c763fc8c762e0a21584584a3ff4f8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.0"
-  flutter_keyboard_visibility_linux:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_linux
-      sha256: "6fba7cd9bb033b6ddd8c2beb4c99ad02d728f1e6e6d9b9446667398b2ac39f08"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  flutter_keyboard_visibility_macos:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_macos
-      sha256: c5c49b16fff453dfdafdc16f26bdd8fb8d55812a1d50b0ce25fc8d9f2e53d086
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  flutter_keyboard_visibility_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_platform_interface
-      sha256: e43a89845873f7be10cb3884345ceb9aebf00a659f479d1c8f4293fcb37022a4
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
-  flutter_keyboard_visibility_web:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_web
-      sha256: d3771a2e752880c79203f8d80658401d0c998e4183edca05a149f5098ce6e3d1
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
-  flutter_keyboard_visibility_windows:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_windows
-      sha256: fc4b0f0b6be9b93ae527f3d527fb56ee2d918cd88bbca438c478af7bcfd0ef73
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -526,22 +374,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.19"
-  flutter_popup:
-    dependency: "direct main"
-    description:
-      name: flutter_popup
-      sha256: "8d653ebb04f0e334797aeb5b49eaf7653c57012e1a7cdeac09297dacf79a6524"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.0"
-  flutter_settings_ui:
-    dependency: "direct main"
-    description:
-      name: flutter_settings_ui
-      sha256: dcc506fab724192594e5c232b6214a941abd6e7b5151626635b89258fadbc17c
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -680,14 +512,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
-  image:
-    dependency: "direct main"
-    description:
-      name: image
-      sha256: "2237616a36c0d69aef7549ab439b833fb7f9fb9fc861af2cc9ac3eedddd69ca8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.2.0"
   image_picker:
     dependency: "direct main"
     description:
@@ -984,14 +808,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.3"
-  petitparser:
-    dependency: transitive
-    description:
-      name: petitparser
-      sha256: c15605cd28af66339f8eb6fbe0e541bfe2d1b72d5825efc6598f3e0a31b9ad27
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.2"
   pin_code_fields:
     dependency: "direct main"
     description:
@@ -1048,14 +864,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.28.0"
-  salomon_bottom_bar:
-    dependency: "direct main"
-    description:
-      name: salomon_bottom_bar
-      sha256: e20abf2e449749432223a8b4e6647c212eef6c2b638e0ed8cc92eff9529c2b48
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.2"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -1413,30 +1221,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
-  win32:
-    dependency: transitive
-    description:
-      name: win32
-      sha256: "0eaf06e3446824099858367950a813472af675116bf63f008a4c2a75ae13e9cb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.5.0"
-  win32_registry:
-    dependency: transitive
-    description:
-      name: win32_registry
-      sha256: "10589e0d7f4e053f2c61023a31c9ce01146656a70b7b7f0828c0b46d7da2a9bb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.3"
-  wolt_modal_sheet:
-    dependency: "direct main"
-    description:
-      name: wolt_modal_sheet
-      sha256: e5f08db4927bd97ec57fdf6f995d4bd6f17459c5511cbb07f4c94c82c6a2cfcd
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.0"
   xdg_directories:
     dependency: transitive
     description:
@@ -1445,14 +1229,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  xml:
-    dependency: transitive
-    description:
-      name: xml
-      sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.5.0"
   yaml:
     dependency: transitive
     description:

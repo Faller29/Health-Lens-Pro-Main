@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthlens/backend_firebase/modals.dart';
 import 'package:iconly/iconly.dart';
 import 'homePage.dart';
 import 'camerapage.dart';
@@ -9,8 +10,10 @@ import 'package:healthlens/graph_data.dart';
 
 class EntryPoint extends StatefulWidget {
   final PageController? pageController;
+  final bool showTutorial;
 
-  const EntryPoint({Key? key, this.pageController}) : super(key: key);
+  const EntryPoint({Key? key, this.pageController, this.showTutorial = false})
+      : super(key: key);
 
   @override
   _EntryPointState createState() => _EntryPointState();
@@ -31,6 +34,11 @@ class _EntryPointState extends State<EntryPoint> {
   void initState() {
     super.initState();
     _pageKey = UniqueKey(); // Initialize the key
+    if (widget.showTutorial) {
+      Future.delayed(Duration.zero, () {
+        appTutorial(context); // Show the modal tutorial
+      });
+    }
   }
 
   void _onItemTapped(int index) {

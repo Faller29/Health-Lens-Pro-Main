@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -91,47 +93,64 @@ class _LoginPageState extends State<LoginPage> {
       duration: Duration(minutes: 1), // Keep it visible until dismissed
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
     // Get email and pincode
     _emailController.text = _email;
     String email = _emailController.text;
     String pincode = _pincodeController.text;
+    User? user;
 
-    // Perform login
-    User? user = await _authService.signInWithEmailAndPincode(email, pincode);
-    setState(() {
-      _firstPress = !_firstPress;
-    });
-    // Dismiss the Snackbar after login attempt
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    final result = await InternetAddress.lookup('example.com');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-    if (user != null) {
-      // Save user data locally
-      await prefs.setString('userName', user.email ?? '');
-      await prefs.setString('currentEmail', email); // Save email locally
+      // Perform login
+      user = await _authService.signInWithEmailAndPincode(email, pincode);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-      setState(() {
-        _isChangingAccount = false;
-      });
+      if (user != null) {
+        // Save user data locally
+        await prefs.setString('userName', user.email ?? '');
+        await prefs.setString('currentEmail', email); // Save email locally
 
-      // Navigate to the next page
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => EntryPoint()),
-      );
+        setState(() {
+          _isChangingAccount = false;
+        });
+
+        // Navigate to the next page
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EntryPoint(showTutorial: false)),
+        );
+      } else {
+        // Show error message if login fails
+        String errorMessage = 'Log in Failed. Check your Email and Password';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            elevation: 3,
+            duration: const Duration(seconds: 2),
+            content: Text(errorMessage),
+          ),
+        );
+      }
     } else {
-      // Show error message if login fails
-      String errorMessage = 'Log in Failed. Check your Email and Password';
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
           elevation: 3,
           duration: const Duration(seconds: 2),
-          content: Text(errorMessage),
+          content:
+              Text('No Internet Connection. Check your Internet Connectivity'),
         ),
       );
     }
+    setState(() {
+      _firstPress = !_firstPress;
+    });
+    // Dismiss the Snackbar after login attempt
   }
 
   @override

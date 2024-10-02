@@ -120,7 +120,7 @@ class _CameraPageState extends State<CameraPage> {
           imageWidth: image.width,
           iouThreshold: 0.5,
           confThreshold: 0.6,
-          classThreshold: 0.75,
+          classThreshold: 0.6,
         );
 
         if (results.isNotEmpty) {
@@ -220,14 +220,16 @@ class _CameraPageState extends State<CameraPage> {
                       children: [
                         Padding(
                           padding: EdgeInsets.fromLTRB(8.0, 14.0, 8.0, 0.0),
-                          child: Text(
-                            "Ingredients Detected",
-                            style: GoogleFonts.outfit(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          child: Center(
+                            child: Text(
+                              "Food Detected",
+                              style: GoogleFonts.outfit(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                         Expanded(

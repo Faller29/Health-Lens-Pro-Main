@@ -179,7 +179,8 @@ class _SetupPageState extends State<SetupPage> {
           if (signUpSuccess) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => EntryPoint()),
+              MaterialPageRoute(
+                  builder: (context) => EntryPoint(showTutorial: true)),
               (route) => false, // Remove all previous routes
             );
           } else {
@@ -2006,12 +2007,11 @@ class _SetupPageState extends State<SetupPage> {
                                                                                 0,
                                                                             margin: const EdgeInsets.fromLTRB(
                                                                                 10,
-                                                                                150,
+                                                                                200,
                                                                                 10,
-                                                                                150),
+                                                                                200),
                                                                             child:
-                                                                                Container(
-                                                                              height: 200,
+                                                                                SingleChildScrollView(
                                                                               child: Column(
                                                                                 children: [
                                                                                   Center(
@@ -2031,17 +2031,18 @@ class _SetupPageState extends State<SetupPage> {
                                                                                     ),
                                                                                   ),
                                                                                   Padding(
-                                                                                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                                                                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                                                                                     child: SizedBox(
                                                                                       width: MediaQuery.of(context).size.width - 20,
-                                                                                      height: 100,
                                                                                       child: Center(
-                                                                                        child: Text(
-                                                                                          'By checking this, I agree to use all the information I provided for the system purposes that will help me in any way that the system may offer. Also, all information that I will provide will be protected by the Data Privacy Act of 2012 and will only be served for the benefit of the intended purpose of the researchers. Furthermore, all the data I present is true and nothing but the truth. If in any case I provide wrong information, the system and the researchers will not be held liable for any miscalculation of the system because of ignorance.',
-                                                                                          style: GoogleFonts.readexPro(
-                                                                                            fontSize: MediaQuery.of(context).textScaler.scale(14),
+                                                                                        child: Container(
+                                                                                          child: Text(
+                                                                                            'By checking this, I agree to use all the information I provided for the system purposes that will help me in any way that the system may offer. Also, all information that I will provide will be protected by the Data Privacy Act of 2012 and will only be served for the benefit of the intended purpose of the researchers. Furthermore, all the data I present is true and nothing but the truth. If in any case I provide wrong information, the system and the researchers will not be held liable for any miscalculation of the system because of ignorance.',
+                                                                                            style: GoogleFonts.readexPro(
+                                                                                              fontSize: MediaQuery.of(context).textScaler.scale(14),
+                                                                                            ),
+                                                                                            textAlign: TextAlign.justify,
                                                                                           ),
-                                                                                          textAlign: TextAlign.justify,
                                                                                         ),
                                                                                       ),
                                                                                     ),
