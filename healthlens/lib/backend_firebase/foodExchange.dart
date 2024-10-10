@@ -1,6 +1,72 @@
 import 'package:flutter/material.dart';
 
 final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
+  'Boiled Ampalaya': {
+    //check
+    '1 Cup': {'fats': 4, 'carbs': 5, 'proteins': 1},
+    '1/2 Cup': {'fats': 2, 'carbs': 3, 'proteins': 1},
+    '1/4 of Cup': {'fats': 1, 'carbs': 1, 'proteins': 0},
+  },
+  'Boiled Broccoli': {
+    //check
+    '1 Cup': {'fats': 0, 'carbs': 4, 'proteins': 2},
+    '1/2 Cup': {'fats': 0, 'carbs': 2, 'proteins': 1},
+    '1/4 of Cup': {'fats': 0, 'carbs': 1, 'proteins': 1},
+  },
+  'Boiled Carrot': {
+    //check
+    '1 Cup': {'fats': 0, 'carbs': 13, 'proteins': 1},
+    '1/2 Cup': {'fats': 0, 'carbs': 7, 'proteins': 1},
+    '1/4 of Cup': {'fats': 0, 'carbs': 3, 'proteins': 0},
+  },
+  'Boiled Corn': {
+    //check
+    '1 Small': {'fats': 1, 'carbs': 19, 'proteins': 3}, //(5-6 inches long)
+    '1 Medium': {'fats': 2, 'carbs': 22, 'proteins': 4}, //(7 inches long)
+    '1 Large': {'fats': 2, 'carbs': 25, 'proteins': 4}, //(8-9 inches long)
+    '1 Cup': {'fats': 2, 'carbs': 31, 'proteins': 5},
+    '1/2 Cup': {'fats': 1, 'carbs': 16, 'proteins': 3},
+    '1/4 of Cup': {'fats': 1, 'carbs': 8, 'proteins': 1},
+  },
+  'Boiled Egg': {
+    //check
+    'Whole Egg': {'fats': 5, 'carbs': 1, 'proteins': 6},
+    'Half Egg': {'fats': 3, 'carbs': 0, 'proteins': 3},
+  },
+  'Boiled Eggplant': {
+    //check
+    '1 Cup': {
+      'fats': 0,
+      'carbs': 9,
+      'proteins': 1
+    }, //(1 inch per pieces in the cup)
+    '1/2 Cup': {'fats': 0, 'carbs': 5, 'proteins': 1},
+    '1/4 of Cup': {'fats': 0, 'carbs': 2, 'proteins': 0},
+  },
+  'Boiled Kalabasa': {
+    //check
+    '1 Cup': {'fats': 1, 'carbs': 5, 'proteins': 2},
+    '1/2 Cup': {'fats': 1, 'carbs': 3, 'proteins': 1},
+    '1/4 of Cup': {'fats': 0, 'carbs': 1, 'proteins': 1},
+  },
+  'Boiled Kangkong': {
+    //check
+    '1 Cup': {'fats': 0, 'carbs': 12, 'proteins': 4},
+    '1/2 Cup': {'fats': 0, 'carbs': 6, 'proteins': 2},
+    '1/4 of Cup': {'fats': 0, 'carbs': 3, 'proteins': 1},
+  },
+  'Boiled Mushroom': {
+    //check
+    '1 Cup': {'fats': 1, 'carbs': 8, 'proteins': 3},
+    '1/2 Cup': {'fats': 0, 'carbs': 4, 'proteins': 2},
+    '1/4 of Cup': {'fats': 0, 'carbs': 2, 'proteins': 1},
+  },
+  'Boiled Okra': {
+    //check
+    '1 Cup': {'fats': 4, 'carbs': 10, 'proteins': 4},
+    '1/2 Cup': {'fats': 2, 'carbs': 5, 'proteins': 2},
+    '1/4 of Cup': {'fats': 1, 'carbs': 3, 'proteins': 1},
+  },
   'Bread': {
     //check (1 piece)
     'Pandesal': {
@@ -88,6 +154,24 @@ final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
     'Body': {'fats': 13, 'carbs': 1, 'proteins': 22},
     'Tail': {'fats': 4, 'carbs': 0, 'proteins': 7},
   },
+  'Kamatis': {
+    //check
+    '1 Cup, Diced': {'fats': 0, 'carbs': 16, 'proteins': 4},
+    '1/2 Cup, Diced': {'fats': 0, 'carbs': 8, 'proteins': 2},
+    '1/4 of Cup, Diced': {'fats': 0, 'carbs': 4, 'proteins': 1},
+  },
+  'Onion': {
+    //check
+    '1 Cup, Diced': {'fats': 0, 'carbs': 16, 'proteins': 1},
+    '1/2 Cup, Diced': {'fats': 0, 'carbs': 8, 'proteins': 1},
+    '1/4 of Cup, Diced': {'fats': 0, 'carbs': 4, 'proteins': 0},
+  },
+  'Pipino': {
+    //check
+    '1 Cup': {'fats': 0, 'carbs': 4, 'proteins': 0},
+    '1/2 Cup': {'fats': 0, 'carbs': 2, 'proteins': 0},
+    '1/4 of Cup': {'fats': 0, 'carbs': 1, 'proteins': 0},
+  },
   'Pork (Breaded Pork Chop)': {
     //1 slice ng tenderloin
     //Warning lang na iwasan yung matatabang part (para sa lahat ng sakit toh hyper, obesity, diabetes)
@@ -119,10 +203,11 @@ final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
     //Warning lang na iwasan yung matatabang part (para sa lahat ng sakit toh hyper, obesity, diabetes)
     'Pork Chop': {'fats': 7, 'carbs': 3, 'proteins': 26},
   },
-  'Boiled Egg': {
+  'Potato': {
     //check
-    'Whole Egg': {'fats': 5, 'carbs': 1, 'proteins': 6},
-    'Half Egg': {'fats': 3, 'carbs': 0, 'proteins': 3},
+    '1 Cup, Diced': {'fats': 0, 'carbs': 26, 'proteins': 3},
+    '1/2 Cup, Diced': {'fats': 0, 'carbs': 13, 'proteins': 2},
+    '1/4 of Cup, Diced': {'fats': 0, 'carbs': 7, 'proteins': 1},
   },
   'Scrambled Egg': {
     //check
@@ -131,6 +216,15 @@ final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
   'Sunny Side Up Egg': {
     //check
     'Chicken Egg': {'fats': 7, 'carbs': 0, 'proteins': 6},
+  },
+  'Talbos ng Kamote (Boiled)': {
+    //check
+    '1 Cup': {'fats': 0, 'carbs': 2, 'proteins': 1},
+    '1/2 Cup': {'fats': 0, 'carbs': 1, 'proteins': 1},
+  },
+  'Tortang Talong': {
+    //check
+    '1 Eggplant': {'fats': 13, 'carbs': 13, 'proteins': 9},
   },
   'White Rice (Fried Rice)': {
     //check
@@ -141,99 +235,5 @@ final Map<String, Map<String, Map<String, int>>> itemMacronutrients = {
     //check
     'Whole Cup': {'fats': 0, 'carbs': 45, 'proteins': 4},
     'Half Cup': {'fats': 0, 'carbs': 23, 'proteins': 2},
-  },
-  'Potato': {
-    //check
-    '1 Cup, Diced': {'fats': 0, 'carbs': 26, 'proteins': 3},
-    '1/2 Cup, Diced': {'fats': 0, 'carbs': 13, 'proteins': 2},
-    '1/4 of Cup, Diced': {'fats': 0, 'carbs': 7, 'proteins': 1},
-  },
-  'Onion': {
-    //check
-    '1 Cup, Diced': {'fats': 0, 'carbs': 16, 'proteins': 1},
-    '1/2 Cup, Diced': {'fats': 0, 'carbs': 8, 'proteins': 1},
-    '1/4 of Cup, Diced': {'fats': 0, 'carbs': 4, 'proteins': 0},
-  },
-  'Kamatis': {
-    //check
-    '1 Cup, Diced': {'fats': 0, 'carbs': 16, 'proteins': 4},
-    '1/2 Cup, Diced': {'fats': 0, 'carbs': 8, 'proteins': 2},
-    '1/4 of Cup, Diced': {'fats': 0, 'carbs': 4, 'proteins': 1},
-  },
-  'Tortang Talong': {
-    //check
-    '1 Eggplant': {'fats': 13, 'carbs': 13, 'proteins': 9},
-  },
-  'Boiled Okra': {
-    //check
-    '1 Cup': {'fats': 4, 'carbs': 10, 'proteins': 4},
-    '1/2 Cup': {'fats': 2, 'carbs': 5, 'proteins': 2},
-    '1/4 of Cup': {'fats': 1, 'carbs': 3, 'proteins': 1},
-  },
-  'Boiled Corn': {
-    //check
-    '1 Small': {'fats': 1, 'carbs': 19, 'proteins': 3}, //(5-6 inches long)
-    '1 Medium': {'fats': 2, 'carbs': 22, 'proteins': 4}, //(7 inches long)
-    '1 Large': {'fats': 2, 'carbs': 25, 'proteins': 4}, //(8-9 inches long)
-    '1 Cup': {'fats': 2, 'carbs': 31, 'proteins': 5},
-    '1/2 Cup': {'fats': 1, 'carbs': 16, 'proteins': 3},
-    '1/4 of Cup': {'fats': 1, 'carbs': 8, 'proteins': 1},
-  },
-  'Boiled Ampalaya': {
-    //check
-    '1 Cup': {'fats': 4, 'carbs': 5, 'proteins': 1},
-    '1/2 Cup': {'fats': 2, 'carbs': 3, 'proteins': 1},
-    '1/4 of Cup': {'fats': 1, 'carbs': 1, 'proteins': 0},
-  },
-  'Boiled Eggplant': {
-    //check
-    '1 Cup': {
-      'fats': 0,
-      'carbs': 9,
-      'proteins': 1
-    }, //(1 inch per pieces in the cup)
-    '1/2 Cup': {'fats': 0, 'carbs': 5, 'proteins': 1},
-    '1/4 of Cup': {'fats': 0, 'carbs': 2, 'proteins': 0},
-  },
-  'Boiled Kalabasa': {
-    //check
-    '1 Cup': {'fats': 1, 'carbs': 5, 'proteins': 2},
-    '1/2 Cup': {'fats': 1, 'carbs': 3, 'proteins': 1},
-    '1/4 of Cup': {'fats': 0, 'carbs': 1, 'proteins': 1},
-  },
-  'Pipino': {
-    //check
-    '1 Cup': {'fats': 0, 'carbs': 4, 'proteins': 0},
-    '1/2 Cup': {'fats': 0, 'carbs': 2, 'proteins': 0},
-    '1/4 of Cup': {'fats': 0, 'carbs': 1, 'proteins': 0},
-  },
-  'Talbos ng Kamote (Boiled)': {
-    //check
-    '1 Cup': {'fats': 0, 'carbs': 2, 'proteins': 1},
-    '1/2 Cup': {'fats': 0, 'carbs': 1, 'proteins': 1},
-  },
-  'Boiled Carrot': {
-    //check
-    '1 Cup': {'fats': 0, 'carbs': 13, 'proteins': 1},
-    '1/2 Cup': {'fats': 0, 'carbs': 7, 'proteins': 1},
-    '1/4 of Cup': {'fats': 0, 'carbs': 3, 'proteins': 0},
-  },
-  'Boiled Kangkong': {
-    //check
-    '1 Cup': {'fats': 0, 'carbs': 12, 'proteins': 4},
-    '1/2 Cup': {'fats': 0, 'carbs': 6, 'proteins': 2},
-    '1/4 of Cup': {'fats': 0, 'carbs': 3, 'proteins': 1},
-  },
-  'Boiled Broccoli': {
-    //check
-    '1 Cup': {'fats': 0, 'carbs': 4, 'proteins': 2},
-    '1/2 Cup': {'fats': 0, 'carbs': 2, 'proteins': 1},
-    '1/4 of Cup': {'fats': 0, 'carbs': 1, 'proteins': 1},
-  },
-  'Boiled Mushroom': {
-    //check
-    '1 Cup': {'fats': 1, 'carbs': 8, 'proteins': 3},
-    '1/2 Cup': {'fats': 0, 'carbs': 4, 'proteins': 2},
-    '1/4 of Cup': {'fats': 0, 'carbs': 2, 'proteins': 1},
   },
 };

@@ -139,8 +139,33 @@ class MyApp extends StatelessWidget {
                 child:
                     CircularProgressIndicator()); // Show a loading indicator while checking authentication
           } else if (snapshot.hasError) {
-            return Center(
-                child: Text('Authentication error: ${snapshot.error}'));
+            return AlertDialog(
+              backgroundColor: Colors.white.withOpacity(.8),
+              shadowColor: Colors.black,
+              elevation: 5,
+              title: Text(
+                "Authentication Error",
+                style: GoogleFonts.readexPro(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              content: Text(
+                "Connection to the Database was suddenly Interrupted.\n\nPlease try restarting the application.",
+                style: GoogleFonts.readexPro(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.justify,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => exit(0),
+                  child: Text("Exit"),
+                ),
+              ],
+            );
           } else {
             return snapshot
                 .data!; // Return the appropriate widget based on authentication status

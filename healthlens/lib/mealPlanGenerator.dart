@@ -322,6 +322,10 @@ class _MealPlanPageState extends State<MealPlanPage> {
                   ),
                 ),
                 TextButton(
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateColor.resolveWith(
+                        (states) => Colors.white30),
+                  ),
                   onPressed: () {
                     setState(() {
                       futureMealPlans = fetchMealPlans();

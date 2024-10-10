@@ -160,12 +160,14 @@ class _FoodServingState extends State<FoodServing> {
             Builder(
               builder: (context) {
                 if (itemRemovedId.contains('Egg') ||
+                    itemRemovedId.contains('Tortang Talong') ||
                     itemRemovedId.contains('Bread')) {
-                  return Text('Type:', style: GoogleFonts.readexPro());
+                  return Text('Food Type:', style: GoogleFonts.readexPro());
                 } else if (itemRemovedId.contains('Rice') ||
                     itemRemovedId.contains('Potato') ||
                     itemRemovedId.contains('Onion') ||
-                    itemRemovedId.contains('Onion') ||
+                    itemRemovedId.contains('Kamatis') ||
+                    itemRemovedId.contains('Boiled') ||
                     itemRemovedId.contains('Pork (Lechon Kawali)') ||
                     itemRemovedId.contains('Chicken (Adobong Iga)')) {
                   return Text('Serving Size:', style: GoogleFonts.readexPro());
@@ -181,12 +183,17 @@ class _FoodServingState extends State<FoodServing> {
               width: 20,
             ),
             DropdownButton<String>(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+              borderRadius: BorderRadius.circular(10),
+              isDense: true,
               dropdownColor: Colors.white,
               value: selectedParts[itemRemovedId],
               items: parts.map((part) {
                 return DropdownMenuItem<String>(
                   value: part,
-                  child: Text(part, style: GoogleFonts.readexPro(fontSize: 14)),
+                  child: Text(part,
+                      style: GoogleFonts.readexPro(
+                          fontSize: 13, fontWeight: FontWeight.w400)),
                 );
               }).toList(),
               onChanged: (String? selectedPart) {
@@ -712,10 +719,13 @@ class _FoodServingState extends State<FoodServing> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                SizedBox(
+                  height: 5,
+                ),
                 Tooltip(
                   triggerMode: TooltipTriggerMode.tap,
                   richMessage: WidgetSpan(
@@ -796,7 +806,7 @@ class _FoodServingState extends State<FoodServing> {
                         color: Colors.black54,
                       ),
                       SizedBox(
-                        width: 10,
+                        width: 5,
                       ),
                     ],
                   ),
@@ -804,7 +814,7 @@ class _FoodServingState extends State<FoodServing> {
                 (foodItems.isNotEmpty)
                     ? Expanded(
                         child: ListView.builder(
-                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                           itemCount: foodItems.length,
                           itemBuilder: (context, index) {
                             final item = foodItems[index]['item'];
@@ -824,12 +834,14 @@ class _FoodServingState extends State<FoodServing> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   isThreeLine: true,
-                                  leading: Icon(Icons.restaurant_menu_outlined),
+                                  leading: Icon(Icons.restaurant_menu_outlined,
+                                      color: Colors.green),
                                   title: Text(
                                     item,
                                     style: GoogleFonts.readexPro(
-                                      fontSize: 18,
-                                    ),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green),
                                   ),
                                   subtitle: Column(
                                     crossAxisAlignment:

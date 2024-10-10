@@ -146,13 +146,18 @@ class _CameraPageState extends State<CameraPage> {
   Future<void> _stopDetection() async {
     setState(() {
       _isDetecting = false;
-      _detections.clear();
     });
 
     // Cancel the timer when detection is stopped
     _detectionTimer?.cancel();
 
     await _cameraController.stopImageStream();
+    await Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        _detections
+            .clear(); // Clear detections after 1 seconds to ensure that the paint will be wiped
+      });
+    });
   }
 
   void _clearIngredients() {
@@ -1655,14 +1660,14 @@ class _CameraPageState extends State<CameraPage> {
         height: rect.height,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: Colors.greenAccent, width: 1.0),
+            borderRadius: BorderRadius.circular(5.0),
+            border: Border.all(color: Color(0xff4b39ef), width: 3),
           ),
           child: Text(
             result['tag'],
-            style: TextStyle(
-              backgroundColor: Colors.greenAccent,
-              color: Colors.black,
+            style: GoogleFonts.readexPro(
+              backgroundColor: Color(0xff4b39ef),
+              color: Colors.white,
             ),
           ),
         ),

@@ -802,6 +802,8 @@ class _HomePage extends State<HomePage> {
                                                     style:
                                                         GoogleFonts.readexPro(
                                                       fontSize: 20.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       textStyle:
                                                           const TextStyle(
                                                         color: Color.fromARGB(
