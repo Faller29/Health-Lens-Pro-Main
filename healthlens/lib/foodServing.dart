@@ -1,6 +1,10 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add this for Firestore
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/main.dart';
@@ -8,6 +12,8 @@ import 'package:iconly/iconly.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'backend_firebase/foodExchange.dart';
+
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class FoodServing extends StatefulWidget {
   @override
@@ -99,7 +105,7 @@ class _FoodServingState extends State<FoodServing> {
 
   void decreaseQuantity(int index) {
     setState(() {
-      if (foodItems[index]['quantity'] > 0) {
+      if (foodItems[index]['quantity'] > 1) {
         foodItems[index]['quantity']--;
         _detectedItems[index]['quantity']--;
       }
@@ -361,7 +367,7 @@ class _FoodServingState extends State<FoodServing> {
         // Notify user that the food exceeds their daily max intake
         showDialog(
           context: context,
-          builder: (BuildContext context) {
+          builder: (context) {
             return AlertDialog(
               backgroundColor: Colors.white,
               title: Text(
@@ -373,7 +379,7 @@ class _FoodServingState extends State<FoodServing> {
                 ),
               ),
               content: Text(
-                "You have reached your recommended daily macronutrients and You are only allowed to exceed upto 20%.\n\nDo you want to Continue?",
+                "You have reached your recommended daily macronutrients and You are only allowed to exceed up to 20%.\n\nDo you want to Continue?",
                 style: GoogleFonts.readexPro(
                   fontSize: 14.0,
                   textStyle: const TextStyle(
@@ -387,15 +393,22 @@ class _FoodServingState extends State<FoodServing> {
                   onPressed: () async {
                     if (_firstPress) {
                       _firstPress = false;
+
+                      // Show the snackbar
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                            behavior: SnackBarBehavior.floating,
-                            elevation: 3,
-                            duration: const Duration(seconds: 2),
-                            content: Text('Processing....')),
+                          behavior: SnackBarBehavior.floating,
+                          elevation: 3,
+                          duration: const Duration(seconds: 2),
+                          content: Text('Processing....'),
+                        ),
                       );
 
-                      Navigator.of(context).pop();
+                      // Check if the widget is still mounted before popping
+                      if (mounted) {
+                        Navigator.pop(context);
+                      }
+
                       await FirebaseFirestore.instance
                           .collection('food_history')
                           .doc(thisUser?.uid)
@@ -406,9 +419,12 @@ class _FoodServingState extends State<FoodServing> {
                       // Now accumulate the macronutrients
                       await _updateUserMacros(wrappedData['items']);
 
-                      setState(() {
-                        _firstPress = true;
-                      });
+                      // Reset the first press state if still mounted
+                      if (mounted) {
+                        setState(() {
+                          _firstPress = true;
+                        });
+                      }
                     }
                   },
                   child: Text(
@@ -422,16 +438,22 @@ class _FoodServingState extends State<FoodServing> {
                 ),
                 TextButton(
                   onPressed: () {
+                    // Show the snackbar
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          behavior: SnackBarBehavior.floating,
-                          elevation: 3,
-                          backgroundColor: Colors.red,
-                          duration: const Duration(seconds: 2),
-                          content: Text(
-                              'This food exceeds your daily macronutrient limits!')),
+                        behavior: SnackBarBehavior.floating,
+                        elevation: 3,
+                        backgroundColor: Colors.red,
+                        duration: const Duration(seconds: 2),
+                        content: Text(
+                            'This food exceeds your daily macronutrient limits!'),
+                      ),
                     );
-                    Navigator.of(context).pop(); // Close dialog
+
+                    // Check if the widget is still mounted before popping
+                    if (mounted) {
+                      Navigator.pop(context);
+                    }
                   },
                   child: Text(
                     "No",
@@ -640,7 +662,9 @@ class _FoodServingState extends State<FoodServing> {
             backgroundColor: Colors.green,
             content: Text('Added successfully')),
       );
-      Navigator.of(context).pop();
+      SchedulerBinding.instance!.addPostFrameCallback((_) {
+        Navigator.pop(context);
+      });
     } catch (e) {
       print('Error updating user macros\n$e');
     }
@@ -679,6 +703,7 @@ class _FoodServingState extends State<FoodServing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Food Serving', style: GoogleFonts.readexPro(fontSize: 18)),
         backgroundColor: Color(0xff4b39ef),
@@ -691,6 +716,91 @@ class _FoodServingState extends State<FoodServing> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Tooltip(
+                  triggerMode: TooltipTriggerMode.tap,
+                  richMessage: WidgetSpan(
+                    alignment: PlaceholderAlignment.baseline,
+                    baseline: TextBaseline.alphabetic,
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 300),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Food Serving',
+                            style: GoogleFonts.readexPro(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          SizedBox(
+                            child: RichText(
+                              text: TextSpan(
+                                  style: GoogleFonts.readexPro(),
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          " In order to determine the right serving size, users are advised to use measuring cups. However, if there are no present measuring cups, be advised that you can use your fist or hand to determine the level of serving size.\n\nTake note that",
+                                    ),
+                                    TextSpan(
+                                      text: " A CUP ",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                        text:
+                                            "of food (e.g. cup of rice) is equivalent to a"),
+                                    TextSpan(
+                                      text: " CLOSED ADULT FIST",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                        text:
+                                            ". By establishing this technique, you can estimate the measurement of a cup."),
+                                  ]),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Image.asset(
+                            'assets/images/serving.jpg',
+                            height: 200,
+                            width: MediaQuery.sizeOf(context).width,
+                            fit: BoxFit.cover,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  padding: EdgeInsets.all(20),
+                  margin: EdgeInsets.all(20),
+                  showDuration: Duration(seconds: 10),
+                  decoration: BoxDecoration(
+                    color: Color(0xff4b39ef).withOpacity(0.9),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  ),
+                  preferBelow: true,
+                  verticalOffset: 20,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [
+                      Icon(
+                        FontAwesomeIcons.circleQuestion,
+                        size: 16,
+                        color: Colors.black54,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                    ],
+                  ),
+                ),
                 (foodItems.isNotEmpty)
                     ? Expanded(
                         child: ListView.builder(
@@ -780,7 +890,7 @@ class _FoodServingState extends State<FoodServing> {
                         ),
                       )
                     : Container(
-                        height: (MediaQuery.sizeOf(context).height - 210),
+                        height: (MediaQuery.sizeOf(context).height - 225),
                         child: Center(
                           child: Text(
                             'No food scanned.\nUse the Add button to manually Add',
@@ -806,7 +916,18 @@ class _FoodServingState extends State<FoodServing> {
                                 setState(() {
                                   _isLoading = true;
                                 });
-                                await _confirmAndSendToFirebase();
+                                if (foodItems.isNotEmpty) {
+                                  await _confirmAndSendToFirebase();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        behavior: SnackBarBehavior.floating,
+                                        elevation: 3,
+                                        duration: const Duration(seconds: 1),
+                                        backgroundColor: Colors.red,
+                                        content: Text('No Food to add')),
+                                  );
+                                }
                                 setState(() {
                                   _isLoading = false;
                                 });
@@ -821,14 +942,17 @@ class _FoodServingState extends State<FoodServing> {
                         child: Text('Add', style: GoogleFonts.readexPro()),
                         onPressed: () {
                           showCupertinoModalPopup(
-                            context: context,
-                            builder: (BuildContext context) {
+                            context: _scaffoldKey.currentContext!,
+                            builder: (context) {
                               return CupertinoActionSheet(
                                 title: Text('Select an item to add'),
                                 actions: itemMacronutrients.keys.map((item) {
                                   return CupertinoActionSheetAction(
                                     onPressed: () {
-                                      Navigator.pop(context);
+                                      SchedulerBinding.instance!
+                                          .addPostFrameCallback((_) {
+                                        Navigator.pop(context);
+                                      });
                                       setState(() {
                                         // Check if item already exists in _detectedItems
 

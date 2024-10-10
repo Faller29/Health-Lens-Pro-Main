@@ -7,6 +7,7 @@ import 'package:healthlens/graph_data.dart';
 import 'package:healthlens/history_page.dart';
 import 'package:healthlens/main.dart';
 import 'package:iconly/iconly.dart';
+import 'package:string_extensions/string_extensions.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,8 @@ class AnalyticsPage extends StatefulWidget {
   @override
   _AnalyticsPageState createState() => _AnalyticsPageState();
 }
+
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
   int _selectedDayIndex = 0;
@@ -44,6 +47,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: ListView(
         children: [
           Column(
@@ -858,7 +862,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: barChart,
                   name: 'Fats',
                   xValueMapper: (AverageData data, _) => data.x,
-                  yValueMapper: (AverageData data, _) => data.y,
+                  yValueMapper: (AverageData data, _) => data.y.toInt(),
                   pointColorMapper: (AverageData data, _) =>
                       const Color(0xff249689)),
               StackedBarSeries<AverageData, String>(
@@ -874,7 +878,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: barChart,
                   name: 'Protein',
                   xValueMapper: (AverageData data, _) => data.x,
-                  yValueMapper: (AverageData data, _) => data.y2,
+                  yValueMapper: (AverageData data, _) => data.y2.toInt(),
                   pointColorMapper: (AverageData data, _) =>
                       const Color(0xffff5963)),
               StackedBarSeries<AverageData, String>(
@@ -890,7 +894,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 dataSource: barChart,
                 name: 'Carbohydrates',
                 xValueMapper: (AverageData data, _) => data.x,
-                yValueMapper: (AverageData data, _) => data.y3,
+                yValueMapper: (AverageData data, _) => data.y3.toInt(),
                 pointColorMapper: (AverageData data, _) =>
                     const Color(0xff4b39ef),
               ),
@@ -1167,7 +1171,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: barChart1,
                   name: 'Fats',
                   xValueMapper: (AverageData data, _) => data.x,
-                  yValueMapper: (AverageData data, _) => data.y,
+                  yValueMapper: (AverageData data, _) => data.y.toInt(),
                   pointColorMapper: (AverageData data, _) =>
                       const Color(0xff249689)),
               StackedBarSeries<AverageData, String>(
@@ -1183,7 +1187,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: barChart1,
                   name: 'Protein',
                   xValueMapper: (AverageData data, _) => data.x,
-                  yValueMapper: (AverageData data, _) => data.y2,
+                  yValueMapper: (AverageData data, _) => data.y2.toInt(),
                   pointColorMapper: (AverageData data, _) =>
                       const Color(0xffff5963)),
               StackedBarSeries<AverageData, String>(
@@ -1199,7 +1203,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 dataSource: barChart1,
                 name: 'Carbohydrates',
                 xValueMapper: (AverageData data, _) => data.x,
-                yValueMapper: (AverageData data, _) => data.y3,
+                yValueMapper: (AverageData data, _) => data.y3.toInt(),
                 pointColorMapper: (AverageData data, _) =>
                     const Color(0xff4b39ef),
               ),
@@ -1474,7 +1478,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: barChart2,
                   name: 'Fats',
                   xValueMapper: (AverageData data, _) => data.x,
-                  yValueMapper: (AverageData data, _) => data.y,
+                  yValueMapper: (AverageData data, _) => data.y.toInt(),
                   pointColorMapper: (AverageData data, _) =>
                       const Color(0xff249689)),
               StackedBarSeries<AverageData, String>(
@@ -1489,7 +1493,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   dataSource: barChart2,
                   name: 'Protein',
                   xValueMapper: (AverageData data, _) => data.x,
-                  yValueMapper: (AverageData data, _) => data.y2,
+                  yValueMapper: (AverageData data, _) => data.y2.toInt(),
                   pointColorMapper: (AverageData data, _) =>
                       const Color(0xffff5963)),
               StackedBarSeries<AverageData, String>(
@@ -1504,7 +1508,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 dataSource: barChart2,
                 name: 'Carbohydrates',
                 xValueMapper: (AverageData data, _) => data.x,
-                yValueMapper: (AverageData data, _) => data.y3,
+                yValueMapper: (AverageData data, _) => data.y3.toInt(),
                 pointColorMapper: (AverageData data, _) =>
                     const Color(0xff4b39ef),
               ),

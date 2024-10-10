@@ -211,6 +211,7 @@ Future<bool> signUp(
         'lastLogIn': currentDate,
       });
     }
+    String thisLifestyle = lifestyle;
     uploadProfileImage();
     final currentUserInfo =
         await db.collection("user").doc(thisUser?.uid).get();
@@ -249,6 +250,7 @@ Future<bool> signUp(
     print('saved?');
     saveData();
     print('it saved');
+    lifestyle = thisLifestyle;
     return true;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {

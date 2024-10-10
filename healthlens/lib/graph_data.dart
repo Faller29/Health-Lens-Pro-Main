@@ -52,12 +52,13 @@ Future<void> fetchMacrosData() async {
     }
 
     for (var item in items) {
+      final quantity = item['quantity'] ?? 1;
       todayMap[time]!['fats'] =
-          (todayMap[time]!['fats'] ?? 0) + (item['fats'] ?? 0);
-      todayMap[time]!['proteins'] =
-          (todayMap[time]!['proteins'] ?? 0) + (item['proteins'] ?? 0);
+          (todayMap[time]!['fats'] ?? 0) + (item['fats'] ?? 0) * quantity;
+      todayMap[time]!['proteins'] = (todayMap[time]!['proteins'] ?? 0) +
+          (item['proteins'] ?? 0) * quantity;
       todayMap[time]!['carbs'] =
-          (todayMap[time]!['carbs'] ?? 0) + (item['carbs'] ?? 0);
+          (todayMap[time]!['carbs'] ?? 0) + (item['carbs'] ?? 0) * quantity;
     }
   }
   chartData = todayMap.entries.map((entry) {

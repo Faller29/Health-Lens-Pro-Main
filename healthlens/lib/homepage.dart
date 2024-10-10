@@ -25,6 +25,7 @@ import 'package:intl/intl.dart';
 
 const double contWidth = 100;
 const double contHeight = 140;
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class ScaleSize {
   static double textScaleFactor(BuildContext context,
@@ -252,6 +253,7 @@ class _HomePage extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: ListView(
         addAutomaticKeepAlives: true,
         children: [

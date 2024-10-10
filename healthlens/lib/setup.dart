@@ -1759,7 +1759,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             10,
                                                                             10),
                                                                 labelText:
-                                                                    'Email',
+                                                                    'Personal Email/Gmail',
                                                                 labelStyle:
                                                                     GoogleFonts
                                                                         .outfit(

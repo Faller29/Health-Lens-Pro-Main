@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vision/flutter_vision.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
+//import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:healthlens/main.dart';
 import 'package:iconly/iconly.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -200,45 +201,54 @@ class _CameraPageState extends State<CameraPage> {
 
       // Step 3: Show scanning animation with captured image
       _showCapturedImageAndScanAnimation(image);
-// Process the image using Google ML Kit Text Recognition
+
+      // Process the image using Google ML Kit Text Recognition
       final inputImage = InputImage.fromFilePath(image.path);
       final textDetector = TextRecognizer();
       final recognizedText = await textDetector.processImage(inputImage);
 
-// Initialize macronutrient totals
+      // Initialize macronutrient totals
       int totalCarbs = 0;
       int totalFats = 0;
       int protein = 0;
 
-// Regular expressions for macronutrient extraction
+      // Regular expressions for macronutrient extraction
       final carbsPattern = RegExp(
-          r'(total\s*carbohydrates?)\s*[:,]?\s*(\d+)\s*g',
+          r'(?:(total\s*carbohydrates?)|(?:carbs?))\s*[:,]?\s*(\d+)\s*[g]?',
           caseSensitive: false);
-      final fatsPattern =
-          RegExp(r'(total\s*fats?)\s*[:,]?\s*(\d+)\s*g', caseSensitive: false);
+
+      final fatsPattern = RegExp(r'(total\s*fats?)\s*[:,]?\s*(\d+)\s*[g]?',
+          caseSensitive: false);
       final proteinPattern =
-          RegExp(r'(protein)\s*[:,]?\s*(\d+)\s*g', caseSensitive: false);
+          RegExp(r'(protein)\s*[:,]?\s*(\d+)\s*[g]?', caseSensitive: false);
 
-// Iterate through recognized text blocks and lines
+      // Iterate through recognized text blocks and lines
       for (TextBlock block in recognizedText.blocks) {
-        String combinedText = ''; // Variable to accumulate lines in a block
+        print(
+            "Detected block: ${block.text}"); // Print the entire block of text for debugging
 
+        String combinedText = ''; // Variable to accumulate lines in a block
         for (TextLine line in block.lines) {
           combinedText +=
               line.text.trim() + ' '; // Combine lines into a single string
+
+          print("Detected line: $combinedText"); // Print each detected line
 
           // Check for macronutrient patterns
           if (carbsPattern.hasMatch(combinedText)) {
             final match = carbsPattern.firstMatch(combinedText);
             totalCarbs = int.parse(match?.group(2) ?? '0');
+            print("Carbs found: $totalCarbs"); // Print the carbs value
           }
           if (fatsPattern.hasMatch(combinedText)) {
             final match = fatsPattern.firstMatch(combinedText);
             totalFats = int.parse(match?.group(2) ?? '0');
+            print("Fats found: $totalFats"); // Print the fats value
           }
           if (proteinPattern.hasMatch(combinedText)) {
             final match = proteinPattern.firstMatch(combinedText);
             protein = int.parse(match?.group(2) ?? '0');
+            print("Protein found: $protein"); // Print the protein value
           }
         }
       }
@@ -316,15 +326,35 @@ class _CameraPageState extends State<CameraPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('No Data Found'),
+          title: Text(
+            'No Data Found',
+            style: GoogleFonts.readexPro(),
+          ),
           content: Text(
-              'No macronutrients Detected from the image of Nutrition Facts. Please try again with a clearer image.'),
+            'No macronutrients Detected from the image of Nutrition Facts.\n\nPlease try again with a clearer image or Manually add the Nutrition Facts.',
+            style: GoogleFonts.readexPro(),
+            textAlign: TextAlign.justify,
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('OK'),
+              child: Text('Close',
+                  style: GoogleFonts.readexPro(
+                      color: Colors.red, fontWeight: FontWeight.bold)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+
+                _showNutritionDialog(0, 0, 0);
+              },
+              child: Text(
+                'Manually Add',
+                style: GoogleFonts.readexPro(
+                    color: Colors.green, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         );
@@ -332,6 +362,631 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
+  void _showNutritionDialog(
+      int initialCarbs, int initialFats, int initialProtein) {
+    // Macronutrient values tracked separately
+    int currentCarbs = initialCarbs;
+    int currentFats = initialFats;
+    int currentProtein = initialProtein;
+
+    // Serving size and quantity variables
+    int quantity = 1;
+    String selectedServingSize = '1 cup/piece';
+    Map<String, double> servingSizeMultipliers = {
+      '1 cup/piece': 1.0,
+      '1/2 cup/piece': 0.5,
+    };
+
+    // Controllers for adjusting the macros and displaying them
+    TextEditingController productNameController =
+        TextEditingController(text: "Scanned Product");
+    TextEditingController carbsController =
+        TextEditingController(text: currentCarbs.toString());
+    TextEditingController fatsController =
+        TextEditingController(text: currentFats.toString());
+    TextEditingController proteinController =
+        TextEditingController(text: currentProtein.toString());
+
+    // Calculate total macros based on current quantity and serving size
+    void updateMacros() {
+      double servingMultiplier = servingSizeMultipliers[selectedServingSize]!;
+      carbsController.text =
+          ((currentCarbs * servingMultiplier) * quantity).toStringAsFixed(0);
+      fatsController.text =
+          ((currentFats * servingMultiplier) * quantity).toStringAsFixed(0);
+      proteinController.text =
+          ((currentProtein * servingMultiplier) * quantity).toStringAsFixed(0);
+    }
+
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Card(
+              elevation: 5,
+              margin: EdgeInsets.fromLTRB(10, 50, 10, 50),
+              child: Material(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'Nutrition Facts Scanned',
+                          style: GoogleFonts.readexPro(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextField(
+                          controller: productNameController,
+                          style: GoogleFonts.readexPro(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green),
+                          decoration: InputDecoration(
+                            labelText: 'Product Name',
+                            isDense: true,
+                            labelStyle: GoogleFonts.readexPro(fontSize: 14),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+
+                        // Macronutrient adjustment fields with add/remove buttons
+                        Text(
+                          'Total Carbohydrates:',
+                          style: GoogleFonts.readexPro(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 20,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.remove),
+                              onPressed: () {
+                                setState(() {
+                                  if (currentCarbs > 0) {
+                                    currentCarbs--; // Decrement carbs
+                                    updateMacros(); // Update displayed values
+                                  }
+                                });
+                              },
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: carbsController,
+                                readOnly: true,
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green),
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  isDense: true,
+                                  labelStyle:
+                                      GoogleFonts.readexPro(fontSize: 10),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () {
+                                setState(() {
+                                  currentCarbs++; // Increment carbs
+                                  updateMacros(); // Update displayed values
+                                });
+                              },
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+
+                        Text(
+                          'Total Fats:',
+                          style: GoogleFonts.readexPro(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 20,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.remove),
+                              onPressed: () {
+                                setState(() {
+                                  if (currentFats > 0) {
+                                    currentFats--; // Decrement fats
+                                    updateMacros(); // Update displayed values
+                                  }
+                                });
+                              },
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: fatsController,
+                                readOnly: true,
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green),
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  isDense: true,
+                                  labelStyle:
+                                      GoogleFonts.readexPro(fontSize: 10),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () {
+                                setState(() {
+                                  currentFats++; // Increment fats
+                                  updateMacros(); // Update displayed values
+                                });
+                              },
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+
+                        Text(
+                          'Total Protein:',
+                          style: GoogleFonts.readexPro(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 20,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.remove),
+                              onPressed: () {
+                                setState(() {
+                                  if (currentProtein > 0) {
+                                    currentProtein--; // Decrement protein
+                                    updateMacros(); // Update displayed values
+                                  }
+                                });
+                              },
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: proteinController,
+                                readOnly: true,
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green),
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  isDense: true,
+                                  labelStyle:
+                                      GoogleFonts.readexPro(fontSize: 10),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () {
+                                setState(() {
+                                  currentProtein++; // Increment protein
+                                  updateMacros(); // Update displayed values
+                                });
+                              },
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+
+                        // Quantity adjustment
+                        Text(
+                          'Quantity:',
+                          style: GoogleFonts.readexPro(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 20,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.remove),
+                              onPressed: () {
+                                setState(() {
+                                  if (quantity > 1) {
+                                    quantity--;
+                                    updateMacros(); // Update macros based on new quantity
+                                  }
+                                });
+                              },
+                            ),
+                            Expanded(
+                              child: TextField(
+                                readOnly: true,
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green),
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  isDense: true,
+                                  labelStyle:
+                                      GoogleFonts.readexPro(fontSize: 10),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  hintText: quantity.toString(),
+                                  hintStyle: GoogleFonts.readexPro(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () {
+                                setState(() {
+                                  quantity++;
+                                  updateMacros(); // Update macros based on new quantity
+                                });
+                              },
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+
+                        // Serving size dropdown
+                        Row(
+                          children: [
+                            Text(
+                              'Serving Size: ',
+                              style: GoogleFonts.readexPro(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            DropdownButton<String>(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              elevation: 3,
+                              borderRadius: BorderRadius.circular(20),
+                              style: GoogleFonts.readexPro(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              alignment: Alignment.center,
+                              value: selectedServingSize,
+                              items: servingSizeMultipliers.keys
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedServingSize = newValue!;
+                                  updateMacros(); // Update macros based on new serving size
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 10),
+
+                        // Action buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Cancel button
+                              },
+                              child: Text('Cancel',
+                                  style: GoogleFonts.readexPro(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            SizedBox(width: 10),
+                            TextButton(
+                              onPressed: () async {
+                                // Show loader
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible:
+                                      false, // Prevent dismissing the loader by tapping outside
+                                  builder: (BuildContext context) {
+                                    return Center(
+                                      child:
+                                          CircularProgressIndicator(), // Loader widget
+                                    );
+                                  },
+                                );
+
+                                List<Map<String, dynamic>> wrappedItems = [
+                                  {
+                                    'item': productNameController
+                                        .text, // Replace with the actual product name
+                                    'quantity':
+                                        quantity, // This is the quantity from your dialog
+                                    'part':
+                                        selectedServingSize, // This is the serving size from your dialog
+                                    'fats': _parseInt(double.parse(
+                                        fatsController
+                                            .text)), // Parse and convert to int
+                                    'carbs': _parseInt(double.parse(
+                                        carbsController
+                                            .text)), // Parse and convert to int
+                                    'proteins': _parseInt(double.parse(
+                                        proteinController
+                                            .text)), // Parse and convert to int
+                                  }
+                                ];
+
+                                // Get current date and time
+                                final String currentDate = DateTime.now()
+                                    .toIso8601String()
+                                    .split('T')[0];
+                                final String currentTime =
+                                    "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+
+                                print('wowers');
+                                // Retrieve existing macro values from Firestore
+                                final DocumentSnapshot userMacrosSnapshot =
+                                    await FirebaseFirestore.instance
+                                        .collection('userMacros')
+                                        .doc(thisUser?.uid)
+                                        .get();
+
+                                // Initialize current macro values
+                                print(thisUser?.uid);
+                                print('wowers1');
+
+                                // Check if the document exists and retrieve current macro values
+                                final data = userMacrosSnapshot.data()
+                                    as Map<String, dynamic>;
+                                print('wowers1.1');
+
+                                final thiscurrentCarbs = (data['carbs'] ?? 0);
+                                final thiscurrentFats = (data['fats'] ?? 0);
+                                final thiscurrentProtein =
+                                    (data['proteins'] ?? 0);
+                                final thiscurrentCalories =
+                                    (data['calories'] ?? 0);
+                                print('wowers1.2');
+
+                                int currentCarbs = thiscurrentCarbs;
+                                int currentFats = thiscurrentFats;
+                                int currentProtein = thiscurrentProtein;
+                                int currentCalories = thiscurrentCalories;
+                                print('wowers2');
+
+                                // Assuming these are the initial macro values you retrieved or calculated
+                                int initialCarbs = _parseInt(
+                                    double.parse(carbsController.text));
+                                int initialFats = _parseInt(
+                                    double.parse(fatsController.text));
+                                int initialProtein = _parseInt(
+                                    double.parse(proteinController.text));
+                                // Retrieve max macros from Firestore
+                                final userMaxDoc = await FirebaseFirestore
+                                    .instance
+                                    .collection('user')
+                                    .doc(thisUser?.uid)
+                                    .get();
+                                print('get?');
+                                final userMaxData = userMaxDoc.data()!;
+                                print('sure?');
+                                // Convert the values to double
+                                double maxCarbs =
+                                    (userMaxData['gramCarbs'] as num)
+                                        .toDouble();
+                                double maxProteins =
+                                    (userMaxData['gramProtein'] as num)
+                                        .toDouble();
+                                double maxFats =
+                                    (userMaxData['gramFats'] as num).toDouble();
+                                print('all right');
+                                // Add 20%
+                                double adjustedMaxCarbs =
+                                    maxCarbs + (maxCarbs * 0.20);
+                                double adjustedMaxProteins =
+                                    maxProteins + (maxProteins * 0.20);
+                                double adjustedMaxFats =
+                                    maxFats + (maxFats * 0.20);
+
+                                print('wowers3');
+                                // Calculate final macros based on quantity
+                                int finalCarbs =
+                                    currentCarbs + (initialCarbs * quantity);
+                                int finalFats =
+                                    currentFats + (initialFats * quantity);
+                                int finalProtein = currentProtein +
+                                    (initialProtein * quantity);
+                                print((finalFats >= adjustedMaxFats &&
+                                    finalCarbs >= adjustedMaxCarbs &&
+                                    finalProtein >= adjustedMaxProteins));
+
+                                if (finalFats >= adjustedMaxFats &&
+                                    finalCarbs >= adjustedMaxCarbs &&
+                                    finalProtein >= adjustedMaxProteins) {
+                                  Navigator.of(context).pop();
+
+                                  Navigator.of(context).pop();
+                                  return showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Warning'),
+                                        content: Text(
+                                          "You have reached your maximum recommended daily macronutrients intake",
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('OK'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                                print('wowers4');
+                                // Calculate total calories
+                                int calories = currentCalories +
+                                    (((initialCarbs * quantity) * 4) +
+                                        ((initialFats * quantity) * 9) +
+                                        ((initialProtein * quantity) *
+                                            4)); // Example calorie calculation
+                                print(finalFats);
+                                print('wowers5');
+                                // Save data to userMacros collection
+                                await FirebaseFirestore.instance
+                                    .collection('userMacros')
+                                    .doc(thisUser?.uid)
+                                    .set(
+                                  {
+                                    'carbs': finalCarbs,
+                                    'fats': finalFats,
+                                    'proteins': finalProtein,
+                                    'calories': calories,
+                                    'lastLogIn':
+                                        currentDate, // Update the last login date
+                                  },
+                                  SetOptions(merge: true),
+                                ); // Merge to prevent overwriting
+
+                                print('wowers6');
+                                // Save data to MacrosIntakeHistory collection
+                                await FirebaseFirestore.instance
+                                    .collection("userMacros")
+                                    .doc(thisUser?.uid)
+                                    .collection('MacrosIntakeHistory')
+                                    .doc(currentDate)
+                                    .set({
+                                  'carbs': finalCarbs,
+                                  'fats': finalFats,
+                                  'proteins': finalProtein,
+                                  'calories': calories,
+                                }, SetOptions(merge: true));
+
+                                print('wowers7');
+                                // Save food history
+                                await FirebaseFirestore.instance
+                                    .collection('food_history')
+                                    .doc(thisUser?.uid)
+                                    .collection(currentDate)
+                                    .doc(currentTime)
+                                    .set({
+                                  'items':
+                                      wrappedItems, // Make sure wrappedItems is defined in scope
+                                  'timestamp': DateTime.now()
+                                      .toIso8601String(), // Add timestamp
+                                  'userId': thisUser?.uid, // Add user ID
+                                });
+
+                                dailyCarbs = finalCarbs;
+                                dailyFats = finalFats;
+                                dailyProtein = finalProtein;
+                                dailyCalories = calories;
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+
+                                await prefs.setInt('dailyCarbs', dailyCarbs!);
+                                await prefs.setInt(
+                                    'dailyProtein', dailyProtein!);
+                                await prefs.setInt('dailyFats', dailyFats!);
+                                await prefs.setInt(
+                                    'dailyCalories', dailyCalories!);
+                                Navigator.of(context).pop(); // Confirm button
+
+                                // Show success snackbar
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    behavior: SnackBarBehavior.floating,
+                                    content: Text('Success!'),
+                                    backgroundColor: Colors.green,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                                Navigator.of(context).pop(); // Confirm button
+                              },
+                              child: Text('Confirm',
+                                  style: GoogleFonts.readexPro(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+/* 
   void _showNutritionDialog(
       int initialCarbs, int initialFats, int initialProtein) {
     // Create a TextEditingController for the product name
@@ -585,7 +1240,7 @@ class _CameraPageState extends State<CameraPage> {
                                   _parseInt(double.parse(fatsController.text));
                               int initialProtein = _parseInt(
                                   double.parse(proteinController.text));
-// Retrieve max macros from Firestore
+                                  // Retrieve max macros from Firestore
                               final userMaxDoc = await FirebaseFirestore
                                   .instance
                                   .collection('user')
@@ -594,7 +1249,7 @@ class _CameraPageState extends State<CameraPage> {
                               print('get?');
                               final userMaxData = userMaxDoc.data()!;
                               print('sure?');
-// Convert the values to double
+                                  // Convert the values to double
                               double maxCarbs =
                                   (userMaxData['gramCarbs'] as num).toDouble();
                               double maxProteins =
@@ -603,7 +1258,7 @@ class _CameraPageState extends State<CameraPage> {
                               double maxFats =
                                   (userMaxData['gramFats'] as num).toDouble();
                               print('all right');
-// Add 20%
+                                // Add 20%
                               double adjustedMaxCarbs =
                                   maxCarbs + (maxCarbs * 0.20);
                               double adjustedMaxProteins =
@@ -742,7 +1397,7 @@ class _CameraPageState extends State<CameraPage> {
       },
     );
   }
-
+ */
   int _parseInt(double value) {
     return value.round();
   }
@@ -763,7 +1418,7 @@ class _CameraPageState extends State<CameraPage> {
       int initialProtein,
       String servingSize,
       int quantity) {
-    double servingMultiplier = servingSize == '1 cup' ? 1.0 : 0.5;
+    double servingMultiplier = servingSize == '1 cup/piece' ? 1.0 : 0.5;
 
     // Calculate adjusted macros based on quantity and serving size
     double adjustedCarbs = initialCarbs * servingMultiplier * quantity;
@@ -779,9 +1434,12 @@ class _CameraPageState extends State<CameraPage> {
         adjustedProtein.toStringAsFixed(1); // Show 1 decimal place
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: Stack(
         children: [
           if (_isInitialized)

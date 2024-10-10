@@ -55,5 +55,16 @@ final List<Map<String, String>> faqItems = [
     'question': 'What Filipino dishes can the application detect?',
     'answer':
         "The application can currently detect the following Filipino dishes:\n\n-Boiled Egg\n-Chicken (Adobong Iga)\n-Chicken (Chicken Inasal)\n-Chicken (Fried Chicken)\n-Fish (Daing na Bangus)\n-Fish (Pan Fried Tilapia)\n-Fish (Sinaing na Tulingan)\n-Pork (Breaded Pork Chop)\n-Pork (Lechon Kawali)\n-Pork (Pork Bistek)\n-Scrambled Egg\n-Sunny Side Up Egg\n-White Rice (Boiled Rice)\n-White Rice (Fried Rice)",
-  }
+  },
+  {
+    'question':
+        "I saw a serving size in the system; however, I do not possess any kind of measuring cups, how to do measure a cup of serving size?",
+    'answer':
+        "You can use your fist for measurement estimation. An adult closed fist is equivalent to a cup of food.",
+  },
+  {
+    'question': "The app is not responding when pressing a button",
+    'answer':
+        "Try to Restart the application, and if it doesn't work. Contact the developer through the information provided at the top",
+  },
 ];

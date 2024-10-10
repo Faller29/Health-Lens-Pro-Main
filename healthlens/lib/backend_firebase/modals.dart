@@ -1512,6 +1512,73 @@ Future<void> appTutorial(BuildContext context) {
                                                   textAlign: TextAlign.center,
                                                 ),
                                                 SizedBox(
+                                                  height: 20,
+                                                ),
+                                                RichText(
+                                                  text: TextSpan(
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                              color:
+                                                                  Colors.black),
+                                                      children: [
+                                                        TextSpan(
+                                                          text:
+                                                              " In order to determine the right serving size, users are advised to use measuring cups. However, if there are no present measuring cups, be advised that you can use your fist or hand to determine the level of serving size.\n\nTake note that",
+                                                        ),
+                                                        TextSpan(
+                                                          text: " A CUP ",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        TextSpan(
+                                                            text:
+                                                                "of food (e.g. cup of rice) is equivalent to a"),
+                                                        TextSpan(
+                                                          text:
+                                                              " CLOSED ADULT FIST",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        TextSpan(
+                                                            text:
+                                                                ". By establishing this technique, you can estimate the measurement of a cup."),
+                                                      ]),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                InkWell(
+                                                    onTap: () {
+                                                      // Show full image in CupertinoModalPopup when thumbnail is clicked
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FullImageModal(
+                                                              imagePath:
+                                                                  'assets/images/serving.jpg');
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Image.asset(
+                                                      'assets/images/serving.jpg',
+                                                      width: MediaQuery.sizeOf(
+                                                              context)
+                                                          .width,
+                                                      fit: BoxFit.fill,
+                                                    )),
+                                                Text(
+                                                  'Click image to full view',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.black54),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                SizedBox(
                                                   height: 10,
                                                 ),
                                               ],
