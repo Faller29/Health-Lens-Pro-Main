@@ -155,7 +155,7 @@ void updateAverageData() {
 
   barChart = [
     AverageData(
-      'Ave. Today',
+      'Avg. Today',
       todayFats.isNotEmpty
           ? decimalValue(todayFats.reduce((a, b) => a + b) / todayFats.length)
           : 0,
@@ -176,7 +176,7 @@ void updateAverageData() {
 
   barChart1 = [
     AverageData(
-      'Ave. 7 days',
+      'Avg. 7 days',
       last7DaysFats.isNotEmpty
           ? decimalValue(
               last7DaysFats.reduce((a, b) => a + b) / last7DaysFats.length)
@@ -199,7 +199,7 @@ void updateAverageData() {
 
   barChart2 = [
     AverageData(
-      'Ave. 30 days',
+      'Avg. 30 days',
       last30DaysFats.isNotEmpty
           ? decimalValue(
               last30DaysFats.reduce((a, b) => a + b) / last30DaysFats.length)

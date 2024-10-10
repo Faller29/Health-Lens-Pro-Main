@@ -119,14 +119,15 @@ class _HomePage extends State<HomePage> {
 
   @override
   void dispose() {
-    // Clear the lists to reset the state
-    if (dailyWeight!.isNotEmpty ||
-        weeklyWeight!.isNotEmpty ||
-        monthlyWeight!.isNotEmpty) {
+    // Check if the lists are not null before checking their contents
+    if ((dailyWeight != null && dailyWeight!.isNotEmpty) ||
+        (weeklyWeight != null && weeklyWeight!.isNotEmpty) ||
+        (monthlyWeight != null && monthlyWeight!.isNotEmpty)) {
       dailyWeight?.clear();
       weeklyWeight?.clear();
       monthlyWeight?.clear();
     }
+
     super.dispose(); // Call the superclass's dispose method
   }
 

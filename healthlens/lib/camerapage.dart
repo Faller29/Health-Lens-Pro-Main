@@ -83,6 +83,7 @@ class _CameraPageState extends State<CameraPage> {
         // Show a dialog or any other UI feedback
         showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
               backgroundColor: Colors.white.withOpacity(.8),

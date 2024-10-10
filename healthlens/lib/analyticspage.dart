@@ -42,6 +42,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     setState(() {
       _isDataLoaded = true; // Mark the data as loaded
     });
+    /*  _analyticsTimer = Timer.periodic(Duration(seconds: 10), (timer) async {
+      if (mounted) {
+        await fetchMacrosData();
+        setState(() {
+          _isDataLoaded = true; // Mark the data as loaded
+        });
+      }
+    }); */
   }
 
   @override
@@ -776,68 +784,74 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             ),
             series: <CartesianSeries>[
               StackedLineSeries<ChartData, String>(
-                  color: fats,
-                  dataLabelSettings: const DataLabelSettings(
-                    isVisible: true,
-                    margin: EdgeInsets.all(3),
-                    labelPosition: ChartDataLabelPosition.outside,
-                    textStyle: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 22, 104, 94)),
-                    labelAlignment: ChartDataLabelAlignment.top,
-                    alignment: ChartAlignment.center,
-                    useSeriesColor: false,
-                  ),
-                  groupName: 'Fats',
-                  name: 'Fats',
-                  dataSource: chartData,
-                  xValueMapper: (ChartData data, _) => data.x,
-                  yValueMapper: (ChartData data, _) => data.y1,
-                  pointColorMapper: (ChartData data, _) =>
-                      const Color(0xff249689)),
+                color: fats,
+                dataLabelSettings: const DataLabelSettings(
+                  isVisible: true,
+                  margin: EdgeInsets.all(3),
+                  labelPosition: ChartDataLabelPosition.outside,
+                  textStyle: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 22, 104, 94)),
+                  labelAlignment: ChartDataLabelAlignment.top,
+                  alignment: ChartAlignment.center,
+                  useSeriesColor: false,
+                ),
+                groupName: 'Fats',
+                name: 'Fats',
+                dataSource: chartData,
+                xValueMapper: (ChartData data, _) => data.x,
+                yValueMapper: (ChartData data, _) => data.y1,
+                pointColorMapper: (ChartData data, _) =>
+                    const Color(0xff249689),
+                markerSettings: MarkerSettings(isVisible: true),
+              ),
               StackedLineSeries<ChartData, String>(
-                  color: protein,
-                  dataLabelSettings: const DataLabelSettings(
-                    isVisible: true,
-                    margin: EdgeInsets.all(3),
-                    labelPosition: ChartDataLabelPosition.inside,
-                    textStyle: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 136, 21, 28)),
-                    labelAlignment: ChartDataLabelAlignment.top,
-                    alignment: ChartAlignment.center,
-                    useSeriesColor: false,
-                  ),
-                  groupName: 'Protein',
-                  name: 'Protein',
-                  dataSource: chartData,
-                  xValueMapper: (ChartData data, _) => data.x,
-                  yValueMapper: (ChartData data, _) => data.y2,
-                  pointColorMapper: (ChartData data, _) =>
-                      const Color(0xffff5963)),
+                color: protein,
+                dataLabelSettings: const DataLabelSettings(
+                  isVisible: true,
+                  margin: EdgeInsets.all(3),
+                  labelPosition: ChartDataLabelPosition.inside,
+                  textStyle: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 136, 21, 28)),
+                  labelAlignment: ChartDataLabelAlignment.top,
+                  alignment: ChartAlignment.center,
+                  useSeriesColor: false,
+                ),
+                groupName: 'Protein',
+                name: 'Protein',
+                dataSource: chartData,
+                xValueMapper: (ChartData data, _) => data.x,
+                yValueMapper: (ChartData data, _) => data.y2,
+                pointColorMapper: (ChartData data, _) =>
+                    const Color(0xffff5963),
+                markerSettings: MarkerSettings(isVisible: true),
+              ),
               StackedLineSeries<ChartData, String>(
-                  color: carbs,
-                  dataLabelSettings: const DataLabelSettings(
-                    isVisible: true,
-                    margin: EdgeInsets.all(3),
-                    labelPosition: ChartDataLabelPosition.inside,
-                    textStyle: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 36, 26, 121)),
-                    labelAlignment: ChartDataLabelAlignment.top,
-                    alignment: ChartAlignment.center,
-                    useSeriesColor: false,
-                  ),
-                  groupName: 'Carbohydrates',
-                  name: 'Carbohydrates',
-                  dataSource: chartData,
-                  xValueMapper: (ChartData data, _) => data.x,
-                  yValueMapper: (ChartData data, _) => data.y3,
-                  pointColorMapper: (ChartData data, _) =>
-                      const Color(0xff4b39ef)),
+                color: carbs,
+                dataLabelSettings: const DataLabelSettings(
+                  isVisible: true,
+                  margin: EdgeInsets.all(3),
+                  labelPosition: ChartDataLabelPosition.inside,
+                  textStyle: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 36, 26, 121)),
+                  labelAlignment: ChartDataLabelAlignment.top,
+                  alignment: ChartAlignment.center,
+                  useSeriesColor: false,
+                ),
+                groupName: 'Carbohydrates',
+                name: 'Carbohydrates',
+                dataSource: chartData,
+                xValueMapper: (ChartData data, _) => data.x,
+                yValueMapper: (ChartData data, _) => data.y3,
+                pointColorMapper: (ChartData data, _) =>
+                    const Color(0xff4b39ef),
+                markerSettings: MarkerSettings(isVisible: true),
+              ),
             ],
           ),
         ),
@@ -980,7 +994,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     height: 20,
                   ),
                   Text(
-                    '${avrgFat.toString()}g',
+                    '${dailyFats.toString()}g',
                     style: GoogleFonts.readexPro(
                       fontSize: 14.0,
                       textStyle: const TextStyle(
@@ -992,7 +1006,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     height: 10,
                   ),
                   Text(
-                    '${avrgProteins.toString()}g',
+                    '${dailyProtein.toString()}g',
                     style: GoogleFonts.readexPro(
                       fontSize: 14.0,
                       textStyle: const TextStyle(
@@ -1004,7 +1018,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     height: 10,
                   ),
                   Text(
-                    '${avrgCarbs.toString()}g',
+                    '${dailyCarbs.toString()}g',
                     style: GoogleFonts.readexPro(
                       fontSize: 14.0,
                       textStyle: const TextStyle(
