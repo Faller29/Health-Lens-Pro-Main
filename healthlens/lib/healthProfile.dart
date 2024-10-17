@@ -32,7 +32,7 @@ class _healthProfile extends State<healthProfile> {
   String? lifeStyle;
   List<String> chronicDisease = [];
   List<Map> categories = [
-    {"name": "Diabetes [Type 1 & 2]", "isChecked": false},
+    {"name": "Diabetes [Type 1 or 2]", "isChecked": false},
     {"name": "Hypertension", "isChecked": false},
     {"name": "Obesity", "isChecked": false},
   ];

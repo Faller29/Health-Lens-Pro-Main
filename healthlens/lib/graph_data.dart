@@ -41,7 +41,6 @@ Future<void> fetchMacrosData() async {
       .collection(todayDate)
       .get();
   final Map<String, Map<String, double>> todayMap = {};
-
   for (var doc in todaySnapshot.docs) {
     final data = doc.data();
     final List<dynamic> items = data['items'] ?? [];
@@ -61,7 +60,13 @@ Future<void> fetchMacrosData() async {
           (todayMap[time]!['carbs'] ?? 0) + (item['carbs'] ?? 0) * quantity;
     }
   }
-  chartData = todayMap.entries.map((entry) {
+
+// Convert todayMap entries to a list and sort by time
+  final sortedEntries = todayMap.entries.toList()
+    ..sort((a, b) => a.key.compareTo(b.key));
+
+// Create chartData from sorted map entries
+  chartData = sortedEntries.map((entry) {
     return ChartData(
       entry.key, // Time in hh:mm
       entry.value['fats']!.toDouble(),

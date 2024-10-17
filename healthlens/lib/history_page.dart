@@ -349,7 +349,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
             // Food History section with a GlobalKey
             Padding(
-              key: _foodHistoryKey, // Set the key for this section
+              key: _foodHistoryKey,
               padding: const EdgeInsets.fromLTRB(20, 20, 10, 0),
               child: Align(
                 alignment: Alignment.bottomLeft,
@@ -373,8 +373,15 @@ class _HistoryPageState extends State<HistoryPage> {
                           child: Container(
                             padding: EdgeInsets.all(15),
                             child: Text(
-                                'No food history for ${widget.formattedDate}',
-                                style: const TextStyle(fontSize: 18)),
+                              'No food history for ${widget.formattedDate}',
+                              style: GoogleFonts.readexPro(
+                                textStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         )
                       : ListView.builder(
@@ -405,7 +412,7 @@ class _HistoryPageState extends State<HistoryPage> {
             ),
             // Exercise History section with a GlobalKey
             Padding(
-              key: _exerciseHistoryKey, // Set the key for this section
+              key: _exerciseHistoryKey,
               padding: const EdgeInsets.fromLTRB(20, 20, 10, 0),
               child: Align(
                 alignment: Alignment.bottomLeft,
@@ -420,7 +427,6 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               ),
             ),
-            // Add your exercise history ListView or other content here
             Padding(
               padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: isLoading
@@ -430,8 +436,15 @@ class _HistoryPageState extends State<HistoryPage> {
                           child: Container(
                             padding: EdgeInsets.all(15),
                             child: Text(
-                                'No food history for ${widget.formattedDate}',
-                                style: const TextStyle(fontSize: 18)),
+                              'No Exercise Activity for ${widget.formattedDate}',
+                              style: GoogleFonts.readexPro(
+                                textStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         )
                       : ListView.builder(

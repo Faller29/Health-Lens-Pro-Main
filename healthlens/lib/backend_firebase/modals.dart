@@ -73,6 +73,7 @@ void mealPlanGeneratorSelector(BuildContext context) async {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(0xff4b39ef)),
                               onPressed: () {
+                                Navigator.of(context).pop(); // Close dialog
                                 Navigator.pushNamed(context, '/mealCreator');
                               },
                               child: Row(
@@ -99,6 +100,8 @@ void mealPlanGeneratorSelector(BuildContext context) async {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(0xff4b39ef)),
                               onPressed: () {
+                                Navigator.of(context).pop(); // Close dialog
+
                                 Navigator.pushNamed(context, '/mealPlan');
                               },
                               child: Row(

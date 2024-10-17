@@ -123,8 +123,8 @@ class _FoodServingState extends State<FoodServing> {
     if (parts.isEmpty) return SizedBox.shrink();
 
     // Ensure selectedParts[itemRemovedId] is set to the first item if null
-    if (selectedParts[itemRemovedId] == null && parts.isNotEmpty) {
-      selectedParts[itemRemovedId] = parts.first;
+    if (selectedParts[item] == null && parts.isNotEmpty) {
+      selectedParts[item] = parts.first;
     }
     if (chronicDisease!.contains('Obesity')) {
       chronicIndexList.add(1);
@@ -187,24 +187,29 @@ class _FoodServingState extends State<FoodServing> {
               borderRadius: BorderRadius.circular(10),
               isDense: true,
               dropdownColor: Colors.white,
-              value: selectedParts[itemRemovedId],
+              value: selectedParts[item],
               items: parts.map((part) {
                 return DropdownMenuItem<String>(
                   value: part,
                   child: Text(part,
                       style: GoogleFonts.readexPro(
-                          fontSize: 13, fontWeight: FontWeight.w400)),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      )),
                 );
               }).toList(),
               onChanged: (String? selectedPart) {
                 setState(() {
-                  selectedParts[itemRemovedId] = selectedPart;
+                  selectedParts[item] = selectedPart;
+                  print(selectedPart);
+                  print(item);
+                  print(foodItems);
                 });
               },
             ),
           ],
         ),
-        if (selectedParts[itemRemovedId] != null)
+        if (selectedParts[item] != null)
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +226,7 @@ class _FoodServingState extends State<FoodServing> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Fats: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['fats']}g',
+                    'Fats: ${itemMacronutrients[itemRemovedId]?[selectedParts[item]]?['fats']}g',
                     style: GoogleFonts.readexPro(
                       textStyle: TextStyle(
                         color: const Color(0xff249689),
@@ -229,7 +234,7 @@ class _FoodServingState extends State<FoodServing> {
                     ),
                   ),
                   Text(
-                    'Carbs: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['carbs']}g',
+                    'Carbs: ${itemMacronutrients[itemRemovedId]?[selectedParts[item]]?['carbs']}g',
                     style: GoogleFonts.readexPro(
                       textStyle: TextStyle(
                         color: const Color(0xff4b39ef),
@@ -237,7 +242,7 @@ class _FoodServingState extends State<FoodServing> {
                     ),
                   ),
                   Text(
-                    'Proteins: ${itemMacronutrients[itemRemovedId]?[selectedParts[itemRemovedId]]?['proteins']}g',
+                    'Proteins: ${itemMacronutrients[itemRemovedId]?[selectedParts[item]]?['proteins']}g',
                     style: GoogleFonts.readexPro(
                       textStyle: TextStyle(
                         color: const Color(0xffff5963),
@@ -301,20 +306,20 @@ class _FoodServingState extends State<FoodServing> {
   // Function to wrap the data for Firebase submission
   // Function to wrap the data for Firebase submission
   Map<String, dynamic> _wrapDataForFirebase() {
-    List<Map<String, dynamic>> foodItemsRemovedId;
-    foodItemsRemovedId = foodItems;
-    foodItemsRemovedId.forEach((foodItemsRemovedId) {
-      foodItemsRemovedId['item'] =
-          removeId(foodItemsRemovedId['item'] as String);
-    });
-    List<Map<String, dynamic>> wrappedItems = foodItemsRemovedId.map((item) {
-      final selectedPart = selectedParts[item['item']];
+    // Instead of removing unique ID, we will use the original unique ID for processing
+    List<Map<String, dynamic>> wrappedItems = foodItems.map((foodItem) {
+      final originalItemId = foodItem['item'] as String;
+      final itemRemovedId =
+          removeId(originalItemId); // Still remove the ID for other purposes
+
+      // Get selected part based on the original unique ID, not the modified one
+      final selectedPart = selectedParts[originalItemId];
       final macronutrients =
-          itemMacronutrients[item['item']]?[selectedPart] ?? {};
+          itemMacronutrients[itemRemovedId]?[selectedPart] ?? {};
 
       return {
-        'item': item['item'],
-        'quantity': item['quantity'],
+        'item': itemRemovedId, // Use item without unique ID for display
+        'quantity': foodItem['quantity'],
         'part': selectedPart,
         'fats': _parseInt(macronutrients['fats']),
         'carbs': _parseInt(macronutrients['carbs']),
@@ -685,11 +690,13 @@ class _FoodServingState extends State<FoodServing> {
       int id = _generateUniqueId();
       // Create a new entry for the separated item
       final separatedItem = {
-        'tag': "${originalItem['tag']}${id.toString()}",
+        'tag':
+            "${originalItem['tag'].replaceAll(RegExp(r'\d+'), '')}${id.toString()}",
         'quantity': newQuantity,
       };
       final separatedFoodItem = {
-        'item': "${originalItem['tag']}${id.toString()}",
+        'item':
+            "${originalItem['tag'].replaceAll(RegExp(r'\d+'), '')}${id.toString()}",
         'quantity': newQuantity,
       };
 
@@ -849,28 +856,60 @@ class _FoodServingState extends State<FoodServing> {
                                     children: [
                                       _buildItemOptions(item),
                                       Row(
-                                        mainAxisSize: MainAxisSize.max,
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceEvenly,
                                         children: [
+                                          Text(
+                                            'Quantity: ',
+                                            style: GoogleFonts.readexPro(
+                                              fontSize: 14,
+                                            ),
+                                          ),
                                           IconButton(
                                             icon: const Icon(
-                                                Icons.remove_circle_outline),
+                                                FontAwesomeIcons.minus,
+                                                size: 16),
                                             onPressed: () =>
                                                 decreaseQuantity(index),
                                           ),
                                           Text(
-                                              '${foodItems[index]['quantity']}'),
-                                          IconButton(
-                                            icon: const Icon(
-                                                Icons.add_circle_outline),
-                                            onPressed: () =>
-                                                increaseQuantity(index),
+                                            '${foodItems[index]['quantity']}',
+                                            style: GoogleFonts.readexPro(
+                                                color: Colors.green,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16),
                                           ),
                                           IconButton(
                                             icon: const Icon(
-                                              IconlyLight.delete,
-                                              color: Colors.red,
+                                              FontAwesomeIcons.plus,
+                                              size: 16,
+                                            ),
+                                            onPressed: () =>
+                                                increaseQuantity(index),
+                                          ),
+                                        ],
+                                      ),
+                                      Divider(),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextButton(
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  IconlyBold.delete,
+                                                  color: Colors.red,
+                                                  size: 16,
+                                                ),
+                                                Text(
+                                                  'Delete',
+                                                  style: GoogleFonts.readexPro(
+                                                      color: Colors.red,
+                                                      fontSize: 14),
+                                                )
+                                              ],
                                             ),
                                             onPressed: () => removeItem(index),
                                           ),
@@ -880,13 +919,15 @@ class _FoodServingState extends State<FoodServing> {
                                             child: Row(
                                               children: [
                                                 Icon(
-                                                  Icons.arrow_downward_outlined,
-                                                  size: 15,
+                                                  IconlyBold.arrow_down_2,
+                                                  color: Colors.green,
+                                                  size: 24,
                                                 ),
                                                 Text(
                                                   'Separate',
                                                   style: GoogleFonts.readexPro(
-                                                      fontSize: 13),
+                                                      color: Colors.green,
+                                                      fontSize: 14),
                                                 ),
                                               ],
                                             ),

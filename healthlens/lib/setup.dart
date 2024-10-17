@@ -31,7 +31,7 @@ class _SetupPageState extends State<SetupPage> {
   ];
 
   List<Map> categories = [
-    {"name": "Diabetes [Type 1 & 2]", "isChecked": false},
+    {"name": "Diabetes [Type 1 or 2]", "isChecked": false},
     {"name": "Hypertension", "isChecked": false},
     {"name": "Obesity", "isChecked": false},
   ];

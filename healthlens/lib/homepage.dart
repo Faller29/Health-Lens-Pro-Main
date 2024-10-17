@@ -133,7 +133,6 @@ class _HomePage extends State<HomePage> {
 
   Future<Map<String, dynamic>> getSavedMacronutrientData() async {
     String uid = thisUser!.uid;
-    String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
         .collection('userFoodBookMark')
@@ -141,8 +140,55 @@ class _HomePage extends State<HomePage> {
         .get();
 
     if (snapshot.exists) {
-      return snapshot.data() as Map<String, dynamic>;
+      // Retrieve data as a Map
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      // Check if selectedFoods exists and is a list
+      if (data['selectedFoods'] != null && data['selectedFoods'] is List) {
+        // Iterate over each meal in the data
+        for (var meal in data['selectedFoods']) {
+          List<dynamic>? foods = meal['foods'];
+
+          // Check if foods exist and are a list before proceeding
+          if (foods != null && foods is List) {
+            // Create a map to track duplicate foods by (foodName, servingSize) key
+            Map<String, Map<String, dynamic>> combinedFoods = {};
+
+            for (var food in foods) {
+              String foodName = food['foodName'];
+              String servingSize = food['servingSize'];
+
+              String key =
+                  '$foodName-$servingSize'; // Unique key for each food + serving size
+
+              // Initialize the quantity to 1 if it's null
+              int currentQuantity = (food['quantity'] ?? 1);
+
+              if (combinedFoods.containsKey(key)) {
+                // If the food is already present, increase its quantity
+                combinedFoods[key]!['quantity'] += currentQuantity;
+              } else {
+                // Add the food to the map and set the quantity
+                combinedFoods[key] = Map<String, dynamic>.from(food);
+                combinedFoods[key]!['quantity'] =
+                    currentQuantity; // Ensure quantity is set
+              }
+            }
+
+            // Update the meal's food list with the combined food entries
+            meal['foods'] = combinedFoods.values.toList();
+          } else {
+            print('Foods list is null or not a list for meal: $meal');
+          }
+        }
+      } else {
+        print('selectedFoods is null or not a list.');
+      }
+
+      // Return the modified data
+      return data;
     } else {
+      print('No data found for the user.');
       return {}; // Return an empty map if no data exists
     }
   }
@@ -1696,212 +1742,386 @@ class _HomePage extends State<HomePage> {
 
     if (savedData.isNotEmpty) {
       showCupertinoModalPopup(
-          context: context,
-          builder: (context) {
-            return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Center(
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 0,
-                    margin: const EdgeInsets.fromLTRB(10, 150, 10, 150),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 25, 25, 10),
-                      child: SingleChildScrollView(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Center(
+                child: Card(
+                  color: Colors.white,
+                  elevation: 0,
+                  margin: const EdgeInsets.fromLTRB(20, 120, 20, 120),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 20,
+                      ),
+                      // Title
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          "My Meal Plan",
+                          style: GoogleFonts.readexPro(
+                            fontSize: 20.0,
+                            textStyle: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(30, 25, 25, 10),
+                            child: Column(
+                              children: [
+                                ...savedData.entries.map((entry) {
+                                  String mealType = entry
+                                      .key; // Get the meal type (e.g., Breakfast)
+                                  var mealsData = entry
+                                      .value; // This should be the list of meals
+
+                                  // Ensure that mealsData is a List
+                                  if (mealsData is List) {
+                                    // Iterate through each meal in mealsData
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: mealsData.map<Widget>((meal) {
+                                        String mealTitle =
+                                            meal['meal']; // Get the meal title
+                                        var selectedFoods = meal[
+                                            'foods']; // Get the foods for this meal
+
+                                        // Ensure that selectedFoods is a List
+                                        if (selectedFoods is List) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 16.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // Display meal type
+                                                Text(
+                                                  mealTitle,
+                                                  style: GoogleFonts.readexPro(
+                                                    fontSize: 16.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black87,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                    height:
+                                                        8), // Space between meal type and foods
+                                                ...selectedFoods.map<Widget>(
+                                                    (selectedFood) {
+                                                  String? foodName = selectedFood[
+                                                      'foodName']; // Nullable type for foodName
+                                                  String? servingSize =
+                                                      selectedFood[
+                                                          'servingSize']; // Use servingSize
+                                                  int quantity = selectedFood[
+                                                          'quantity'] ??
+                                                      1; // Default to 1 if quantity is missing
+
+                                                  // Check if foodName and servingSize are not null
+                                                  if (foodName != null &&
+                                                      servingSize != null &&
+                                                      itemMacronutrients
+                                                          .containsKey(
+                                                              foodName) &&
+                                                      itemMacronutrients[
+                                                              foodName]!
+                                                          .containsKey(
+                                                              servingSize)) {
+                                                    Map<String, dynamic>
+                                                        macronutrients =
+                                                        itemMacronutrients[
+                                                                foodName]![
+                                                            servingSize]!;
+
+                                                    // Calculate macronutrients based on quantity
+                                                    int totalCarbs =
+                                                        macronutrients[
+                                                                'carbs']! *
+                                                            quantity;
+                                                    int totalFats =
+                                                        macronutrients[
+                                                                'fats']! *
+                                                            quantity;
+                                                    int totalProteins =
+                                                        macronutrients[
+                                                                'proteins']! *
+                                                            quantity;
+
+                                                    return Padding(
+                                                      padding: const EdgeInsets
+                                                          .fromLTRB(0, 0, 0,
+                                                          8), // Use vertical padding to minimize left/right gap
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            foodName,
+                                                            style: GoogleFonts
+                                                                .readexPro(
+                                                              fontSize: 14.0,
+                                                              textStyle:
+                                                                  const TextStyle(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        0,
+                                                                        0,
+                                                                        0),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "Serving: $servingSize",
+                                                            style: GoogleFonts
+                                                                .readexPro(
+                                                              fontSize: 12.0,
+                                                              textStyle:
+                                                                  const TextStyle(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        0,
+                                                                        0,
+                                                                        0),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            'Quantity: x$quantity\n'
+                                                            'Carbs: $totalCarbs g, '
+                                                            'Fats: $totalFats g, '
+                                                            'Proteins: $totalProteins g',
+                                                            style: GoogleFonts
+                                                                .readexPro(
+                                                              fontSize: 12.0,
+                                                              textStyle:
+                                                                  const TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    // Log if no matching food found
+                                                    print(
+                                                        'No macronutrients found for food: $foodName, serving size: $servingSize');
+                                                    return const SizedBox(); // Return empty widget if no match found or foodName is null
+                                                  }
+                                                }).toList(),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // Log if selectedFoods is not a List
+                                          print(
+                                              'Expected selectedFoods to be a List for meal type: $mealTitle');
+                                          return const SizedBox(); // Return empty widget if selectedFoods is not a List
+                                        }
+                                      }).toList(),
+                                    );
+                                  } else {
+                                    // Log if mealsData is not a List
+                                    print(
+                                        'Expected mealsData to be a List for meal type: $mealType');
+                                    return const SizedBox(); // Return empty widget if mealsData is not a List
+                                  }
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Show total macronutrients
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(10),
+                            bottomRight: Radius.circular(10),
+                          ),
+                          color: Color(0xff4b39ef),
+                        ),
+                        padding: const EdgeInsets.fromLTRB(30, 0, 5, 0),
+                        width: MediaQuery.sizeOf(context).width,
                         child: Column(
-                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Title
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Text(
-                                "My Meal Plan",
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 20.0,
-                                  textStyle: const TextStyle(
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
+                            // const Divider(),
+                            SizedBox(
+                              height: 10,
                             ),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                  overlayColor: MaterialStateColor.resolveWith(
-                                      (states) => Colors.white30),
-                                  backgroundColor:
-                                      const MaterialStatePropertyAll<Color>(
-                                    Colors.redAccent,
-                                  ),
-                                  side: const MaterialStatePropertyAll(
-                                    BorderSide(
-                                      color: Color(0xFFE0E3E7),
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  shape:
-                                      MaterialStateProperty.all<OutlinedBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(50.0),
-                                    ),
-                                  ),
-                                  padding:
-                                      MaterialStateProperty.all<EdgeInsets>(
-                                    const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  // Show confirmation dialog before clearing
-                                  _showClearConfirmationDialog(context);
-                                },
-                                child: Text(
-                                  'Clear',
-                                  style: GoogleFonts.readexPro(
-                                    fontSize: 11.0,
-                                    textStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                            Text(
+                              "Total Macronutrients",
+                              style: GoogleFonts.readexPro(
+                                fontSize: 16.0,
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-
-                            // Loop through each item in the saved data
-                            ...savedData.values.map((selectedFoods) {
-                              if (selectedFoods is List) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment
-                                      .start, // Align all items to the start
-                                  children:
-                                      selectedFoods.map<Widget>((selectedFood) {
-                                    String foodName = selectedFood['foodName'];
-                                    String servingPart =
-                                        selectedFood['servingPart'];
-                                    int quantity = selectedFood[
-                                        'quantity']; // Get quantity
-
-                                    if (itemMacronutrients
-                                            .containsKey(foodName) &&
-                                        itemMacronutrients[foodName]!
-                                            .containsKey(servingPart)) {
-                                      Map<String, int> macronutrients =
-                                          itemMacronutrients[foodName]![
-                                              servingPart]!;
-
-                                      // Calculate macronutrients based on quantity
-                                      int totalCarbs =
-                                          macronutrients['carbs']! * quantity;
-                                      int totalFats =
-                                          macronutrients['fats']! * quantity;
-                                      int totalProteins =
-                                          macronutrients['proteins']! *
-                                              quantity;
-
-                                      return Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0,
-                                            0,
-                                            0,
-                                            8), // Use vertical padding to minimize left/right gap
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              foodName,
-                                              style: GoogleFonts.readexPro(
-                                                fontSize: 14.0,
-                                                textStyle: const TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 0, 0, 0),
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                            Text(
-                                              "Serving: $servingPart",
-                                              style: GoogleFonts.readexPro(
-                                                fontSize: 12.0,
-                                                textStyle: const TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 0, 0, 0),
-                                                ),
-                                              ),
-                                            ),
-                                            Text(
-                                              'Quantity: x$quantity\n'
-                                              'Carbs: $totalCarbs g, '
-                                              'Fats: $totalFats g, '
-                                              'Proteins: $totalProteins g',
-                                              style: GoogleFonts.readexPro(
-                                                fontSize: 12.0,
-                                                textStyle: const TextStyle(
-                                                  color: Colors.black54,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Carbs:",
+                                      style: GoogleFonts.readexPro(
+                                        fontSize: 14.0,
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
                                         ),
-                                      );
-                                    } else {
-                                      return const SizedBox(); // Empty widget if no match found
-                                    }
-                                  }).toList(),
-                                );
-                              } else {
-                                return const SizedBox(); // Empty widget if selectedFoods is not a List
-                              }
-                            }).toList(),
-
-                            const SizedBox(height: 20),
-                            const Divider(),
-                            // Show total macronutrients
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Text(
-                                "Total Macronutrients",
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 16.0,
-                                  textStyle: const TextStyle(
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                      ),
+                                    ),
+                                    Text(
+                                      "Fats:",
+                                      style: GoogleFonts.readexPro(
+                                        fontSize: 14.0,
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      "Proteins:",
+                                      style: GoogleFonts.readexPro(
+                                        fontSize: 14.0,
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            // Calculate the total macronutrients from the saved data
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Text(
-                                "Carbs: ${calculateTotalMacronutrients(savedData)['carbs']} g\n"
-                                "Fats: ${calculateTotalMacronutrients(savedData)['fats']} g\n"
-                                "Proteins: ${calculateTotalMacronutrients(savedData)['proteins']} g\n",
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 14.0,
-                                  textStyle: const TextStyle(
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                  ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "${calculateTotalMacronutrients(savedData)['carbs']} g",
+                                      style: GoogleFonts.readexPro(
+                                        fontSize: 14.0,
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      "${calculateTotalMacronutrients(savedData)['fats']} g",
+                                      style: GoogleFonts.readexPro(
+                                        fontSize: 14.0,
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      "${calculateTotalMacronutrients(savedData)['proteins']} g",
+                                      style: GoogleFonts.readexPro(
+                                        fontSize: 14.0,
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                  ],
                                 ),
-                              ),
+                                SizedBox(
+                                  width: 50,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                        overlayColor:
+                                            MaterialStateColor.resolveWith(
+                                                (states) => Colors.white30),
+                                        backgroundColor:
+                                            const MaterialStatePropertyAll<
+                                                Color>(
+                                          Colors.redAccent,
+                                        ),
+                                        side: const MaterialStatePropertyAll(
+                                          BorderSide(
+                                            color: Color(0xFFE0E3E7),
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        shape: MaterialStateProperty.all<
+                                            OutlinedBorder>(
+                                          RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50.0),
+                                          ),
+                                        ),
+                                        padding: MaterialStateProperty.all<
+                                            EdgeInsets>(
+                                          const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        // Show confirmation dialog before clearing
+                                        _showClearConfirmationDialog(context);
+                                      },
+                                      child: Text(
+                                        'Clear',
+                                        style: GoogleFonts.readexPro(
+                                          fontSize: 11.0,
+                                          textStyle: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 10),
                           ],
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                );
-              },
-            );
-          });
+                ),
+              );
+            },
+          );
+        },
+      );
     } else {
       showCupertinoModalPopup(
           context: context,
@@ -1987,10 +2207,8 @@ class _HomePage extends State<HomePage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 clearFoodItems(context); // Pass context to show Snackbar
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Close modal
               },
               child: Text(
                 "Confirm",
@@ -2028,27 +2246,36 @@ class _HomePage extends State<HomePage> {
       await FirebaseFirestore.instance
           .collection('userFoodBookMark')
           .doc(uid)
-          .set({}); // Update the selectedFoods field to an empty list
+          .set({}); // Clear the selectedFoods
 
-      // Show confirmation Snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("All food items have been cleared."),
-          behavior: SnackBarBehavior.floating,
-          elevation: 3,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      // Show confirmation Snackbar if the widget is still mounted
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("All food items have been cleared."),
+            behavior: SnackBarBehavior.floating,
+            elevation: 3,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        Navigator.of(context).pop(); // Close dialog
+        Navigator.of(context).pop(); // Close dialog
+      }
     } catch (e) {
-      // Handle error
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Failed to clear food items. Please try again."),
-          behavior: SnackBarBehavior.floating,
-          elevation: 3,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      // Show error Snackbar if the widget is still mounted
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to clear food items. Please try again."),
+            behavior: SnackBarBehavior.floating,
+            elevation: 3,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -2058,28 +2285,68 @@ class _HomePage extends State<HomePage> {
     int totalFats = 0;
     int totalProteins = 0;
 
-    // Iterate through the savedData from Firebase
-    savedData.forEach((_, selectedFoods) {
-      if (selectedFoods is List) {
-        for (var selectedFood in selectedFoods) {
-          String foodName = selectedFood['foodName'];
-          String servingPart = selectedFood['servingPart'];
-          int quantity = selectedFood['quantity']; // Get the quantity
+    // Use a Map to accumulate quantities of the same food and serving size
+    Map<String, Map<String, int>> foodQuantityMap = {};
 
-          // Check if the item exists in itemMacronutrients
-          if (itemMacronutrients.containsKey(foodName) &&
-              itemMacronutrients[foodName]!.containsKey(servingPart)) {
-            Map<String, int> macronutrients =
-                itemMacronutrients[foodName]![servingPart]!;
+    // Check if 'selectedFoods' exists and is a List
+    if (savedData.containsKey('selectedFoods') &&
+        savedData['selectedFoods'] is List) {
+      // Iterate through each meal entry
+      for (var mealEntry in savedData['selectedFoods']) {
+        // Ensure that mealEntry is a Map and contains 'foods'
+        if (mealEntry is Map<String, dynamic> &&
+            mealEntry.containsKey('foods')) {
+          List<dynamic> foods = mealEntry['foods'];
 
-            // Sum up the macronutrients considering the quantity
-            totalCarbs += macronutrients['carbs']! * quantity;
-            totalFats += macronutrients['fats']! * quantity;
-            totalProteins += macronutrients['proteins']! * quantity;
+          // Iterate through each food in the foods list
+          for (var selectedFood in foods) {
+            String foodName = selectedFood['foodName'] ?? '';
+            String servingSize = selectedFood['servingSize'] ?? '';
+            int quantity =
+                selectedFood['quantity'] ?? 1; // Get quantity, default to 1
+
+            // If the same food and serving size exists, increase the quantity
+            if (foodQuantityMap.containsKey(foodName)) {
+              if (foodQuantityMap[foodName]!.containsKey(servingSize)) {
+                foodQuantityMap[foodName]![servingSize] =
+                    foodQuantityMap[foodName]![servingSize]! + quantity;
+              } else {
+                foodQuantityMap[foodName]![servingSize] = quantity;
+              }
+            } else {
+              foodQuantityMap[foodName] = {servingSize: quantity};
+            }
           }
+        } else {
+          // Log a message if mealEntry is not valid (for debugging)
+          print('Expected mealEntry to be a Map with a "foods" key');
         }
       }
-    });
+
+      // Now iterate through the foodQuantityMap to calculate macronutrients
+      foodQuantityMap.forEach((foodName, servingMap) {
+        servingMap.forEach((servingSize, quantity) {
+          // Check if the item exists in itemMacronutrients
+          if (itemMacronutrients.containsKey(foodName) &&
+              itemMacronutrients[foodName]!.containsKey(servingSize)) {
+            Map<String, dynamic> macronutrients =
+                itemMacronutrients[foodName]![servingSize]!;
+
+            // Sum up the macronutrients considering the accumulated quantity
+            totalCarbs += (macronutrients['carbs'] as int) * quantity;
+            totalFats += (macronutrients['fats'] as int) * quantity;
+            totalProteins += (macronutrients['proteins'] as int) * quantity;
+          } else {
+            // Log a message for foods not found in itemMacronutrients (for debugging)
+            print(
+                'No macronutrients found for food: $foodName, serving size: $servingSize');
+          }
+        });
+      });
+    } else {
+      // Log a message if 'selectedFoods' is not found or not a List (for debugging)
+      print('No selectedFoods found or it is not a List in savedData');
+    }
 
     // Return the total macronutrient sums
     return {

@@ -1413,7 +1413,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             ),
             primaryXAxis: const CategoryAxis(
               labelIntersectAction: AxisLabelIntersectAction.multipleRows,
-              maximum: 8,
+              initialVisibleMaximum: 8,
             ),
             primaryYAxis: const NumericAxis(
               anchorRangeToVisiblePoints: true,
