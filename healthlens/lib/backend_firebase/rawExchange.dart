@@ -308,23 +308,6 @@ final Map<String, Map<String, Map<String, dynamic>>> itemMacronutrients = {
       'type': 5,
     },
   },
-  'Boiled Egg': {
-    //check
-    'Whole Egg (Chicken)': {
-      'fats': 5,
-      'carbs': 1,
-      'proteins': 6,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Half Egg (Chicken)': {
-      'fats': 3,
-      'carbs': 0,
-      'proteins': 3,
-      'foodExchange': 0.5,
-      'type': 8,
-    },
-  },
   'Brohas': {
     '5 Pcs': {
       'fats': 0,
@@ -536,99 +519,6 @@ final Map<String, Map<String, Map<String, dynamic>>> itemMacronutrients = {
       'proteins': 0,
       'foodExchange': 1,
       'type': 5,
-    },
-  },
-  'Chicken (Adobong Iga)': {
-    //check
-    //Case 1: Warning lang na kapag sobra sa oil nung luto bawal dito (hyper, obesity, diabetes)
-    //Case 2: Warning if matamis yung luto bawal sa may diabetes
-    'Whole Cup': {
-      'fats': 16,
-      'carbs': 8,
-      'proteins': 16,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Half Cup': {
-      'fats': 8,
-      'carbs': 4,
-      'proteins': 8,
-      'foodExchange': 0.5,
-      'type': 8,
-    },
-  },
-  'Chicken (Chicken Inasal)': {
-    //check
-    'Breast with Wings': {
-      'fats': 27,
-      'carbs': 13,
-      'proteins': 27,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Leg': {
-      'fats': 21,
-      'carbs': 13,
-      'proteins': 24,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Thigh': {
-      'fats': 10,
-      'carbs': 5,
-      'proteins': 20,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Drumstick': {
-      'fats': 13,
-      'carbs': 7,
-      'proteins': 17,
-      'foodExchange': 1,
-      'type': 8,
-    },
-  },
-  'Chicken (Fried Chicken)': {
-    //check
-    'Drumstick': {
-      'fats': 7,
-      'carbs': 0,
-      'proteins': 14,
-      'warnings': 2,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Breast': {
-      'fats': 9,
-      'carbs': 0,
-      'proteins': 31,
-      'warnings': 2,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Leg': {
-      'fats': 17,
-      'carbs': 0,
-      'proteins': 31,
-      'warnings': 2,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Thigh': {
-      'fats': 10,
-      'carbs': 0,
-      'proteins': 17,
-      'warnings': 2,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Wing': {
-      'fats': 7,
-      'carbs': 0,
-      'proteins': 9,
-      'warnings': 2,
-      'foodExchange': 1,
-      'type': 8,
     },
   },
   'Coco Sugar': {
@@ -895,71 +785,6 @@ final Map<String, Map<String, Map<String, dynamic>>> itemMacronutrients = {
       'proteins': 2,
       'foodExchange': 1,
       'type': 6,
-    },
-  },
-  'Fish (Daing na Bangus)': {
-    //check
-    'Big - 1 Slice': {
-      'fats': 12,
-      'carbs': 1,
-      'proteins': 22,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Small - 1 Slice': {
-      'fats': 5,
-      'carbs': 0,
-      'proteins': 13,
-      'foodExchange': 0.5,
-      'type': 8,
-    },
-  },
-  'Fish (Pan Fried Tilapia)': {
-    //check
-    'Head': {
-      'fats': 3,
-      'carbs': 6,
-      'proteins': 8,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Body': {
-      'fats': 10,
-      'carbs': 17,
-      'proteins': 25,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Tail': {
-      'fats': 3,
-      'carbs': 6,
-      'proteins': 8,
-      'foodExchange': 1,
-      'type': 8,
-    },
-  },
-  'Fish (Sinaing na Tulingan)': {
-    //check
-    'Head': {
-      'fats': 4,
-      'carbs': 0,
-      'proteins': 7,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Body': {
-      'fats': 13,
-      'carbs': 1,
-      'proteins': 22,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Tail': {
-      'fats': 4,
-      'carbs': 0,
-      'proteins': 7,
-      'foodExchange': 1,
-      'type': 8,
     },
   },
   'Fish': {
@@ -3009,49 +2834,6 @@ final Map<String, Map<String, Map<String, dynamic>>> itemMacronutrients = {
       'type': 6,
     },
   },
-  'Pork (Breaded Pork Chop)': {
-    //1 Slice ng tenderloin
-    //Warning lang na iwasan yung matatabang part (para sa lahat ng sakit toh hyper, obesity, diabetes)
-    '1 Slice': {
-      'fats': 26,
-      'carbs': 19,
-      'proteins': 30,
-      'warnings': 4,
-      'foodExchange': 1,
-      'type': 8,
-    },
-  },
-  'Pork (Lechon Kawali)': {
-    //1 Cup cooked, diced
-    //Warning lang na iwasan yung matatabang part (para sa lahat ng sakit toh hyper, obesity, diabetes)
-    'Whole Cup': {
-      'fats': 37,
-      'carbs': 4,
-      'proteins': 25,
-      'warnings': 4,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Half Cup': {
-      'fats': 19,
-      'carbs': 2,
-      'proteins': 13,
-      'warnings': 4,
-      'foodExchange': 0.5,
-      'type': 8,
-    },
-  },
-  'Pork (Pork Bistek)': {
-    //1 Slice ng tenderloin
-    //Warning lang na iwasan yung matatabang part (para sa lahat ng sakit toh hyper, obesity, diabetes)
-    'Pork Chop': {
-      'fats': 7,
-      'carbs': 3,
-      'proteins': 26,
-      'foodExchange': 1,
-      'type': 8,
-    },
-  },
   'Pork Crackling (Skin)': {
     '5 Pcs': {
       'fats': 5,
@@ -3367,16 +3149,6 @@ final Map<String, Map<String, Map<String, dynamic>>> itemMacronutrients = {
       'type': 5,
     },
   },
-  'Scrambled Egg': {
-    //check
-    '1 Pc Chicken Egg': {
-      'fats': 7,
-      'carbs': 1,
-      'proteins': 6,
-      'foodExchange': 1,
-      'type': 8,
-    },
-  },
   'Seeds': {
     '1 Tbsp Sunflower': {
       'fats': 5,
@@ -3536,16 +3308,6 @@ final Map<String, Map<String, Map<String, dynamic>>> itemMacronutrients = {
       'proteins': 2,
       'foodExchange': 1,
       'type': 6,
-    },
-  },
-  'Sunny Side Up Egg': {
-    //check
-    '1 Pc Chicken Egg': {
-      'fats': 7,
-      'carbs': 0,
-      'proteins': 6,
-      'foodExchange': 1,
-      'type': 8,
     },
   },
   'Taho': {
@@ -3807,40 +3569,6 @@ final Map<String, Map<String, Map<String, dynamic>>> itemMacronutrients = {
       'proteins': 4,
       'foodExchange': 1,
       'type': 6,
-    },
-  },
-  'White Rice (Boiled Rice)': {
-    //check
-    'Whole Cup': {
-      'fats': 0,
-      'carbs': 45,
-      'proteins': 4,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Half Cup': {
-      'fats': 0,
-      'carbs': 23,
-      'proteins': 2,
-      'foodExchange': 0.5,
-      'type': 8,
-    },
-  },
-  'White Rice (Fried Rice)': {
-    //check
-    'Whole Cup': {
-      'fats': 4,
-      'carbs': 45,
-      'proteins': 6,
-      'foodExchange': 1,
-      'type': 8,
-    },
-    'Half Cup': {
-      'fats': 2,
-      'carbs': 23,
-      'proteins': 3,
-      'foodExchange': 0.5,
-      'type': 8,
     },
   },
   'Yogurt': {

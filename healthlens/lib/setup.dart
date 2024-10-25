@@ -906,7 +906,7 @@ class _SetupPageState extends State<SetupPage> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    'Please enter your Age, Heigh, and Weight.',
+                                                    'Please enter your Age, Height, and Weight.',
                                                     style:
                                                         GoogleFonts.readexPro(
                                                       fontSize: 14.0,

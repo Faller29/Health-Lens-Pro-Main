@@ -154,35 +154,46 @@ class _FoodServingState extends State<FoodServing> {
 
     return Column(
       children: [
-        Row(
+        Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Builder(
-              builder: (context) {
-                if (itemRemovedId.contains('Egg') ||
-                    itemRemovedId.contains('Tortang Talong') ||
-                    itemRemovedId.contains('Bread')) {
-                  return Text('Food Type:', style: GoogleFonts.readexPro());
-                } else if (itemRemovedId.contains('Rice') ||
-                    itemRemovedId.contains('Potato') ||
-                    itemRemovedId.contains('Onion') ||
-                    itemRemovedId.contains('Kamatis') ||
-                    itemRemovedId.contains('Boiled') ||
-                    itemRemovedId.contains('Pork (Lechon Kawali)') ||
-                    itemRemovedId.contains('Chicken (Adobong Iga)')) {
-                  return Text('Serving Size:', style: GoogleFonts.readexPro());
-                } else if (itemRemovedId.contains('Pork (Breaded Pork Chop)') ||
-                    itemRemovedId.contains('Fish (Daing na Bangus)')) {
-                  return Text('Slice:', style: GoogleFonts.readexPro());
-                } else {
-                  return Text('Select part:', style: GoogleFonts.readexPro());
-                }
-              },
+            SizedBox(
+              height: 20,
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Builder(
+                builder: (context) {
+                  if (itemRemovedId.contains('Egg') ||
+                      itemRemovedId.contains('Tortang Talong') ||
+                      itemRemovedId.contains('Bread')) {
+                    return Text('Food Type:', style: GoogleFonts.readexPro());
+                  } else if (itemRemovedId.contains('Rice') ||
+                      itemRemovedId.contains('Potato') ||
+                      itemRemovedId.contains('Onion') ||
+                      itemRemovedId.contains('Kamatis') ||
+                      itemRemovedId.contains('Boiled') ||
+                      itemRemovedId.contains('Pork (Lechon Kawali)') ||
+                      itemRemovedId.contains('Chicken (Adobong Iga)')) {
+                    return Text('Serving Size:',
+                        style: GoogleFonts.readexPro());
+                  } else if (itemRemovedId
+                          .contains('Pork (Breaded Pork Chop)') ||
+                      itemRemovedId.contains('Fish (Daing na Bangus)')) {
+                    return Text('Slice:', style: GoogleFonts.readexPro());
+                  } else {
+                    return Text('Select serving:',
+                        style: GoogleFonts.readexPro());
+                  }
+                },
+              ),
             ),
             SizedBox(
               width: 20,
             ),
             DropdownButton<String>(
+              isExpanded: true,
+              menuMaxHeight: 400,
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
               borderRadius: BorderRadius.circular(10),
               isDense: true,
@@ -722,6 +733,94 @@ class _FoodServingState extends State<FoodServing> {
         title: Text('Food Serving', style: GoogleFonts.readexPro(fontSize: 18)),
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
+        actions: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+            child: Tooltip(
+              triggerMode: TooltipTriggerMode.tap,
+              richMessage: WidgetSpan(
+                alignment: PlaceholderAlignment.baseline,
+                baseline: TextBaseline.alphabetic,
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 300),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Food Serving',
+                        style: GoogleFonts.readexPro(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      SizedBox(
+                        child: RichText(
+                          text: TextSpan(
+                              style: GoogleFonts.readexPro(),
+                              children: [
+                                TextSpan(
+                                  text:
+                                      " In order to determine the right serving size, users are advised to use measuring cups. However, if there are no present measuring cups, be advised that you can use your fist or hand to determine the level of serving size.\n\nTake note that",
+                                ),
+                                TextSpan(
+                                  text: " A CUP ",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(
+                                    text:
+                                        "of food (e.g. cup of rice) is equivalent to a"),
+                                TextSpan(
+                                  text: " CLOSED ADULT FIST",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(
+                                    text:
+                                        ". By establishing this technique, you can estimate the measurement of a cup."),
+                              ]),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Image.asset(
+                        'assets/images/serving.jpg',
+                        height: 200,
+                        width: MediaQuery.sizeOf(context).width,
+                        fit: BoxFit.cover,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.all(20),
+              margin: EdgeInsets.all(20),
+              showDuration: Duration(seconds: 10),
+              decoration: BoxDecoration(
+                color: Color(0xff4b39ef).withOpacity(0.9),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+              ),
+              preferBelow: true,
+              verticalOffset: 20,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: const [
+                  Icon(
+                    FontAwesomeIcons.circleQuestion,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
       body: Stack(
         children: [
@@ -732,91 +831,6 @@ class _FoodServingState extends State<FoodServing> {
               children: [
                 SizedBox(
                   height: 5,
-                ),
-                Tooltip(
-                  triggerMode: TooltipTriggerMode.tap,
-                  richMessage: WidgetSpan(
-                    alignment: PlaceholderAlignment.baseline,
-                    baseline: TextBaseline.alphabetic,
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 300),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Food Serving',
-                            style: GoogleFonts.readexPro(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          SizedBox(
-                            child: RichText(
-                              text: TextSpan(
-                                  style: GoogleFonts.readexPro(),
-                                  children: [
-                                    TextSpan(
-                                      text:
-                                          " In order to determine the right serving size, users are advised to use measuring cups. However, if there are no present measuring cups, be advised that you can use your fist or hand to determine the level of serving size.\n\nTake note that",
-                                    ),
-                                    TextSpan(
-                                      text: " A CUP ",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    TextSpan(
-                                        text:
-                                            "of food (e.g. cup of rice) is equivalent to a"),
-                                    TextSpan(
-                                      text: " CLOSED ADULT FIST",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    TextSpan(
-                                        text:
-                                            ". By establishing this technique, you can estimate the measurement of a cup."),
-                                  ]),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Image.asset(
-                            'assets/images/serving.jpg',
-                            height: 200,
-                            width: MediaQuery.sizeOf(context).width,
-                            fit: BoxFit.cover,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  padding: EdgeInsets.all(20),
-                  margin: EdgeInsets.all(20),
-                  showDuration: Duration(seconds: 10),
-                  decoration: BoxDecoration(
-                    color: Color(0xff4b39ef).withOpacity(0.9),
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  ),
-                  preferBelow: true,
-                  verticalOffset: 20,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: const [
-                      Icon(
-                        FontAwesomeIcons.circleQuestion,
-                        size: 16,
-                        color: Colors.black54,
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                    ],
-                  ),
                 ),
                 (foodItems.isNotEmpty)
                     ? Expanded(

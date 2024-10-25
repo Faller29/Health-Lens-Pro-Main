@@ -1043,7 +1043,7 @@ Future<void> appTutorial(BuildContext context) {
                                                           ),
                                                           TextSpan(
                                                             text:
-                                                                "Warning Icon ",
+                                                                "Warning Icon. ",
                                                             style: TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
@@ -1051,7 +1051,7 @@ Future<void> appTutorial(BuildContext context) {
                                                           ),
                                                           TextSpan(
                                                             text:
-                                                                "This indicated that specific food is harmful to the user and advised to not include it in their Meal Plan.",
+                                                                "This indicates that the specific food is harmful to the user and advised to not include it in their Meal Plan.",
                                                           ),
                                                         ])),
                                                 SizedBox(
@@ -1311,7 +1311,7 @@ Future<void> appTutorial(BuildContext context) {
                                                           ),
                                                           TextSpan(
                                                             text:
-                                                                "Foods Detected Section ",
+                                                                "Foods Detected Section.",
                                                             style: TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
@@ -1362,7 +1362,7 @@ Future<void> appTutorial(BuildContext context) {
                                                     children: [
                                                       TextSpan(
                                                           text:
-                                                              "If the you are satisfied in the results/foods detected, the click the "),
+                                                              "If you are satisfied in the results/foods detected, click the "),
                                                       TextSpan(
                                                         text:
                                                             "Eat Food Button ",
@@ -1450,7 +1450,7 @@ Future<void> appTutorial(BuildContext context) {
                                                           ),
                                                           TextSpan(
                                                             text:
-                                                                "to add this in your data and to update your Macronutrients",
+                                                                "to add this in your data and to update your Macronutrients.",
                                                           ),
                                                         ])),
                                                 SizedBox(
@@ -1526,7 +1526,7 @@ Future<void> appTutorial(BuildContext context) {
                                                       children: [
                                                         TextSpan(
                                                           text:
-                                                              " In order to determine the right serving size, users are advised to use measuring cups. However, if there are no present measuring cups, be advised that you can use your fist or hand to determine the level of serving size.\n\nTake note that",
+                                                              "In order to determine the right serving size, users are advised to use measuring cups. However, if there are no present measuring cups, be advised that you can use your fist or hand to determine the level of serving size.\n\nTake note that",
                                                         ),
                                                         TextSpan(
                                                           text: " A CUP ",
@@ -1625,7 +1625,7 @@ Future<void> appTutorial(BuildContext context) {
                                                   ),
                                                   TextSpan(
                                                     text:
-                                                        "Check History Button ",
+                                                        "Check History Button.",
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold),

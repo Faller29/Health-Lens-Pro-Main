@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/main.dart';
 import 'package:iconly/iconly.dart';
-import 'backend_firebase/foodExchange.dart'; // Import your existing file
+import 'backend_firebase/rawExchange.dart'; // Import your existing file
 
 class FoodSelectorPage extends StatefulWidget {
   @override

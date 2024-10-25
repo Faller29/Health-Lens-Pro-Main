@@ -276,7 +276,7 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
-// Trigger flash effect for 0.5 seconds
+  // Trigger flash effect for 0.5 seconds
   void _triggerFlashEffect() {
     showDialog(
       context: context,
