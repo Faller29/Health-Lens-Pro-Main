@@ -397,7 +397,7 @@ class _SetupPageState extends State<SetupPage> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      'Please enter your name and sex to continue',
+                                                      'Please enter your Name and Sex to continue',
                                                       style:
                                                           GoogleFonts.readexPro(
                                                         fontSize: 14.0,

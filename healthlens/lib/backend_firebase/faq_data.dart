@@ -54,7 +54,7 @@ final List<Map<String, String>> faqItems = [
   {
     'question': 'What Filipino dishes can the application detect?',
     'answer':
-        "The application can currently detect the following Filipino dishes:\n\n-Boiled Egg\n-Chicken (Adobong Iga)\n-Chicken (Chicken Inasal)\n-Chicken (Fried Chicken)\n-Fish (Daing na Bangus)\n-Fish (Pan Fried Tilapia)\n-Fish (Sinaing na Tulingan)\n-Pork (Breaded Pork Chop)\n-Pork (Lechon Kawali)\n-Pork (Pork Bistek)\n-Scrambled Egg\n-Sunny Side Up Egg\n-White Rice (Boiled Rice)\n-White Rice (Fried Rice)",
+        "The application can currently detect the following Filipino dishes:\n\n-Chicken (Adobong Iga)\n-Chicken (Chicken Inasal)\n-Chicken (Fried Chicken)\n-Fish (Daing na Bangus)\n-Fish (Pan Fried Tilapia)\n-Fish (Sinaing na Tulingan)\n-Pork (Breaded Pork Chop)\n-Pork (Lechon Kawali)\n-Pork (Pork Bistek)\n-White Rice (Boiled Rice)\n-White Rice (Fried Rice)",
   },
   {
     'question':
