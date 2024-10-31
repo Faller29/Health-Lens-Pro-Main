@@ -65,6 +65,8 @@ class _HomePage extends State<HomePage> {
   late Timer _timer;
   String _currentDay = '';
   String _currentTime = '';
+  String _todayDate = '';
+
   // Function to get the current day name
   String _getCurrentDay() {
     DateTime now = DateTime.now();
@@ -98,6 +100,12 @@ class _HomePage extends State<HomePage> {
     return '$hour:$minute';
   }
 
+  String _getTodayDate() {
+    DateTime now = DateTime.now();
+    return DateFormat('EEEE, MMMM d, y')
+        .format(now); // Formats to "Monday, October 24, 2024"
+  }
+
   @override
   void initState() {
     super.initState();
@@ -105,13 +113,14 @@ class _HomePage extends State<HomePage> {
     print(thisUser!.uid);
     _currentDay = _getCurrentDay();
     _currentTime = _getCurrentTime();
-
+    _todayDate = _getTodayDate();
     // Update the time every minute
     _timer = Timer.periodic(const Duration(minutes: 1), (Timer t) {
       if (mounted) {
         setState(() {
           _currentDay = _getCurrentDay();
           _currentTime = _getCurrentTime();
+          _todayDate = _getTodayDate();
         });
       }
     });
@@ -305,12 +314,12 @@ class _HomePage extends State<HomePage> {
         addAutomaticKeepAlives: true,
         children: [
           Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 8.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 8.0),
             child: Container(
               width: MediaQuery.sizeOf(context).width,
-              height: 100.0,
+              //height: 100.0,
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: Color(0xff4b39ef),
                 boxShadow: [
                   BoxShadow(
                     blurRadius: 3.0,
@@ -324,11 +333,97 @@ class _HomePage extends State<HomePage> {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Row(
                     children: [
                       Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                _todayDate.toUpperCase(),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                "Dashboard",
+                                style: GoogleFonts.outfit(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  height: 0.6,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Weight: ${weight}kg",
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    "BMI: $userBMI",
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              14.0, 0.0, 14.0, 0.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(50.0),
+                            child: url != null
+                                ? CachedNetworkImage(
+                                    key: ValueKey(url),
+                                    imageUrl: url,
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Image.asset(
+                                            'assets/images/profile.jpg'),
+                                    fit: BoxFit.cover,
+                                    width: 70,
+                                    height: 70,
+                                  )
+                                : Image.asset(
+                                    'assets/images/profile.jpg',
+                                    fit: BoxFit.cover,
+                                    width: 70,
+                                    height: 70,
+                                  ),
+                          ),
+                        ),
+                      ),
+                      /* Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             14.0, 0.0, 14.0, 0.0),
                         child: ClipRRect(
@@ -394,10 +489,10 @@ class _HomePage extends State<HomePage> {
                             ),
                           ],
                         ),
-                      ),
+                      ), */
                     ],
                   ),
-                  Padding(
+                  /* Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(
                         14.0, 0.0, 0.0, 0.0),
                     child: Container(
@@ -446,21 +541,23 @@ class _HomePage extends State<HomePage> {
                         ],
                       ),
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 14.0, 0.0),
+            padding:
+                const EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 14.0, 15.0),
             child: Container(
               width: 350.0,
               decoration: BoxDecoration(
                 color: const Color(0xffffffff),
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
-                    blurRadius: 4.0,
-                    color: Color(0x33000000),
+                    blurStyle: BlurStyle.outer,
+                    blurRadius: 10.0,
+                    color: Color(0xff4b39ef).withOpacity(0.8),
                     offset: Offset(
                       0.0,
                       2.0,
@@ -475,42 +572,51 @@ class _HomePage extends State<HomePage> {
                   SizedBox(
                     height: 10,
                   ),
-                  Tooltip(
-                    triggerMode: TooltipTriggerMode.tap,
-                    message:
-                        "You're advised to meet at least 75% of your daily macronutrient needs.\n\nYou can exceed your target by up to 120%, but going beyond that may be harmful to your health.",
-                    padding: EdgeInsets.all(20),
-                    margin: EdgeInsets.all(20),
-                    showDuration: Duration(seconds: 10),
-                    decoration: BoxDecoration(
-                      color: Color(0xff4b39ef).withOpacity(0.9),
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    ),
-                    textStyle: TextStyle(color: Colors.white),
-                    preferBelow: true,
-                    verticalOffset: 20,
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 14.0),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: const [
-                        Icon(
-                          FontAwesomeIcons.circleQuestion,
-                          size: 16,
-                          color: Colors.black54,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Macronutrients",
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(
                           width: 10,
                         ),
+                        Tooltip(
+                          triggerMode: TooltipTriggerMode.tap,
+                          message:
+                              "You're advised to meet at least 75% of your daily macronutrient needs.\n\nYou can exceed your target by up to 120%, but going beyond that may be harmful to your health.",
+                          padding: EdgeInsets.all(20),
+                          margin: EdgeInsets.all(20),
+                          showDuration: Duration(seconds: 10),
+                          decoration: BoxDecoration(
+                            color: Color(0xff4b39ef).withOpacity(0.9),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                          ),
+                          textStyle: TextStyle(color: Colors.white),
+                          preferBelow: true,
+                          verticalOffset: 20,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: const [
+                              Icon(
+                                FontAwesomeIcons.solidCircleQuestion,
+                                size: 16,
+                                color: Colors.black,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
-                  const Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 14.0),
-                    child: Text(
-                      "Macronutrients",
-                      style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Row(
@@ -581,6 +687,10 @@ class _HomePage extends State<HomePage> {
                         ),
                         circularStrokeCap: CircularStrokeCap.round,
                         progressColor: const Color(0xffff5963),
+                        /* linearGradient: LinearGradient(colors: [
+                          Color(0xff4b39ef).withOpacity(0.8),
+                          Color.fromARGB(255, 38, 29, 122)
+                        ], transform: GradientRotation(50)), */
                       ),
 
                       // Second division or column
@@ -792,6 +902,11 @@ class _HomePage extends State<HomePage> {
                                 color: Color(0xff4b39ef),
                               ),
                             ),
+                          ),
+                          icon: const Icon(
+                            Icons.book,
+                            color: Color(0xff4b39ef),
+                            size: 15,
                           ),
                           onPressed: () async {
                             if (_firstPress) {
@@ -1536,11 +1651,6 @@ class _HomePage extends State<HomePage> {
                               );
                             }
                           },
-                          icon: const Icon(
-                            FontAwesomeIcons.info,
-                            color: Color(0xff4b39ef),
-                            size: 15,
-                          ),
                         ),
                       ),
                       SizedBox(
@@ -1563,7 +1673,7 @@ class _HomePage extends State<HomePage> {
                             showMacronutrientModal(context);
                           },
                           icon: const Icon(
-                            Icons.book,
+                            FontAwesomeIcons.utensils,
                             color: Color(0xff4b39ef),
                             size: 20,
                           ),
@@ -1577,9 +1687,10 @@ class _HomePage extends State<HomePage> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              /* crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center, */
               children: [
                 Material(
                   elevation: 3,

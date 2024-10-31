@@ -169,6 +169,52 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
             style: GoogleFonts.readexPro(fontSize: 18)),
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Tooltip(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(
+                    Icons.info,
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'Help',
+                    style: GoogleFonts.readexPro(color: Colors.white),
+                  ),
+                ],
+              ),
+              triggerMode: TooltipTriggerMode.tap,
+              message:
+                  "Create your own Meal Plan by Selecting the Foods on the List while paying attention to the Macronutrients Counter to manage what you eat.\n\nWarning Icon indicates that the food is bad for your Health Condition",
+              padding: EdgeInsets.all(20),
+              margin: EdgeInsets.all(20),
+              showDuration: Duration(seconds: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xff4b39ef).withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              textStyle: GoogleFonts.readexPro(color: Colors.black),
+              preferBelow: true,
+              verticalOffset: 20,
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -264,46 +310,6 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                       ],
                     ),
                   ],
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 50),
-                    child: Tooltip(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Icon(
-                            Icons.info,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'Help',
-                            style: GoogleFonts.readexPro(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                      triggerMode: TooltipTriggerMode.tap,
-                      message:
-                          "Create your own Meal Plan by Selecting the Foods on the List while paying attention to the Macronutrients Counter to manage what you eat.\n\nWarning Icon indicates that the food is bad for your Health Condition",
-                      padding: EdgeInsets.all(20),
-                      margin: EdgeInsets.all(20),
-                      showDuration: Duration(seconds: 10),
-                      decoration: BoxDecoration(
-                        color: Color(0xff4b39ef).withOpacity(0.9),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                      ),
-                      textStyle: TextStyle(color: Colors.white),
-                      preferBelow: true,
-                      verticalOffset: 20,
-                    ),
-                  ),
                 ),
               ],
             ),

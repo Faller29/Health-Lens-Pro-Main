@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:healthlens/login_page.dart';
 import 'package:iconly/iconly.dart';
@@ -290,30 +291,35 @@ class _SetupPageState extends State<SetupPage> {
                                     children: [
                                       PageViewPage(
                                         children: [
-                                          Align(
-                                            alignment:
-                                                AlignmentDirectional(-1.0, 0.0),
+                                          Center(
+                                            //alignment: Alignment.center,
                                             child: Text(
-                                              'Welcome To HealthLens Pro!',
+                                              'Welcome To',
                                               style: GoogleFonts.outfit(
-                                                fontSize: 40.0,
+                                                fontSize: 24.0,
                                               ),
                                             ),
                                           ),
-                                          Align(
-                                            alignment: AlignmentDirectional(
-                                                -1.0, -1.0),
-                                            child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
-                                                      0.0, 4.0, 0.0, 15.0),
-                                              child: Text(
-                                                'HealthLens Pro is a mobile application designed to raise awareness and guide individuals about their chronic illnesses. This is to help them reduce health-risk-related issues.',
-                                                style: GoogleFonts.readexPro(
-                                                  fontSize: 14.0,
-                                                ),
-                                                textAlign: TextAlign.justify,
+                                          Center(
+                                            //alignment: Alignment.center,
+                                            child: Text(
+                                              ' HealthLens Pro!',
+                                              style: GoogleFonts.outfit(
+                                                  fontSize: 40.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 0.9),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 15.0, 0.0, 15.0),
+                                            child: Text(
+                                              'HealthLens Pro is a mobile application designed to raise awareness and guide individuals about their chronic illnesses. This is to help them reduce health-risk-related issues.',
+                                              style: GoogleFonts.readexPro(
+                                                fontSize: 14.0,
                                               ),
+                                              textAlign: TextAlign.justify,
                                             ),
                                           ),
                                           Align(
@@ -383,8 +389,12 @@ class _SetupPageState extends State<SetupPage> {
                                                               .readexPro(
                                                                   fontSize:
                                                                       18.0,
-                                                                  color: Color(
-                                                                      0xff4b39ef)),
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          7,
+                                                                          18,
+                                                                          123)),
                                                         ),
                                                       ),
                                                     ),
@@ -397,7 +407,7 @@ class _SetupPageState extends State<SetupPage> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      'Please enter your Name and Sex to continue',
+                                                      'Please enter your Name and Sex to continue.',
                                                       style:
                                                           GoogleFonts.readexPro(
                                                         fontSize: 14.0,
@@ -816,15 +826,18 @@ class _SetupPageState extends State<SetupPage> {
                                                                               100,
                                                                           circular:
                                                                               true,
-                                                                          mainColor: Colors
-                                                                              .grey,
-                                                                          selectedColor: Color(
-                                                                              0xff4b39ef),
+                                                                          mainColor: Colors.grey.withOpacity(
+                                                                              0.2),
+                                                                          selectedColor: Color.fromARGB(
+                                                                              255,
+                                                                              7,
+                                                                              18,
+                                                                              123),
                                                                           selectedBorderSide: BorderSide(
                                                                               width:
                                                                                   1,
-                                                                              color: Color(
-                                                                                  0xff4b39ef)),
+                                                                              color: Color.fromARGB(255, 7, 18,
+                                                                                  123)),
                                                                           preSelectedIdx:
                                                                               genderIndex,
                                                                           options:
@@ -892,8 +905,12 @@ class _SetupPageState extends State<SetupPage> {
                                                         style: GoogleFonts
                                                             .readexPro(
                                                                 fontSize: 18.0,
-                                                                color: Color(
-                                                                    0xff4b39ef)),
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        7,
+                                                                        18,
+                                                                        123)),
                                                       ),
                                                     ),
                                                   ),
@@ -1172,13 +1189,19 @@ class _SetupPageState extends State<SetupPage> {
                                                                   print(height);
                                                                 },
                                                                 validator:
-                                                                    (value) {
-                                                                  if (value ==
+                                                                    (height) {
+                                                                  if (height ==
                                                                           null ||
-                                                                      value
+                                                                      height
                                                                           .isEmpty) {
                                                                     return 'Please enter your Height';
                                                                   }
+                                                                  if (height
+                                                                          .length <
+                                                                      3) {
+                                                                    return 'Please make sure your height is in cm';
+                                                                  }
+
                                                                   return null; // Validation successful
                                                                 },
                                                               ),
@@ -1312,6 +1335,12 @@ class _SetupPageState extends State<SetupPage> {
                                                                           .isEmpty) {
                                                                     return 'Please enter your weight';
                                                                   }
+                                                                  if (value
+                                                                          .length <
+                                                                      2) {
+                                                                    return 'Please enter a valid weight';
+                                                                  }
+
                                                                   return null; // Validation successful
                                                                 },
                                                               ),
@@ -1375,8 +1404,12 @@ class _SetupPageState extends State<SetupPage> {
                                                               style: GoogleFonts
                                                                   .readexPro(
                                                                 fontSize: 18.0,
-                                                                color: Color(
-                                                                    0xff4b39ef),
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        7,
+                                                                        18,
+                                                                        123),
                                                               ),
                                                             ),
                                                           ),
@@ -1403,13 +1436,18 @@ class _SetupPageState extends State<SetupPage> {
                                                           height: 20,
                                                         ),
                                                         Material(
+                                                            color: Colors.white,
                                                             elevation: 4,
-                                                            shadowColor: Color(
-                                                                0xFF2336E2),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
                                                                         8),
+                                                            shadowColor: Color(
+                                                                0xFF2336E2),
+                                                            /* borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8), */
                                                             child: Column(
                                                               mainAxisSize:
                                                                   MainAxisSize
@@ -1536,8 +1574,15 @@ class _SetupPageState extends State<SetupPage> {
                                                                                 );
                                                                               }));
                                                                         },
-                                                                        icon: Icon(
-                                                                            IconlyBold.info_circle),
+                                                                        icon:
+                                                                            Icon(
+                                                                          FontAwesomeIcons
+                                                                              .solidCircleQuestion,
+                                                                          size:
+                                                                              16,
+                                                                          color:
+                                                                              Colors.black,
+                                                                        ),
                                                                       ),
                                                                     ],
                                                                   ),
@@ -1556,8 +1601,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                           circular: true,
                                                                           textStyle: TextStyle(fontSize: 13, color: Colors.white),
                                                                           mainColor: Colors.grey,
-                                                                          selectedColor: Color(0xff4b39ef),
-                                                                          selectedBorderSide: BorderSide(width: 1, color: Color(0xff4b39ef)),
+                                                                          selectedColor: Color.fromARGB(255, 7, 18, 123),
+                                                                          selectedBorderSide: BorderSide(width: 1, color: Color.fromARGB(255, 7, 18, 123)),
                                                                           preSelectedIdx: 0,
                                                                           options: [
                                                                             RadioOption("SEDENTARY",
@@ -1586,66 +1631,75 @@ class _SetupPageState extends State<SetupPage> {
                                                         SizedBox(
                                                           height: 30,
                                                         ),
-                                                        Text(
-                                                          'Chronic Disease:',
-                                                          style: GoogleFonts
-                                                              .readexPro(
-                                                                  fontSize:
-                                                                      18.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
-                                                        ),
                                                         Padding(
                                                           padding: EdgeInsets
                                                               .fromLTRB(
                                                                   0, 0, 0, 10),
                                                           child: Material(
                                                             elevation: 4,
+                                                            color: Colors.white,
                                                             shadowColor: Color(
                                                                 0xFF2336E2),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
                                                                         8),
-                                                            child: Padding(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(
-                                                                          20.0),
-                                                              child: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                children:
-                                                                    categories.map(
-                                                                        (disease) {
-                                                                  return CheckboxListTile(
-                                                                    title: Text(
-                                                                        disease[
-                                                                            'name']),
-                                                                    checkboxShape:
-                                                                        RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              6),
-                                                                    ),
-                                                                    value: disease[
-                                                                        'isChecked'],
-                                                                    onChanged:
-                                                                        (val) {
-                                                                      setState(
-                                                                          () {
-                                                                        disease['isChecked'] =
-                                                                            val;
-                                                                        getCheckedDiseases();
-                                                                        print(
-                                                                            '${disease['name']} isChecked: ${disease['isChecked']}');
-                                                                      });
-                                                                    },
-                                                                  );
-                                                                }).toList(),
-                                                              ),
+                                                            child: Column(
+                                                              children: [
+                                                                SizedBox(
+                                                                  height: 20,
+                                                                ),
+                                                                Text(
+                                                                  'Chronic Disease:',
+                                                                  style: GoogleFonts.readexPro(
+                                                                      fontSize:
+                                                                          18.0,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              15.0),
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    children:
+                                                                        categories
+                                                                            .map((disease) {
+                                                                      return CheckboxListTile(
+                                                                        title:
+                                                                            Text(
+                                                                          disease[
+                                                                              'name'],
+                                                                          style:
+                                                                              GoogleFonts.readexPro(),
+                                                                        ),
+                                                                        checkboxShape:
+                                                                            RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(6),
+                                                                        ),
+                                                                        value: disease[
+                                                                            'isChecked'],
+                                                                        onChanged:
+                                                                            (val) {
+                                                                          setState(
+                                                                              () {
+                                                                            disease['isChecked'] =
+                                                                                val;
+                                                                            getCheckedDiseases();
+                                                                            print('${disease['name']} isChecked: ${disease['isChecked']}');
+                                                                          });
+                                                                        },
+                                                                      );
+                                                                    }).toList(),
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
                                                           ),
                                                         ),
@@ -1759,7 +1813,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                             10,
                                                                             10),
                                                                 labelText:
-                                                                    'Personal Email/Gmail',
+                                                                    'Personal Email',
                                                                 labelStyle:
                                                                     GoogleFonts
                                                                         .outfit(
@@ -1847,6 +1901,15 @@ class _SetupPageState extends State<SetupPage> {
                                                       SizedBox(
                                                         height: 30,
                                                       ),
+                                                      Text(
+                                                        'Set up 6 Digit Pin Code.',
+                                                        style: GoogleFonts
+                                                            .readexPro(
+                                                          fontSize: 14.0,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
                                                       Align(
                                                         alignment:
                                                             AlignmentDirectional(
@@ -1871,6 +1934,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                 GoogleFonts
                                                                     .readexPro(
                                                               fontSize: 18.0,
+                                                              color:
+                                                                  Colors.green,
                                                             ),
                                                             mainAxisAlignment:
                                                                 MainAxisAlignment
@@ -1944,8 +2009,21 @@ class _SetupPageState extends State<SetupPage> {
                                                                   .setString(
                                                                       'pinCode',
                                                                       pinCode);
-                                                              // You can add additional logic here, like navigating to a new screen
                                                               print(pinCode);
+                                                            },
+                                                            validator: (value) {
+                                                              if (value ==
+                                                                      null ||
+                                                                  value
+                                                                      .isEmpty) {
+                                                                return 'Please enter your Pincode';
+                                                              }
+                                                              if (value
+                                                                      .length !=
+                                                                  6) {
+                                                                return 'Please enter a 6 digit Pincode';
+                                                              }
+                                                              return null;
                                                             },
                                                             autovalidateMode:
                                                                 AutovalidateMode
@@ -1954,15 +2032,6 @@ class _SetupPageState extends State<SetupPage> {
                                                                 value) {},
                                                           ),
                                                         ),
-                                                      ),
-                                                      Text(
-                                                        'Set up 6 Digit Pin Code.',
-                                                        style: GoogleFonts
-                                                            .readexPro(
-                                                          fontSize: 14.0,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
                                                       ),
                                                       SizedBox(
                                                         height: 10,
@@ -2110,7 +2179,8 @@ class _SetupPageState extends State<SetupPage> {
                                         dotHeight: 10.0,
                                         dotColor:
                                             Color.fromARGB(40, 75, 57, 239),
-                                        activeDotColor: Color(0xff4b39ef),
+                                        activeDotColor:
+                                            Color.fromARGB(255, 7, 18, 123),
                                         paintStyle: PaintingStyle.fill,
                                       ),
                                     ),
@@ -2134,8 +2204,10 @@ class _SetupPageState extends State<SetupPage> {
                                       onPressed: _previousPage,
                                       child: Text("Back"),
                                       style: TextButton.styleFrom(
-                                        backgroundColor: Colors.grey[300],
-                                        foregroundColor: Color(0xff4b39ef),
+                                        backgroundColor:
+                                            Colors.grey.withOpacity(0.2),
+                                        foregroundColor:
+                                            Color.fromARGB(255, 7, 18, 123),
                                       ),
                                     ),
                                   ],
@@ -2145,7 +2217,8 @@ class _SetupPageState extends State<SetupPage> {
                                 onPressed: _nextPage,
                                 child: Text(nextText),
                                 style: TextButton.styleFrom(
-                                  backgroundColor: Color(0xff4b39ef),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 7, 18, 123),
                                   foregroundColor: Colors.white,
                                 ),
                               ),
@@ -2157,7 +2230,8 @@ class _SetupPageState extends State<SetupPage> {
                               child: Text(nextText),
     
                               style: TextButton.styleFrom(
-                                backgroundColor: Color(0xff4b39ef),
+                                backgroundColor: 
+                                      Color.fromARGB(255, 7, 18, 123),
                                 foregroundColor: Colors.white,
                               ),
                             ),*/
@@ -2185,7 +2259,7 @@ class _SetupPageState extends State<SetupPage> {
                           children: [
                             Icon(
                               IconlyBroken.login,
-                              color: Color(0xff4b39ef),
+                              color: Color.fromARGB(255, 7, 18, 123),
                               size: 20,
                             ),
                             SizedBox(
@@ -2195,9 +2269,9 @@ class _SetupPageState extends State<SetupPage> {
                               'Log In',
                               style: GoogleFonts.readexPro(
                                 fontSize: 14.0,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.bold,
                                 textStyle: TextStyle(
-                                  color: Color(0xff4b39ef),
+                                  color: Color.fromARGB(255, 7, 18, 123),
                                 ),
                               ),
                               textAlign: TextAlign.end,

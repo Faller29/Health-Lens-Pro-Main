@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/food_data_history.dart';
@@ -29,11 +31,19 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   Color carbs = const Color(0xff4b39ef);
   final List<Item> _data = generateItems(1);
   bool _isDataLoaded = false; // For managing loading state
+  String _todayDate = '';
+
+  String _getTodayDate() {
+    DateTime now = DateTime.now();
+    return DateFormat('EEEE, MMMM d, y')
+        .format(now); // Formats to "Monday, October 24, 2024"
+  }
 
   @override
   void initState() {
     super.initState();
     _fetchAndLoadData();
+    _todayDate = _getTodayDate();
   }
 
   Future<void> _fetchAndLoadData() async {
@@ -62,6 +72,216 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              Padding(
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 8.0),
+                child: Container(
+                  width: MediaQuery.sizeOf(context).width,
+                  //height: 100.0,
+                  decoration: const BoxDecoration(
+                    color: Color(0xff4b39ef),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 3.0,
+                        color: Color(0x33000000),
+                        offset: Offset(
+                          0.0,
+                          1.0,
+                        ),
+                      )
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                'Overview',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              /* SizedBox(
+                                height: 5,
+                              ), */
+                              Text(
+                                "Analytics",
+                                style: GoogleFonts.outfit(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  height: 0.5,
+                                ),
+                              ),
+                              SizedBox(height: 15),
+                              SizedBox(
+                                height: 25,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      padding: EdgeInsets.fromLTRB(5, 1, 5, 1)),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        IconlyBroken.calendar,
+                                        color: Color(0xff4b39ef),
+                                        size: 16,
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        'Check History',
+                                        style: GoogleFonts.readexPro(
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.bold,
+                                          textStyle: const TextStyle(
+                                            color: Color(0xff4b39ef),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    showCupertinoModalPopup(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return StatefulBuilder(
+                                          builder: (BuildContext context,
+                                              StateSetter setState) {
+                                            return Card(
+                                              color: Colors.white,
+                                              elevation: 0,
+                                              margin: const EdgeInsets.fromLTRB(
+                                                  10, 200, 10, 200),
+                                              child: SfCalendar(
+                                                view: CalendarView.month,
+                                                showTodayButton: true,
+                                                headerHeight: 50,
+                                                showNavigationArrow: true,
+                                                viewNavigationMode:
+                                                    ViewNavigationMode.snap,
+                                                todayHighlightColor:
+                                                    Color(0xff4b39ef),
+                                                todayTextStyle: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                showDatePickerButton: true,
+                                                monthViewSettings:
+                                                    MonthViewSettings(
+                                                  monthCellStyle:
+                                                      MonthCellStyle(
+                                                    todayBackgroundColor:
+                                                        Color(0xff4b39ef),
+                                                  ),
+                                                  showTrailingAndLeadingDates:
+                                                      false,
+                                                ),
+                                                headerStyle:
+                                                    CalendarHeaderStyle(
+                                                  textAlign: TextAlign.center,
+                                                  textStyle: GoogleFonts.outfit(
+                                                    fontSize: 16.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                  backgroundColor:
+                                                      Color(0xff4b39ef),
+                                                ),
+                                                viewHeaderStyle:
+                                                    ViewHeaderStyle(
+                                                  dayTextStyle:
+                                                      GoogleFonts.readexPro(
+                                                    fontSize: 12.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  backgroundColor:
+                                                      Color.fromARGB(
+                                                          255, 236, 236, 236),
+                                                ),
+                                                initialSelectedDate:
+                                                    DateTime.now(),
+                                                maxDate: DateTime.now(),
+                                                onTap: (CalendarTapDetails
+                                                    details) {
+                                                  if (details.targetElement ==
+                                                          CalendarElement
+                                                              .calendarCell &&
+                                                      details.date != null) {
+                                                    String formattedDate =
+                                                        DateFormat('yyyy-MM-dd')
+                                                            .format(
+                                                                details.date!);
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            HistoryPage(
+                                                                formattedDate:
+                                                                    formattedDate),
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              14.0, 0.0, 14.0, 0.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(50.0),
+                            child: url != null
+                                ? CachedNetworkImage(
+                                    key: ValueKey(url),
+                                    imageUrl: url,
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Image.asset(
+                                            'assets/images/profile.jpg'),
+                                    fit: BoxFit.cover,
+                                    width: 70,
+                                    height: 70,
+                                  )
+                                : Image.asset(
+                                    'assets/images/profile.jpg',
+                                    fit: BoxFit.cover,
+                                    width: 70,
+                                    height: 70,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: Container(
@@ -207,112 +427,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton.icon(
-                              label: Text(
-                                'Check History',
-                                style: GoogleFonts.readexPro(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.bold,
-                                  textStyle: const TextStyle(
-                                    color: Color(0xff4b39ef),
-                                  ),
-                                ),
-                              ),
-                              onPressed: () {
-                                showCupertinoModalPopup(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return StatefulBuilder(
-                                      builder: (BuildContext context,
-                                          StateSetter setState) {
-                                        return Card(
-                                          color: Colors.white,
-                                          elevation: 0,
-                                          margin: const EdgeInsets.fromLTRB(
-                                              10, 200, 10, 200),
-                                          child: SfCalendar(
-                                            view: CalendarView.month,
-                                            showTodayButton: true,
-                                            headerHeight: 50,
-                                            showNavigationArrow: true,
-                                            viewNavigationMode:
-                                                ViewNavigationMode.snap,
-                                            todayHighlightColor:
-                                                Color(0xff4b39ef),
-                                            todayTextStyle: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                            showDatePickerButton: true,
-                                            monthViewSettings:
-                                                MonthViewSettings(
-                                              monthCellStyle: MonthCellStyle(
-                                                todayBackgroundColor:
-                                                    Color(0xff4b39ef),
-                                              ),
-                                              showTrailingAndLeadingDates:
-                                                  false,
-                                            ),
-                                            headerStyle: CalendarHeaderStyle(
-                                              textAlign: TextAlign.center,
-                                              textStyle: GoogleFonts.outfit(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                              backgroundColor:
-                                                  Color(0xff4b39ef),
-                                            ),
-                                            viewHeaderStyle: ViewHeaderStyle(
-                                              dayTextStyle:
-                                                  GoogleFonts.readexPro(
-                                                fontSize: 12.0,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              backgroundColor: Color.fromARGB(
-                                                  255, 236, 236, 236),
-                                            ),
-                                            initialSelectedDate: DateTime.now(),
-                                            maxDate: DateTime.now(),
-                                            onTap:
-                                                (CalendarTapDetails details) {
-                                              if (details.targetElement ==
-                                                      CalendarElement
-                                                          .calendarCell &&
-                                                  details.date != null) {
-                                                String formattedDate =
-                                                    DateFormat('yyyy-MM-dd')
-                                                        .format(details.date!);
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        HistoryPage(
-                                                            formattedDate:
-                                                                formattedDate),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                              icon: const Icon(
-                                IconlyBroken.calendar,
-                                color: Color(0xff4b39ef),
-                                size: 25,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
                     ],
                   ),
                 ),

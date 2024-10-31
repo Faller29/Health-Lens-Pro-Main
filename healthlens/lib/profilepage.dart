@@ -11,6 +11,7 @@ import 'backend_firebase/auth.dart';
 export 'ProfilePage.dart';
 import 'package:healthlens/login_page.dart';
 import 'main.dart' hide Auth;
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -35,11 +36,19 @@ class _ProfilePageState extends State<ProfilePage> {
   late ProfilePage _model;
   bool dataNeedsRefresh = false;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  String _todayDate = '';
+
+  String _getTodayDate() {
+    DateTime now = DateTime.now();
+    return DateFormat('EEEE, MMMM d, y')
+        .format(now); // Formats to "Monday, October 24, 2024"
+  }
 
   @override
   void initState() {
     super.initState();
     fetchImageUrl(); // Fetch the image URL when the widget is created
+    _todayDate = _getTodayDate();
   }
 
   Future<void> fetchImageUrl() async {
@@ -73,124 +82,136 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 1.0, 0.0, 0.0),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 3.0,
-                        color: Color(0x33000000),
-                        offset: Offset(
-                          0.0,
-                          1.0,
-                        ),
-                      )
-                    ],
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Container(
-                          width: 90.0,
-                          height: 90.0,
-                          decoration: BoxDecoration(
-                            color: Color(0x4D39D2C0),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Color(0xFF39D2C0),
-                              width: 2.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(50.0),
-                              child: url != null
-                                  ? CachedNetworkImage(
-                                      key: ValueKey(url),
-                                      imageUrl: url,
-                                      placeholder: (context, url) =>
-                                          CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) =>
-                                          Image.asset(
-                                              'assets/images/profile.jpg'),
-                                      fit: BoxFit.cover,
-                                      width: 60,
-                                      height: 60,
-                                    )
-                                  : Image.asset(
-                                      'assets/images/profile.jpg',
-                                      fit: BoxFit.cover,
-                                      width: 60,
-                                      height: 60,
-                                    ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              16.0, 0.0, 0.0, 0.0),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color(0xff4b39ef),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 3.0,
+                      color: Color(0x33000000),
+                      offset: Offset(
+                        0.0,
+                        1.0,
+                      ),
+                    )
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 0.0, 0.0),
+                        child: Container(
+                          alignment: Alignment.centerLeft,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                firstName! +
-                                    ' ' +
-                                    middleInitial! +
-                                    '.' +
-                                    ' ' +
-                                    lastName!,
+                                _todayDate,
                                 style: GoogleFonts.readexPro(
-                                  color: Color(0xFF14181B),
-                                  fontSize: MediaQuery.of(context)
-                                      .textScaler
-                                      .scale(15),
+                                  color: Colors.white,
+                                  fontSize: 14,
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 //textScaler: TextScaler.linear(1.3),
                               ),
-                              Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 4.0, 0.0, 0.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        textAlign: TextAlign.start,
-                                        age.toString() + ' Years Old',
-                                        style: GoogleFonts.readexPro(
-                                          color: Color(0xFF57636C),
-                                          fontSize: 14.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                      Text(
-                                        'BMI: ' + userBMI.toString(),
-                                        style: GoogleFonts.readexPro(
-                                          color: Color(0xFF57636C),
-                                          fontSize: 14.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ],
-                                  )),
+                              Text(
+                                'Profile',
+                                style: GoogleFonts.readexPro(
+                                  color: Colors.white,
+                                  fontSize: 30.0,
+                                  height: 0.6,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    firstName! +
+                                        ' ' +
+                                        middleInitial! +
+                                        '.' +
+                                        ' ' +
+                                        lastName!,
+                                    style: GoogleFonts.readexPro(
+                                      color: Colors.white,
+                                      fontSize: 14.0,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    "$age Yrs Old",
+                                    style: GoogleFonts.readexPro(
+                                      color: Colors.white,
+                                      fontSize: 14.0,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(
+                        width: 50,
+                      ),
+                      Container(
+                        width: 70.0,
+                        height: 70.0,
+                        decoration: BoxDecoration(
+                          color: Color(0x4D39D2C0),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Color(0xFF39D2C0),
+                            width: 2.0,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(2.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(50.0),
+                            child: url != null
+                                ? CachedNetworkImage(
+                                    key: ValueKey(url),
+                                    imageUrl: url,
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Image.asset(
+                                            'assets/images/profile.jpg'),
+                                    fit: BoxFit.cover,
+                                    width: 70,
+                                    height: 70,
+                                  )
+                                : Image.asset(
+                                    'assets/images/profile.jpg',
+                                    fit: BoxFit.cover,
+                                    width: 70,
+                                    height: 70,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -6,6 +6,7 @@ import 'package:healthlens/backend_firebase/modals.dart';
 import 'package:healthlens/main.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:intl/intl.dart';
 
 class HistoryPage extends StatefulWidget {
   final String formattedDate;
@@ -48,6 +49,13 @@ class _HistoryPageState extends State<HistoryPage> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  String getFormattedDate() {
+    // Parse the input date string
+    DateTime parsedDate = DateTime.parse(formattedDate);
+    // Format it to the desired pattern
+    return DateFormat('MMMM d, y').format(parsedDate);
   }
 
   @override
@@ -183,11 +191,11 @@ class _HistoryPageState extends State<HistoryPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          formattedDate,
+          getFormattedDate(),
           style: GoogleFonts.outfit(fontSize: 25.0),
         ),
         foregroundColor: Colors.white,
-        backgroundColor: const Color(0xff4b39ef),
+        backgroundColor: Color(0xff4b39ef),
       ),
       body: SingleChildScrollView(
         controller: _scrollController, // Attach the controller
@@ -201,11 +209,15 @@ class _HistoryPageState extends State<HistoryPage> {
                 decoration: BoxDecoration(
                   color: const Color(0xffffffff),
                   boxShadow: [
-                    const BoxShadow(
-                      blurRadius: 4.0,
-                      color: Color(0x33000000),
-                      offset: Offset(0.0, 2.0),
-                    ),
+                    BoxShadow(
+                      blurStyle: BlurStyle.outer,
+                      blurRadius: 10.0,
+                      color: Color(0xff4b39ef).withOpacity(0.8),
+                      offset: Offset(
+                        0.0,
+                        2.0,
+                      ),
+                    )
                   ],
                   borderRadius: BorderRadius.circular(8.0),
                   shape: BoxShape.rectangle,
@@ -365,7 +377,7 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
                   : foodHistory.isEmpty
@@ -390,21 +402,50 @@ class _HistoryPageState extends State<HistoryPage> {
                           itemCount: foodHistory.length,
                           itemBuilder: (context, index) {
                             var item = foodHistory[index];
-                            return Card(
-                              color: Colors.white,
-                              elevation: 3,
+                            return Container(
                               margin: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+                              decoration: BoxDecoration(
+                                /* gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xff4b39ef).withOpacity(0.8),
+                                    Color.fromARGB(255, 38, 29, 122)
+                                        .withOpacity(0.8),
+                                    /*  Color.fromARGB(255, 46, 40, 90)
+                                        .withOpacity(0.8),
+                                    Color.fromARGB(255, 0, 1, 78)
+                                        .withOpacity(0.8), */
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ), */
+                                color: Color(0xff4b39ef),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
                               child: ListTile(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                contentPadding:
+                                    EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                dense: true,
+                                title: Text(
+                                  "${item['item']}",
+                                  style: GoogleFonts.readexPro(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 14),
                                 ),
-                                tileColor: Colors.white,
-                                title: Text("${item['item']} (${item['part']})",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
                                 subtitle: Text(
-                                    "Carbs: ${item['carbs']}, Fats: ${item['fats']}, Proteins: ${item['proteins']}, Quantity: ${item['quantity']}"),
-                                trailing: Text(item['timestamp']),
+                                  "Serving: ${item['part']}\nCarbs: ${item['carbs']}, Fats: ${item['fats']}, Proteins: ${item['proteins']}\nQuantity: ${item['quantity']}",
+                                  style: GoogleFonts.readexPro(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                trailing: Text(
+                                  item['timestamp'],
+                                  style: GoogleFonts.readexPro(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             );
                           },
@@ -428,7 +469,7 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
                   : ExerciseHistory.isEmpty
@@ -453,20 +494,50 @@ class _HistoryPageState extends State<HistoryPage> {
                           itemCount: ExerciseHistory.length,
                           itemBuilder: (context, index) {
                             var item = ExerciseHistory[index];
-                            return Card(
-                              color: Colors.white,
-                              elevation: 3,
+                            return Container(
                               margin: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+                              decoration: BoxDecoration(
+                                /* gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xff4b39ef).withOpacity(0.8),
+                                    Color.fromARGB(255, 38, 29, 122)
+                                        .withOpacity(0.8),
+                                    /*  Color.fromARGB(255, 46, 40, 90)
+                                        .withOpacity(0.8),
+                                    Color.fromARGB(255, 0, 1, 78)
+                                        .withOpacity(0.8), */
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ), */
+                                color: Color(0xff4b39ef),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
                               child: ListTile(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                tileColor: Colors.white,
-                                title: Text("${item['exercise']}",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                subtitle: Text("Calories: ${item['calories']}"),
-                                trailing: Text(item['timestamp']),
+                                title: Text(
+                                  "${item['exercise']}",
+                                  style: GoogleFonts.readexPro(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  "Calories burned: ${item['calories']}",
+                                  style: GoogleFonts.readexPro(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                trailing: Text(
+                                  item['timestamp'],
+                                  style: GoogleFonts.readexPro(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             );
                           },

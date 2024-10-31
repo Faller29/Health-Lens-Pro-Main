@@ -332,25 +332,42 @@ class _CameraPageState extends State<CameraPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          insetPadding: EdgeInsets.all(15),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
+            ),
+          ),
           title: Text(
             'No Data Found',
-            style: GoogleFonts.readexPro(),
+            style: GoogleFonts.readexPro(
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
           ),
           content: Text(
             'No macronutrients Detected from the image of Nutrition Facts.\n\nPlease try again with a clearer image or Manually add the Nutrition Facts.',
-            style: GoogleFonts.readexPro(),
+            style: GoogleFonts.readexPro(fontSize: 14),
             textAlign: TextAlign.justify,
           ),
+          actionsAlignment: MainAxisAlignment.end,
+          actionsPadding: EdgeInsets.fromLTRB(0, 0, 10, 10),
           actions: [
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               onPressed: () {
                 Navigator.of(context).pop();
               },
               child: Text('Close',
                   style: GoogleFonts.readexPro(
-                      color: Colors.red, fontWeight: FontWeight.bold)),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  )),
             ),
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
               onPressed: () {
                 Navigator.of(context).pop();
 
@@ -359,7 +376,10 @@ class _CameraPageState extends State<CameraPage> {
               child: Text(
                 'Manually Add',
                 style: GoogleFonts.readexPro(
-                    color: Colors.green, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
             ),
           ],
@@ -412,577 +432,608 @@ class _CameraPageState extends State<CameraPage> {
           builder: (context, setState) {
             return Card(
               elevation: 5,
-              margin: EdgeInsets.fromLTRB(10, 50, 10, 50),
+              margin: EdgeInsets.fromLTRB(10, 60, 10, 60),
               child: Material(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'Nutrition Facts Scanned',
-                          style: GoogleFonts.readexPro(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        TextField(
-                          controller: productNameController,
-                          style: GoogleFonts.readexPro(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green),
-                          decoration: InputDecoration(
-                            labelText: 'Product Name',
-                            isDense: true,
-                            labelStyle: GoogleFonts.readexPro(fontSize: 14),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-
-                        // Macronutrient adjustment fields with add/remove buttons
-                        Text(
-                          'Total Carbohydrates:',
-                          style: GoogleFonts.readexPro(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
+                child: Column(
+                  children: [
+                    SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              width: 20,
+                              height: 10,
                             ),
-                            IconButton(
-                              icon: Icon(Icons.remove),
-                              onPressed: () {
-                                setState(() {
-                                  if (currentCarbs > 0) {
-                                    currentCarbs--; // Decrement carbs
-                                    updateMacros(); // Update displayed values
-                                  }
-                                });
-                              },
-                            ),
-                            Expanded(
-                              child: TextField(
-                                controller: carbsController,
-                                readOnly: true,
+                            Center(
+                              child: Text(
+                                'Nutritional Facts Scanned',
                                 style: GoogleFonts.readexPro(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.all(10.0),
-                                  isDense: true,
-                                  labelStyle:
-                                      GoogleFonts.readexPro(fontSize: 10),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            TextField(
+                              controller: productNameController,
+                              style: GoogleFonts.readexPro(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green),
+                              decoration: InputDecoration(
+                                labelText: 'Product Name',
+                                isDense: true,
+                                labelStyle: GoogleFonts.readexPro(fontSize: 14),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
                             ),
-                            IconButton(
-                              icon: Icon(Icons.add),
-                              onPressed: () {
-                                setState(() {
-                                  currentCarbs++; // Increment carbs
-                                  updateMacros(); // Update displayed values
-                                });
-                              },
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
+                            SizedBox(height: 20),
 
-                        Text(
-                          'Total Fats:',
-                          style: GoogleFonts.readexPro(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.remove),
-                              onPressed: () {
-                                setState(() {
-                                  if (currentFats > 0) {
-                                    currentFats--; // Decrement fats
-                                    updateMacros(); // Update displayed values
-                                  }
-                                });
-                              },
-                            ),
-                            Expanded(
-                              child: TextField(
-                                controller: fatsController,
-                                readOnly: true,
-                                style: GoogleFonts.readexPro(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green),
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.all(10.0),
-                                  isDense: true,
-                                  labelStyle:
-                                      GoogleFonts.readexPro(fontSize: 10),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.add),
-                              onPressed: () {
-                                setState(() {
-                                  currentFats++; // Increment fats
-                                  updateMacros(); // Update displayed values
-                                });
-                              },
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-
-                        Text(
-                          'Total Protein:',
-                          style: GoogleFonts.readexPro(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.remove),
-                              onPressed: () {
-                                setState(() {
-                                  if (currentProtein > 0) {
-                                    currentProtein--; // Decrement protein
-                                    updateMacros(); // Update displayed values
-                                  }
-                                });
-                              },
-                            ),
-                            Expanded(
-                              child: TextField(
-                                controller: proteinController,
-                                readOnly: true,
-                                style: GoogleFonts.readexPro(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green),
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.all(10.0),
-                                  isDense: true,
-                                  labelStyle:
-                                      GoogleFonts.readexPro(fontSize: 10),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.add),
-                              onPressed: () {
-                                setState(() {
-                                  currentProtein++; // Increment protein
-                                  updateMacros(); // Update displayed values
-                                });
-                              },
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-
-                        // Quantity adjustment
-                        Text(
-                          'Quantity:',
-                          style: GoogleFonts.readexPro(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.remove),
-                              onPressed: () {
-                                setState(() {
-                                  if (quantity > 1) {
-                                    quantity--;
-                                    updateMacros(); // Update macros based on new quantity
-                                  }
-                                });
-                              },
-                            ),
-                            Expanded(
-                              child: TextField(
-                                readOnly: true,
-                                style: GoogleFonts.readexPro(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green),
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.all(10.0),
-                                  isDense: true,
-                                  labelStyle:
-                                      GoogleFonts.readexPro(fontSize: 10),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  hintText: quantity.toString(),
-                                  hintStyle: GoogleFonts.readexPro(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green),
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.add),
-                              onPressed: () {
-                                setState(() {
-                                  quantity++;
-                                  updateMacros(); // Update macros based on new quantity
-                                });
-                              },
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-
-                        // Serving size dropdown
-                        Row(
-                          children: [
+                            // Macronutrient adjustment fields with add/remove buttons
                             Text(
-                              'Serving Size: ',
+                              'Total Carbohydrates (g):',
                               style: GoogleFonts.readexPro(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(
-                              width: 20,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.remove),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (currentCarbs > 0) {
+                                        currentCarbs--; // Decrement carbs
+                                        updateMacros(); // Update displayed values
+                                      }
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 150,
+                                  child: Expanded(
+                                    child: TextField(
+                                      controller: carbsController,
+                                      readOnly: true,
+                                      style: GoogleFonts.readexPro(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green),
+                                      textAlign: TextAlign.center,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.all(10.0),
+                                        isDense: true,
+                                        labelStyle:
+                                            GoogleFonts.readexPro(fontSize: 10),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.add),
+                                  onPressed: () {
+                                    setState(() {
+                                      currentCarbs++; // Increment carbs
+                                      updateMacros(); // Update displayed values
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                              ],
                             ),
-                            DropdownButton<String>(
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              elevation: 3,
-                              borderRadius: BorderRadius.circular(20),
+                            SizedBox(height: 10),
+
+                            Text(
+                              'Total Fats (g):',
                               style: GoogleFonts.readexPro(
-                                color: Colors.green,
                                 fontWeight: FontWeight.bold,
                               ),
-                              alignment: Alignment.center,
-                              value: selectedServingSize,
-                              items: servingSizeMultipliers.keys
-                                  .map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedServingSize = newValue!;
-                                  updateMacros(); // Update macros based on new serving size
-                                });
-                              },
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.remove),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (currentFats > 0) {
+                                        currentFats--; // Decrement fats
+                                        updateMacros(); // Update displayed values
+                                      }
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 150,
+                                  child: Expanded(
+                                    child: SizedBox(
+                                      width: 150,
+                                      child: TextField(
+                                        controller: fatsController,
+                                        readOnly: true,
+                                        style: GoogleFonts.readexPro(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green),
+                                        textAlign: TextAlign.center,
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.all(10.0),
+                                          isDense: true,
+                                          labelStyle: GoogleFonts.readexPro(
+                                              fontSize: 10),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.add),
+                                  onPressed: () {
+                                    setState(() {
+                                      currentFats++; // Increment fats
+                                      updateMacros(); // Update displayed values
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+
+                            Text(
+                              'Total Protein (g):',
+                              style: GoogleFonts.readexPro(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.remove),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (currentProtein > 0) {
+                                        currentProtein--; // Decrement protein
+                                        updateMacros(); // Update displayed values
+                                      }
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 150,
+                                  child: Expanded(
+                                    child: TextField(
+                                      controller: proteinController,
+                                      readOnly: true,
+                                      style: GoogleFonts.readexPro(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green),
+                                      textAlign: TextAlign.center,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.all(10.0),
+                                        isDense: true,
+                                        labelStyle:
+                                            GoogleFonts.readexPro(fontSize: 10),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.add),
+                                  onPressed: () {
+                                    setState(() {
+                                      currentProtein++; // Increment protein
+                                      updateMacros(); // Update displayed values
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+
+                            // Quantity adjustment
+                            Text(
+                              'Quantity:',
+                              style: GoogleFonts.readexPro(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.remove),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (quantity > 1) {
+                                        quantity--;
+                                        updateMacros(); // Update macros based on new quantity
+                                      }
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 150,
+                                  child: Expanded(
+                                    child: TextField(
+                                      readOnly: true,
+                                      style: GoogleFonts.readexPro(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green),
+                                      textAlign: TextAlign.center,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.all(10.0),
+                                        isDense: true,
+                                        labelStyle:
+                                            GoogleFonts.readexPro(fontSize: 10),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        hintText: quantity.toString(),
+                                        hintStyle: GoogleFonts.readexPro(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.add),
+                                  onPressed: () {
+                                    setState(() {
+                                      quantity++;
+                                      updateMacros(); // Update macros based on new quantity
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+
+                            // Serving size dropdown
+                            Row(
+                              children: [
+                                Text(
+                                  'Serving Size: ',
+                                  style: GoogleFonts.readexPro(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                DropdownButton<String>(
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  elevation: 3,
+                                  borderRadius: BorderRadius.circular(20),
+                                  style: GoogleFonts.readexPro(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  alignment: Alignment.center,
+                                  value: selectedServingSize,
+                                  items: servingSizeMultipliers.keys
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedServingSize = newValue!;
+                                      updateMacros(); // Update macros based on new serving size
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                    // Action buttons
 
-                        SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red),
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Cancel button
+                            },
+                            child: Text('Cancel',
+                                style: GoogleFonts.readexPro(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green),
+                            child: Text('Confirm',
+                                style: GoogleFonts.readexPro(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            onPressed: () async {
+                              // Show loader
+                              showDialog(
+                                context: context,
+                                barrierDismissible:
+                                    false, // Prevent dismissing the loader by tapping outside
+                                builder: (BuildContext context) {
+                                  return Center(
+                                    child:
+                                        CircularProgressIndicator(), // Loader widget
+                                  );
+                                },
+                              );
 
-                        // Action buttons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Cancel button
-                              },
-                              child: Text('Cancel',
-                                  style: GoogleFonts.readexPro(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            SizedBox(width: 10),
-                            TextButton(
-                              onPressed: () async {
-                                // Show loader
-                                showDialog(
+                              List<Map<String, dynamic>> wrappedItems = [
+                                {
+                                  'item': productNameController
+                                      .text, // Replace with the actual product name
+                                  'quantity':
+                                      quantity, // This is the quantity from your dialog
+                                  'part':
+                                      selectedServingSize, // This is the serving size from your dialog
+                                  'fats': _parseInt(double.parse(fatsController
+                                      .text)), // Parse and convert to int
+                                  'carbs': _parseInt(double.parse(
+                                      carbsController
+                                          .text)), // Parse and convert to int
+                                  'proteins': _parseInt(double.parse(
+                                      proteinController
+                                          .text)), // Parse and convert to int
+                                }
+                              ];
+
+                              // Get current date and time
+                              final String currentDate = DateTime.now()
+                                  .toIso8601String()
+                                  .split('T')[0];
+                              final String currentTime =
+                                  "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+
+                              print('wowers');
+                              // Retrieve existing macro values from Firestore
+                              final DocumentSnapshot userMacrosSnapshot =
+                                  await FirebaseFirestore.instance
+                                      .collection('userMacros')
+                                      .doc(thisUser?.uid)
+                                      .get();
+
+                              // Initialize current macro values
+                              print(thisUser?.uid);
+                              print('wowers1');
+
+                              // Check if the document exists and retrieve current macro values
+                              final data = userMacrosSnapshot.data()
+                                  as Map<String, dynamic>;
+                              print('wowers1.1');
+
+                              final thiscurrentCarbs = (data['carbs'] ?? 0);
+                              final thiscurrentFats = (data['fats'] ?? 0);
+                              final thiscurrentProtein =
+                                  (data['proteins'] ?? 0);
+                              final thiscurrentCalories =
+                                  (data['calories'] ?? 0);
+                              print('wowers1.2');
+
+                              int currentCarbs = thiscurrentCarbs;
+                              int currentFats = thiscurrentFats;
+                              int currentProtein = thiscurrentProtein;
+                              int currentCalories = thiscurrentCalories;
+                              print('wowers2');
+
+                              // Assuming these are the initial macro values you retrieved or calculated
+                              int initialCarbs =
+                                  _parseInt(double.parse(carbsController.text));
+                              int initialFats =
+                                  _parseInt(double.parse(fatsController.text));
+                              int initialProtein = _parseInt(
+                                  double.parse(proteinController.text));
+                              // Retrieve max macros from Firestore
+                              final userMaxDoc = await FirebaseFirestore
+                                  .instance
+                                  .collection('user')
+                                  .doc(thisUser?.uid)
+                                  .get();
+                              print('get?');
+                              final userMaxData = userMaxDoc.data()!;
+                              print('sure?');
+                              // Convert the values to double
+                              double maxCarbs =
+                                  (userMaxData['gramCarbs'] as num).toDouble();
+                              double maxProteins =
+                                  (userMaxData['gramProtein'] as num)
+                                      .toDouble();
+                              double maxFats =
+                                  (userMaxData['gramFats'] as num).toDouble();
+                              print('all right');
+                              // Add 20%
+                              double adjustedMaxCarbs =
+                                  maxCarbs + (maxCarbs * 0.20);
+                              double adjustedMaxProteins =
+                                  maxProteins + (maxProteins * 0.20);
+                              double adjustedMaxFats =
+                                  maxFats + (maxFats * 0.20);
+
+                              print('wowers3');
+                              // Calculate final macros based on quantity
+                              int finalCarbs =
+                                  currentCarbs + (initialCarbs * quantity);
+                              int finalFats =
+                                  currentFats + (initialFats * quantity);
+                              int finalProtein =
+                                  currentProtein + (initialProtein * quantity);
+                              print((finalFats >= adjustedMaxFats &&
+                                  finalCarbs >= adjustedMaxCarbs &&
+                                  finalProtein >= adjustedMaxProteins));
+
+                              if (finalFats >= adjustedMaxFats &&
+                                  finalCarbs >= adjustedMaxCarbs &&
+                                  finalProtein >= adjustedMaxProteins) {
+                                Navigator.of(context).pop();
+
+                                Navigator.of(context).pop();
+                                return showDialog(
                                   context: context,
-                                  barrierDismissible:
-                                      false, // Prevent dismissing the loader by tapping outside
                                   builder: (BuildContext context) {
-                                    return Center(
-                                      child:
-                                          CircularProgressIndicator(), // Loader widget
+                                    return AlertDialog(
+                                      title: Text('Warning'),
+                                      content: Text(
+                                        "You have reached your maximum recommended daily macronutrients intake",
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('OK'),
+                                        ),
+                                      ],
                                     );
                                   },
                                 );
-
-                                List<Map<String, dynamic>> wrappedItems = [
-                                  {
-                                    'item': productNameController
-                                        .text, // Replace with the actual product name
-                                    'quantity':
-                                        quantity, // This is the quantity from your dialog
-                                    'part':
-                                        selectedServingSize, // This is the serving size from your dialog
-                                    'fats': _parseInt(double.parse(
-                                        fatsController
-                                            .text)), // Parse and convert to int
-                                    'carbs': _parseInt(double.parse(
-                                        carbsController
-                                            .text)), // Parse and convert to int
-                                    'proteins': _parseInt(double.parse(
-                                        proteinController
-                                            .text)), // Parse and convert to int
-                                  }
-                                ];
-
-                                // Get current date and time
-                                final String currentDate = DateTime.now()
-                                    .toIso8601String()
-                                    .split('T')[0];
-                                final String currentTime =
-                                    "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
-
-                                print('wowers');
-                                // Retrieve existing macro values from Firestore
-                                final DocumentSnapshot userMacrosSnapshot =
-                                    await FirebaseFirestore.instance
-                                        .collection('userMacros')
-                                        .doc(thisUser?.uid)
-                                        .get();
-
-                                // Initialize current macro values
-                                print(thisUser?.uid);
-                                print('wowers1');
-
-                                // Check if the document exists and retrieve current macro values
-                                final data = userMacrosSnapshot.data()
-                                    as Map<String, dynamic>;
-                                print('wowers1.1');
-
-                                final thiscurrentCarbs = (data['carbs'] ?? 0);
-                                final thiscurrentFats = (data['fats'] ?? 0);
-                                final thiscurrentProtein =
-                                    (data['proteins'] ?? 0);
-                                final thiscurrentCalories =
-                                    (data['calories'] ?? 0);
-                                print('wowers1.2');
-
-                                int currentCarbs = thiscurrentCarbs;
-                                int currentFats = thiscurrentFats;
-                                int currentProtein = thiscurrentProtein;
-                                int currentCalories = thiscurrentCalories;
-                                print('wowers2');
-
-                                // Assuming these are the initial macro values you retrieved or calculated
-                                int initialCarbs = _parseInt(
-                                    double.parse(carbsController.text));
-                                int initialFats = _parseInt(
-                                    double.parse(fatsController.text));
-                                int initialProtein = _parseInt(
-                                    double.parse(proteinController.text));
-                                // Retrieve max macros from Firestore
-                                final userMaxDoc = await FirebaseFirestore
-                                    .instance
-                                    .collection('user')
-                                    .doc(thisUser?.uid)
-                                    .get();
-                                print('get?');
-                                final userMaxData = userMaxDoc.data()!;
-                                print('sure?');
-                                // Convert the values to double
-                                double maxCarbs =
-                                    (userMaxData['gramCarbs'] as num)
-                                        .toDouble();
-                                double maxProteins =
-                                    (userMaxData['gramProtein'] as num)
-                                        .toDouble();
-                                double maxFats =
-                                    (userMaxData['gramFats'] as num).toDouble();
-                                print('all right');
-                                // Add 20%
-                                double adjustedMaxCarbs =
-                                    maxCarbs + (maxCarbs * 0.20);
-                                double adjustedMaxProteins =
-                                    maxProteins + (maxProteins * 0.20);
-                                double adjustedMaxFats =
-                                    maxFats + (maxFats * 0.20);
-
-                                print('wowers3');
-                                // Calculate final macros based on quantity
-                                int finalCarbs =
-                                    currentCarbs + (initialCarbs * quantity);
-                                int finalFats =
-                                    currentFats + (initialFats * quantity);
-                                int finalProtein = currentProtein +
-                                    (initialProtein * quantity);
-                                print((finalFats >= adjustedMaxFats &&
-                                    finalCarbs >= adjustedMaxCarbs &&
-                                    finalProtein >= adjustedMaxProteins));
-
-                                if (finalFats >= adjustedMaxFats &&
-                                    finalCarbs >= adjustedMaxCarbs &&
-                                    finalProtein >= adjustedMaxProteins) {
-                                  Navigator.of(context).pop();
-
-                                  Navigator.of(context).pop();
-                                  return showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('Warning'),
-                                        content: Text(
-                                          "You have reached your maximum recommended daily macronutrients intake",
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('OK'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                }
-                                print('wowers4');
-                                // Calculate total calories
-                                int calories = currentCalories +
-                                    (((initialCarbs * quantity) * 4) +
-                                        ((initialFats * quantity) * 9) +
-                                        ((initialProtein * quantity) *
-                                            4)); // Example calorie calculation
-                                print(finalFats);
-                                print('wowers5');
-                                // Save data to userMacros collection
-                                await FirebaseFirestore.instance
-                                    .collection('userMacros')
-                                    .doc(thisUser?.uid)
-                                    .set(
-                                  {
-                                    'carbs': finalCarbs,
-                                    'fats': finalFats,
-                                    'proteins': finalProtein,
-                                    'calories': calories,
-                                    'lastLogIn':
-                                        currentDate, // Update the last login date
-                                  },
-                                  SetOptions(merge: true),
-                                ); // Merge to prevent overwriting
-
-                                print('wowers6');
-                                // Save data to MacrosIntakeHistory collection
-                                await FirebaseFirestore.instance
-                                    .collection("userMacros")
-                                    .doc(thisUser?.uid)
-                                    .collection('MacrosIntakeHistory')
-                                    .doc(currentDate)
-                                    .set({
+                              }
+                              print('wowers4');
+                              // Calculate total calories
+                              int calories = currentCalories +
+                                  (((initialCarbs * quantity) * 4) +
+                                      ((initialFats * quantity) * 9) +
+                                      ((initialProtein * quantity) *
+                                          4)); // Example calorie calculation
+                              print(finalFats);
+                              print('wowers5');
+                              // Save data to userMacros collection
+                              await FirebaseFirestore.instance
+                                  .collection('userMacros')
+                                  .doc(thisUser?.uid)
+                                  .set(
+                                {
                                   'carbs': finalCarbs,
                                   'fats': finalFats,
                                   'proteins': finalProtein,
                                   'calories': calories,
-                                }, SetOptions(merge: true));
+                                  'lastLogIn':
+                                      currentDate, // Update the last login date
+                                },
+                                SetOptions(merge: true),
+                              ); // Merge to prevent overwriting
 
-                                print('wowers7');
-                                // Save food history
-                                await FirebaseFirestore.instance
-                                    .collection('food_history')
-                                    .doc(thisUser?.uid)
-                                    .collection(currentDate)
-                                    .doc(currentTime)
-                                    .set({
-                                  'items':
-                                      wrappedItems, // Make sure wrappedItems is defined in scope
-                                  'timestamp': DateTime.now()
-                                      .toIso8601String(), // Add timestamp
-                                  'userId': thisUser?.uid, // Add user ID
-                                });
+                              print('wowers6');
+                              // Save data to MacrosIntakeHistory collection
+                              await FirebaseFirestore.instance
+                                  .collection("userMacros")
+                                  .doc(thisUser?.uid)
+                                  .collection('MacrosIntakeHistory')
+                                  .doc(currentDate)
+                                  .set({
+                                'carbs': finalCarbs,
+                                'fats': finalFats,
+                                'proteins': finalProtein,
+                                'calories': calories,
+                              }, SetOptions(merge: true));
 
-                                dailyCarbs = finalCarbs;
-                                dailyFats = finalFats;
-                                dailyProtein = finalProtein;
-                                dailyCalories = calories;
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
+                              print('wowers7');
+                              // Save food history
+                              await FirebaseFirestore.instance
+                                  .collection('food_history')
+                                  .doc(thisUser?.uid)
+                                  .collection(currentDate)
+                                  .doc(currentTime)
+                                  .set({
+                                'items':
+                                    wrappedItems, // Make sure wrappedItems is defined in scope
+                                'timestamp': DateTime.now()
+                                    .toIso8601String(), // Add timestamp
+                                'userId': thisUser?.uid, // Add user ID
+                              });
 
-                                await prefs.setInt('dailyCarbs', dailyCarbs!);
-                                await prefs.setInt(
-                                    'dailyProtein', dailyProtein!);
-                                await prefs.setInt('dailyFats', dailyFats!);
-                                await prefs.setInt(
-                                    'dailyCalories', dailyCalories!);
-                                Navigator.of(context).pop(); // Confirm button
+                              dailyCarbs = finalCarbs;
+                              dailyFats = finalFats;
+                              dailyProtein = finalProtein;
+                              dailyCalories = calories;
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
 
-                                // Show success snackbar
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    behavior: SnackBarBehavior.floating,
-                                    content: Text('Success!'),
-                                    backgroundColor: Colors.green,
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                                Navigator.of(context).pop(); // Confirm button
-                              },
-                              child: Text('Confirm',
-                                  style: GoogleFonts.readexPro(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                          ],
-                        ),
-                      ],
+                              await prefs.setInt('dailyCarbs', dailyCarbs!);
+                              await prefs.setInt('dailyProtein', dailyProtein!);
+                              await prefs.setInt('dailyFats', dailyFats!);
+                              await prefs.setInt(
+                                  'dailyCalories', dailyCalories!);
+                              Navigator.of(context).pop(); // Confirm button
+
+                              // Show success snackbar
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text('Success!'),
+                                  backgroundColor: Colors.green,
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                              Navigator.of(context).pop(); // Confirm button
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             );
@@ -1466,7 +1517,7 @@ class _CameraPageState extends State<CameraPage> {
                 0.0,
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     width: 150.0,
@@ -1560,7 +1611,7 @@ class _CameraPageState extends State<CameraPage> {
           ),
           Positioned(
             bottom: 160,
-            left: 20,
+            left: 25,
             child: ElevatedButton(
               onPressed:
                   _scanProduct, // Call the _scanProduct function when clicked
@@ -1617,8 +1668,8 @@ class _CameraPageState extends State<CameraPage> {
                   onPressed: _clearIngredients,
                   style: ElevatedButton.styleFrom(
                     elevation: 5,
-                    backgroundColor: Color.fromARGB(
-                        255, 114, 13, 13), // Custom color for the clear button
+                    backgroundColor:
+                        Colors.red, // Custom color for the clear button
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                   child: Text(
@@ -1631,6 +1682,37 @@ class _CameraPageState extends State<CameraPage> {
                   ),
                 ),
               ],
+            ),
+          ),
+          Positioned(
+            top: 50,
+            width: MediaQuery.sizeOf(context).width,
+            child: Center(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Camera",
+                    style: GoogleFonts.readexPro(
+                        fontSize: 30,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        height: 0.5),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "Stay still for 10 seconds to scan",
+                    style: GoogleFonts.readexPro(
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

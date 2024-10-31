@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/aboutUs_page.dart';
 import 'package:healthlens/backend_firebase/firestore_provider.dart';
@@ -114,6 +115,9 @@ void main() async {
 
   currentUserEmail = prefs.getString('currentUserEmail') ?? '';
   currentUserPincode = prefs.getString('currentUserPincode') ?? '';
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Color(0xff4b39ef),
+  ));
   runApp(MyApp());
 }
 
@@ -130,6 +134,7 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Color(0xfff1f4f8),
       ),
+
       // Initial route will be determined by authentication status and user registration
       home: FutureBuilder(
         future: _handleStartScreen(),

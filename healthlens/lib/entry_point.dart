@@ -53,7 +53,7 @@ class _EntryPointState extends State<EntryPoint> {
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      /* appBar: AppBar(
         elevation: 1,
         title: Text(
           pageTitles[_selectedIndex],
@@ -63,7 +63,8 @@ class _EntryPointState extends State<EntryPoint> {
         ),
         foregroundColor: Colors.white,
         backgroundColor: const Color(0xff4b39ef),
-      ),
+      ), */
+      appBar: EmptyAppBar(),
       body: Center(
         // Add a Key to the widget tree to force rebuild
         child: KeyedSubtree(
@@ -172,4 +173,16 @@ class CustomNavigationBarItem {
     required this.icon,
     required this.label,
   });
+}
+
+class EmptyAppBar extends StatelessWidget implements PreferredSizeWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+    );
+  }
+
+  @override
+  Size get preferredSize => Size(0.0, 0.0);
 }

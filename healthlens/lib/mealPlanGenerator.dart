@@ -1005,6 +1005,10 @@ class _MealPlanPageState extends State<MealPlanPage> {
                         SizedBox(
                           width: 5,
                         ),
+                        Text(
+                          'Help',
+                          style: GoogleFonts.readexPro(color: Colors.white),
+                        ),
                       ],
                     ),
                     triggerMode: TooltipTriggerMode.tap,
@@ -1054,7 +1058,7 @@ class _MealPlanPageState extends State<MealPlanPage> {
                       ),
                       SizedBox(height: 10),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Column(
@@ -1113,7 +1117,7 @@ class _MealPlanPageState extends State<MealPlanPage> {
                             ],
                           ),
                           SizedBox(
-                            width: 60,
+                            width: 10,
                           ),
                           Column(
                             children: [
@@ -1139,6 +1143,7 @@ class _MealPlanPageState extends State<MealPlanPage> {
                                         "Refresh",
                                         style: GoogleFonts.readexPro(
                                             fontSize: 12,
+                                            fontWeight: FontWeight.bold,
                                             color: Colors.greenAccent),
                                       ),
                                     ],
