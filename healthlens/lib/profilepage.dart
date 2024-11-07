@@ -98,14 +98,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(14.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Padding(
                         padding:
-                            EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 0.0, 0.0),
+                            EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 0.0, 0.0),
                         child: Container(
                           alignment: Alignment.centerLeft,
                           child: Column(
@@ -114,14 +114,15 @@ class _ProfilePageState extends State<ProfilePage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                _todayDate,
-                                style: GoogleFonts.readexPro(
+                                _todayDate.toUpperCase(),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 12,
                                   color: Colors.white,
-                                  fontSize: 14,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.w500,
                                 ),
                                 //textScaler: TextScaler.linear(1.3),
+                              ),
+                              SizedBox(
+                                height: 1,
                               ),
                               Text(
                                 'Profile',

@@ -285,8 +285,25 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: Container(
-                  width: MediaQuery.of(context).size.width,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
                   decoration: BoxDecoration(
+                    color: const Color(0xffffffff),
+                    boxShadow: [
+                      BoxShadow(
+                        blurStyle: BlurStyle.outer,
+                        blurRadius: 10.0,
+                        color: Color(0xff4b39ef).withOpacity(0.8),
+                        offset: Offset(
+                          0.0,
+                          2.0,
+                        ),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(8.0),
+                    shape: BoxShape.rectangle,
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  /* decoration: BoxDecoration(
                     color: const Color(0xffffffff),
                     boxShadow: [
                       const BoxShadow(
@@ -296,12 +313,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     ],
                     borderRadius: BorderRadius.circular(8.0),
                     shape: BoxShape.rectangle,
-                  ),
+                  ), */
                   child: Column(
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      Stack(
+                        /* crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.end, */
                         children: [
                           Center(
                             child: Padding(
@@ -316,8 +333,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 50),
+                          Positioned(
+                            right: 5,
+                            top: 5,
                             child: Tooltip(
                               child: Icon(
                                 Icons.info,

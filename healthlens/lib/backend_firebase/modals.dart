@@ -1893,7 +1893,3 @@ class FullImageModal extends StatelessWidget {
     );
   }
 }
-
-
-
-//for Camera Page scanned product:

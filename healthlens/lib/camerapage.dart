@@ -504,24 +504,21 @@ class _CameraPageState extends State<CameraPage> {
                                 ),
                                 SizedBox(
                                   width: 150,
-                                  child: Expanded(
-                                    child: TextField(
-                                      controller: carbsController,
-                                      readOnly: true,
-                                      style: GoogleFonts.readexPro(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green),
-                                      textAlign: TextAlign.center,
-                                      decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.all(10.0),
-                                        isDense: true,
-                                        labelStyle:
-                                            GoogleFonts.readexPro(fontSize: 10),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
+                                  child: TextField(
+                                    controller: carbsController,
+                                    readOnly: true,
+                                    style: GoogleFonts.readexPro(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green),
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10.0),
+                                      isDense: true,
+                                      labelStyle:
+                                          GoogleFonts.readexPro(fontSize: 10),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
                                     ),
                                   ),
@@ -567,26 +564,24 @@ class _CameraPageState extends State<CameraPage> {
                                 ),
                                 SizedBox(
                                   width: 150,
-                                  child: Expanded(
-                                    child: SizedBox(
-                                      width: 150,
-                                      child: TextField(
-                                        controller: fatsController,
-                                        readOnly: true,
-                                        style: GoogleFonts.readexPro(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green),
-                                        textAlign: TextAlign.center,
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.all(10.0),
-                                          isDense: true,
-                                          labelStyle: GoogleFonts.readexPro(
-                                              fontSize: 10),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
+                                  child: SizedBox(
+                                    width: 150,
+                                    child: TextField(
+                                      controller: fatsController,
+                                      readOnly: true,
+                                      style: GoogleFonts.readexPro(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green),
+                                      textAlign: TextAlign.center,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.all(10.0),
+                                        isDense: true,
+                                        labelStyle:
+                                            GoogleFonts.readexPro(fontSize: 10),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
                                         ),
                                       ),
                                     ),
@@ -633,24 +628,21 @@ class _CameraPageState extends State<CameraPage> {
                                 ),
                                 SizedBox(
                                   width: 150,
-                                  child: Expanded(
-                                    child: TextField(
-                                      controller: proteinController,
-                                      readOnly: true,
-                                      style: GoogleFonts.readexPro(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green),
-                                      textAlign: TextAlign.center,
-                                      decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.all(10.0),
-                                        isDense: true,
-                                        labelStyle:
-                                            GoogleFonts.readexPro(fontSize: 10),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
+                                  child: TextField(
+                                    controller: proteinController,
+                                    readOnly: true,
+                                    style: GoogleFonts.readexPro(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green),
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10.0),
+                                      isDense: true,
+                                      labelStyle:
+                                          GoogleFonts.readexPro(fontSize: 10),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
                                     ),
                                   ),
@@ -697,29 +689,26 @@ class _CameraPageState extends State<CameraPage> {
                                 ),
                                 SizedBox(
                                   width: 150,
-                                  child: Expanded(
-                                    child: TextField(
-                                      readOnly: true,
-                                      style: GoogleFonts.readexPro(
+                                  child: TextField(
+                                    readOnly: true,
+                                    style: GoogleFonts.readexPro(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green),
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10.0),
+                                      isDense: true,
+                                      labelStyle:
+                                          GoogleFonts.readexPro(fontSize: 10),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      hintText: quantity.toString(),
+                                      hintStyle: GoogleFonts.readexPro(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.green),
-                                      textAlign: TextAlign.center,
-                                      decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.all(10.0),
-                                        isDense: true,
-                                        labelStyle:
-                                            GoogleFonts.readexPro(fontSize: 10),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        hintText: quantity.toString(),
-                                        hintStyle: GoogleFonts.readexPro(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green),
-                                      ),
                                     ),
                                   ),
                                 ),
@@ -1523,7 +1512,14 @@ class _CameraPageState extends State<CameraPage> {
                     width: 150.0,
                     height: 300.0, // Adjust the height if needed
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
+                      color: Colors.transparent,
+                      boxShadow: [
+                        BoxShadow(
+                          blurStyle: BlurStyle.outer,
+                          blurRadius: 10.0,
+                          color: Colors.white.withOpacity(0.8),
+                        )
+                      ],
                       borderRadius: BorderRadius.circular(8.0),
                       border: Border.all(
                         color: Colors.white,
@@ -1640,8 +1636,7 @@ class _CameraPageState extends State<CameraPage> {
           ),
           Positioned(
             bottom: 100,
-            left: 0,
-            right: 0,
+            left: 25,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1696,10 +1691,11 @@ class _CameraPageState extends State<CameraPage> {
                   Text(
                     "Camera",
                     style: GoogleFonts.readexPro(
-                        fontSize: 30,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        height: 0.5),
+                      fontSize: 30,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      height: 0.5,
+                    ),
                   ),
                   SizedBox(
                     height: 5,

@@ -19,20 +19,38 @@ class _FAQPageState extends State<FAQPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('FAQs', style: GoogleFonts.readexPro(fontSize: 18)),
+        toolbarHeight: 50,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'PROFILE',
+              style: GoogleFonts.outfit(fontSize: 12),
+            ),
+            Text(
+              'Frequently Asked Questions',
+              style: GoogleFonts.readexPro(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 0.9),
+            ),
+          ],
+        ),
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
           Container(
+            //padding: EdgeInsets.only(left: 100),
             color: Color(0xff4b39ef),
             width: MediaQuery.sizeOf(context).width,
-            padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+            padding: EdgeInsets.fromLTRB(70, 0, 20, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
+                /* Center(
                   child: Text(
                     'Frequently Asked Questions',
                     style: GoogleFonts.readexPro(
@@ -43,7 +61,7 @@ class _FAQPageState extends State<FAQPage> {
                 ),
                 SizedBox(
                   height: 10,
-                ),
+                ), */
                 Text(
                   "Need Help? Contact our developers:",
                   style: GoogleFonts.readexPro(

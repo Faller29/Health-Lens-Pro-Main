@@ -548,9 +548,9 @@ class _HomePage extends State<HomePage> {
           ),
           Padding(
             padding:
-                const EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 14.0, 15.0),
+                const EdgeInsetsDirectional.fromSTEB(14.0, 10.0, 14.0, 15.0),
             child: Container(
-              width: 350.0,
+              width: MediaQuery.sizeOf(context).width,
               decoration: BoxDecoration(
                 color: const Color(0xffffffff),
                 boxShadow: [
@@ -575,45 +575,46 @@ class _HomePage extends State<HomePage> {
                   Padding(
                     padding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 14.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Stack(
                       children: [
-                        Text(
-                          "Macronutrients",
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Tooltip(
-                          triggerMode: TooltipTriggerMode.tap,
-                          message:
-                              "You're advised to meet at least 75% of your daily macronutrient needs.\n\nYou can exceed your target by up to 120%, but going beyond that may be harmful to your health.",
-                          padding: EdgeInsets.all(20),
-                          margin: EdgeInsets.all(20),
-                          showDuration: Duration(seconds: 10),
-                          decoration: BoxDecoration(
-                            color: Color(0xff4b39ef).withOpacity(0.9),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
+                        Center(
+                          child: Text(
+                            "Macronutrients",
+                            style: TextStyle(
+                                fontSize: 25, fontWeight: FontWeight.bold),
                           ),
-                          textStyle: TextStyle(color: Colors.white),
-                          preferBelow: true,
-                          verticalOffset: 20,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: const [
-                              Icon(
-                                FontAwesomeIcons.solidCircleQuestion,
-                                size: 16,
-                                color: Colors.black,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                            ],
+                        ),
+                        Positioned(
+                          right: 0,
+                          child: Tooltip(
+                            triggerMode: TooltipTriggerMode.tap,
+                            message:
+                                "You're advised to meet at least 75% of your daily macronutrient needs.\n\nYou can exceed your target by up to 120%, but going beyond that may be harmful to your health.",
+                            padding: EdgeInsets.all(20),
+                            margin: EdgeInsets.all(20),
+                            showDuration: Duration(seconds: 10),
+                            decoration: BoxDecoration(
+                              color: Color(0xff4b39ef).withOpacity(0.9),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(10)),
+                            ),
+                            textStyle: TextStyle(color: Colors.white),
+                            preferBelow: true,
+                            verticalOffset: 20,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: const [
+                                Icon(
+                                  FontAwesomeIcons.solidCircleQuestion,
+                                  size: 16,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -1294,8 +1295,8 @@ class _HomePage extends State<HomePage> {
                                                                 backgroundColor:
                                                                     const MaterialStatePropertyAll<
                                                                         Color>(
-                                                                  Colors
-                                                                      .blueAccent,
+                                                                  Color(
+                                                                      0xff4b39ef),
                                                                 ),
                                                                 side:
                                                                     const MaterialStatePropertyAll(
@@ -1687,120 +1688,169 @@ class _HomePage extends State<HomePage> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              /* crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center, */
+            child: Row(
+              //alignment: WrapAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Material(
-                  elevation: 3,
-                  borderRadius: BorderRadius.circular(10),
+                Container(
                   clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: InkWell(
-                    onTap: (((dailyCalories! / TER!) * 100) > 5)
-                        ? () async {
-                            final result =
-                                await Navigator.pushNamed(context, '/exercise');
-                            if (result == true) {
-                              setState(() {
-                                dataNeedsRefresh =
-                                    true; // Trigger a refresh in the main page
-                              });
+                  decoration: BoxDecoration(
+                    color: const Color(0xffffffff),
+                    boxShadow: [
+                      BoxShadow(
+                        blurStyle: BlurStyle.outer,
+                        blurRadius: 5.0,
+                        color: Color(0xff4b39ef).withOpacity(0.8),
+                        offset: Offset(
+                          0.0,
+                          2.0,
+                        ),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(8.0),
+                    shape: BoxShape.rectangle,
+                  ),
+                  child: Material(
+                    //elevation: 5,
+                    //borderRadius: BorderRadius.circular(10),
+                    //clipBehavior: Clip.antiAliasWithSaveLayer,
+                    //shadowColor: const Color(0xff4b39ef),
+                    child: InkWell(
+                      onTap: (((dailyCalories! / TER!) * 100) > 5)
+                          ? () async {
+                              final result = await Navigator.pushNamed(
+                                  context, '/exercise');
+                              if (result == true) {
+                                setState(() {
+                                  dataNeedsRefresh =
+                                      true; // Trigger a refresh in the main page
+                                });
+                              }
                             }
-                          }
-                        : () {
-                            showCupertinoModalPopup(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return StatefulBuilder(builder:
-                                      (BuildContext context,
-                                          StateSetter setState) {
-                                    return Center(
-                                      child: Card(
-                                        color: const Color.fromARGB(
-                                            234, 255, 255, 255),
-                                        elevation: 0,
-                                        margin: const EdgeInsets.fromLTRB(
-                                            10, 150, 10, 150),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                20,
-                                            height: 100,
-                                            child: Text(
-                                              'Please eat food first before doing exercise. Currently you have less than 5% calories which is not enough to burn Calories',
-                                              style: GoogleFonts.readexPro(
-                                                fontSize: MediaQuery.of(context)
-                                                    .textScaler
-                                                    .scale(14),
+                          : () {
+                              showCupertinoModalPopup(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(builder:
+                                        (BuildContext context,
+                                            StateSetter setState) {
+                                      return Center(
+                                        child: Card(
+                                          color: const Color.fromARGB(
+                                              234, 255, 255, 255),
+                                          elevation: 0,
+                                          margin: const EdgeInsets.fromLTRB(
+                                              10, 150, 10, 150),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                  20,
+                                              height: 100,
+                                              child: Text(
+                                                'Please eat food first before doing exercise. Currently you have less than 5% calories which is not enough to burn Calories',
+                                                style: GoogleFonts.readexPro(
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                          .textScaler
+                                                          .scale(14),
+                                                ),
+                                                textAlign: TextAlign.center,
                                               ),
-                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    });
                                   });
-                                });
-                          },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Ink.image(
-                          image: const AssetImage('assets/images/exercise.png'),
-                          height: 160,
-                          width: 160,
-                        ),
-                        Text(
-                          'Exercise',
-                          style: GoogleFonts.readexPro(
-                            textStyle: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
+                            },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Ink.image(
+                            image:
+                                const AssetImage('assets/images/exercise.png'),
+                            height: 160,
+                            width: MediaQuery.sizeOf(context).width * 0.44,
+                            fit: BoxFit.fitWidth,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                      ],
+                          Text(
+                            'Exercise',
+                            style: GoogleFonts.readexPro(
+                              textStyle: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            textScaler: TextScaler.linear(1.1),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(
                   width: 10,
                 ),
-                Material(
-                  elevation: 3,
-                  borderRadius: BorderRadius.circular(10),
+                Container(
                   clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: InkWell(
-                    onTap: () {
-                      mealPlanGeneratorSelector(context);
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Ink.image(
-                          image: const AssetImage('assets/images/food.png'),
-                          height: 160,
-                          width: 160,
+                  decoration: BoxDecoration(
+                    color: const Color(0xffffffff),
+                    boxShadow: [
+                      BoxShadow(
+                        blurStyle: BlurStyle.outer,
+                        blurRadius: 5.0,
+                        color: Color(0xff4b39ef).withOpacity(0.8),
+                        offset: Offset(
+                          0.0,
+                          2.0,
                         ),
-                        Text(
-                          'Meal Plan',
-                          style: GoogleFonts.readexPro(
-                            textStyle: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(8.0),
+                    shape: BoxShape.rectangle,
+                  ),
+                  child: Material(
+                    /* elevation: 5,
+                    borderRadius: BorderRadius.circular(10),
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    shadowColor: const Color(0xff4b39ef), */
+                    child: InkWell(
+                      onTap: () {
+                        mealPlanGeneratorSelector(context);
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Ink.image(
+                            image: const AssetImage('assets/images/food.png'),
+                            height: 160,
+                            width: MediaQuery.sizeOf(context).width * 0.44,
+                            fit: BoxFit.fitWidth,
                           ),
-                        ),
-                      ],
+                          Text(
+                            'Meal Plan',
+                            style: GoogleFonts.readexPro(
+                              textStyle: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            textScaler: TextScaler.linear(1.1),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

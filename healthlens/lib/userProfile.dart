@@ -185,8 +185,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Edit Profile', style: GoogleFonts.readexPro(fontSize: 18)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'PROFILE',
+              style: GoogleFonts.outfit(fontSize: 12),
+            ),
+            Text(
+              'Edit Profile',
+              style: GoogleFonts.readexPro(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 0.9),
+            ),
+          ],
+        ),
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
       ),

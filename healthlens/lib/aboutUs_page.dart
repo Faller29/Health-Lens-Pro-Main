@@ -16,7 +16,23 @@ class _AboutUs extends State<AboutUs> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('About Us', style: GoogleFonts.readexPro(fontSize: 18)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'PROFILE',
+              style: GoogleFonts.outfit(fontSize: 12),
+            ),
+            Text(
+              'About Us',
+              style: GoogleFonts.readexPro(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 0.9),
+            ),
+          ],
+        ),
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
       ),

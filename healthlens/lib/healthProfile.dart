@@ -307,13 +307,28 @@ class _healthProfile extends State<healthProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Edit Health Profile',
-            style: GoogleFonts.readexPro(fontSize: 18)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'PROFILE',
+              style: GoogleFonts.outfit(fontSize: 12),
+            ),
+            Text(
+              'Edit Health Profile',
+              style: GoogleFonts.readexPro(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 0.9),
+            ),
+          ],
+        ),
         backgroundColor: Color(0xff4b39ef),
         foregroundColor: Colors.white,
       ),
-      backgroundColor: Colors.white,
       body: Form(
         key: _formKey,
         child: ListView(

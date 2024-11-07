@@ -192,7 +192,8 @@ class _SetupPageState extends State<SetupPage> {
                   elevation: 3,
                   duration: const Duration(seconds: 2),
                   backgroundColor: Colors.red,
-                  content: Text('Sign up failed. Please try again.')),
+                  content: Text(
+                      'Sign up failed.\nPlease check the information you Provided and try again.')),
             );
             setState(() {
               _firstPress = !_firstPress;
@@ -389,12 +390,8 @@ class _SetupPageState extends State<SetupPage> {
                                                               .readexPro(
                                                                   fontSize:
                                                                       18.0,
-                                                                  color: Color
-                                                                      .fromARGB(
-                                                                          255,
-                                                                          7,
-                                                                          18,
-                                                                          123)),
+                                                                  color: Color(
+                                                                      0xff4b39ef)),
                                                         ),
                                                       ),
                                                     ),
@@ -828,16 +825,13 @@ class _SetupPageState extends State<SetupPage> {
                                                                               true,
                                                                           mainColor: Colors.grey.withOpacity(
                                                                               0.2),
-                                                                          selectedColor: Color.fromARGB(
-                                                                              255,
-                                                                              7,
-                                                                              18,
-                                                                              123),
+                                                                          selectedColor: Color(
+                                                                              0xff4b39ef),
                                                                           selectedBorderSide: BorderSide(
                                                                               width:
                                                                                   1,
-                                                                              color: Color.fromARGB(255, 7, 18,
-                                                                                  123)),
+                                                                              color: Color(
+                                                                                  0xff4b39ef)),
                                                                           preSelectedIdx:
                                                                               genderIndex,
                                                                           options:
@@ -905,12 +899,8 @@ class _SetupPageState extends State<SetupPage> {
                                                         style: GoogleFonts
                                                             .readexPro(
                                                                 fontSize: 18.0,
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        7,
-                                                                        18,
-                                                                        123)),
+                                                                color: Color(
+                                                                    0xff4b39ef)),
                                                       ),
                                                     ),
                                                   ),
@@ -1198,7 +1188,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                   }
                                                                   if (height
                                                                           .length <
-                                                                      3) {
+                                                                      1) {
                                                                     return 'Please make sure your height is in cm';
                                                                   }
 
@@ -1337,7 +1327,7 @@ class _SetupPageState extends State<SetupPage> {
                                                                   }
                                                                   if (value
                                                                           .length <
-                                                                      2) {
+                                                                      1) {
                                                                     return 'Please enter a valid weight';
                                                                   }
 
@@ -1404,12 +1394,8 @@ class _SetupPageState extends State<SetupPage> {
                                                               style: GoogleFonts
                                                                   .readexPro(
                                                                 fontSize: 18.0,
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        7,
-                                                                        18,
-                                                                        123),
+                                                                color: Color(
+                                                                    0xff4b39ef),
                                                               ),
                                                             ),
                                                           ),
@@ -1601,8 +1587,8 @@ class _SetupPageState extends State<SetupPage> {
                                                                           circular: true,
                                                                           textStyle: TextStyle(fontSize: 13, color: Colors.white),
                                                                           mainColor: Colors.grey,
-                                                                          selectedColor: Color.fromARGB(255, 7, 18, 123),
-                                                                          selectedBorderSide: BorderSide(width: 1, color: Color.fromARGB(255, 7, 18, 123)),
+                                                                          selectedColor: Color(0xff4b39ef),
+                                                                          selectedBorderSide: BorderSide(width: 1, color: Color(0xff4b39ef)),
                                                                           preSelectedIdx: 0,
                                                                           options: [
                                                                             RadioOption("SEDENTARY",
@@ -2179,8 +2165,7 @@ class _SetupPageState extends State<SetupPage> {
                                         dotHeight: 10.0,
                                         dotColor:
                                             Color.fromARGB(40, 75, 57, 239),
-                                        activeDotColor:
-                                            Color.fromARGB(255, 7, 18, 123),
+                                        activeDotColor: Color(0xff4b39ef),
                                         paintStyle: PaintingStyle.fill,
                                       ),
                                     ),
@@ -2206,8 +2191,7 @@ class _SetupPageState extends State<SetupPage> {
                                       style: TextButton.styleFrom(
                                         backgroundColor:
                                             Colors.grey.withOpacity(0.2),
-                                        foregroundColor:
-                                            Color.fromARGB(255, 7, 18, 123),
+                                        foregroundColor: Color(0xff4b39ef),
                                       ),
                                     ),
                                   ],
@@ -2217,8 +2201,7 @@ class _SetupPageState extends State<SetupPage> {
                                 onPressed: _nextPage,
                                 child: Text(nextText),
                                 style: TextButton.styleFrom(
-                                  backgroundColor:
-                                      Color.fromARGB(255, 7, 18, 123),
+                                  backgroundColor: Color(0xff4b39ef),
                                   foregroundColor: Colors.white,
                                 ),
                               ),
@@ -2231,7 +2214,7 @@ class _SetupPageState extends State<SetupPage> {
     
                               style: TextButton.styleFrom(
                                 backgroundColor: 
-                                      Color.fromARGB(255, 7, 18, 123),
+                                      Color(0xff4b39ef),
                                 foregroundColor: Colors.white,
                               ),
                             ),*/
@@ -2259,7 +2242,7 @@ class _SetupPageState extends State<SetupPage> {
                           children: [
                             Icon(
                               IconlyBroken.login,
-                              color: Color.fromARGB(255, 7, 18, 123),
+                              color: Color(0xff4b39ef),
                               size: 20,
                             ),
                             SizedBox(
@@ -2271,7 +2254,7 @@ class _SetupPageState extends State<SetupPage> {
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.bold,
                                 textStyle: TextStyle(
-                                  color: Color.fromARGB(255, 7, 18, 123),
+                                  color: Color(0xff4b39ef),
                                 ),
                               ),
                               textAlign: TextAlign.end,

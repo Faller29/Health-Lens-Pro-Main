@@ -189,13 +189,27 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          getFormattedDate(),
-          style: GoogleFonts.outfit(fontSize: 25.0),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'HISTORY',
+              style: GoogleFonts.outfit(fontSize: 14),
+            ),
+            Text(
+              getFormattedDate(),
+              style: GoogleFonts.readexPro(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 0.9),
+            ),
+          ],
         ),
-        foregroundColor: Colors.white,
         backgroundColor: Color(0xff4b39ef),
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         controller: _scrollController, // Attach the controller
@@ -385,11 +399,12 @@ class _HistoryPageState extends State<HistoryPage> {
                           child: Container(
                             padding: EdgeInsets.all(15),
                             child: Text(
-                              'No food history for ${widget.formattedDate}',
+                              'No food history for\n${getFormattedDate()}',
                               style: GoogleFonts.readexPro(
                                 textStyle: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.black54,
                                   fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               textAlign: TextAlign.center,
@@ -477,11 +492,12 @@ class _HistoryPageState extends State<HistoryPage> {
                           child: Container(
                             padding: EdgeInsets.all(15),
                             child: Text(
-                              'No Exercise Activity for ${widget.formattedDate}',
+                              'No Exercise Activity for\n${getFormattedDate()}',
                               style: GoogleFonts.readexPro(
                                 textStyle: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.black54,
                                   fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               textAlign: TextAlign.center,

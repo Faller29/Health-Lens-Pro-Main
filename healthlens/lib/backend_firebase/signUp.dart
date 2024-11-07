@@ -140,7 +140,8 @@ Future<bool> signUp(
   doubleCarbs = carbs / 4;
   doubleFats = fats / 9;
   doubleProtein = protein / 4;
-
+  print(doubleCarbs);
+  print(weight);
   //parsing double to interget no need to pay attention
   String strCarbs = doubleCarbs.toStringAsFixed(0);
   String strProtein = doubleProtein.toStringAsFixed(0);
@@ -151,7 +152,10 @@ Future<bool> signUp(
   gCarbs = roundUp5s(gCarbs);
   gProtein = roundUp5s(gProtein);
   gFats = roundUp5s(gFats);
-
+  print(gFats);
+  if (gCarbs < 0 || gFats < 0 || gProtein < 0) {
+    return false;
+  }
   try {
     // Create a new user with email and password
     UserCredential userCredential = await FirebaseAuth.instance

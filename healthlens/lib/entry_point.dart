@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:healthlens/backend_firebase/modals.dart';
 import 'package:iconly/iconly.dart';
 import 'homePage.dart';
@@ -50,6 +51,9 @@ class _EntryPointState extends State<EntryPoint> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Color(0xff4b39ef),
+    ));
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
