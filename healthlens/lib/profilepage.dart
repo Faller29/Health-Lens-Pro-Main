@@ -173,7 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       SizedBox(
-                        width: 50,
+                        width: 20,
                       ),
                       Container(
                         width: 70.0,

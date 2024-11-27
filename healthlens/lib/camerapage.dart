@@ -77,10 +77,10 @@ class _CameraPageState extends State<CameraPage> {
       _isDetecting = true;
     });
 
-    // Start a 10-second timer
+    // Start a 10 second timer
     _detectionTimer = Timer(Duration(seconds: 10), () {
       if (_detections.isEmpty) {
-        // Show a dialog or any other UI feedback
+        // Show a dialog
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -944,8 +944,7 @@ class _CameraPageState extends State<CameraPage> {
                               int calories = currentCalories +
                                   (((initialCarbs * quantity) * 4) +
                                       ((initialFats * quantity) * 9) +
-                                      ((initialProtein * quantity) *
-                                          4)); // Example calorie calculation
+                                      ((initialProtein * quantity) * 4));
                               print(finalFats);
                               print('wowers5');
                               // Save data to userMacros collection
@@ -1356,7 +1355,7 @@ class _CameraPageState extends State<CameraPage> {
                                   (((initialCarbs * quantity) * 4) +
                                       ((initialFats * quantity) * 9) +
                                       ((initialProtein * quantity) *
-                                          4)); // Example calorie calculation
+                                          4)); 
                               print(finalFats);
                               print('wowers5');
                               // Save data to userMacros collection

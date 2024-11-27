@@ -1,108 +1,105 @@
 final List<Map<String, dynamic>> exercises = [
   {
-    'name': 'Walking', //yung excercise title
-    'image': 'assets/images/Walking.jpg', //wag mo na to intindihin
-    'instructions':
-        'Walk at a steady pace of 3mph for 20 minutes.', //description
-    'calories': 109, //wag mo na to intindihin
+    'name': 'Walking',
+    'image': 'assets/images/Walking.jpg',
+    'instructions': 'Walk at a steady pace of 3mph for 20 minutes.',
+    'calories': 109,
   },
   {
-    'name': 'Playing Catch', //yung excercise title
-    'image': 'assets/images/Playing Catch.jpg', //wag mo na to intindihin
+    'name': 'Playing Catch',
+    'image': 'assets/images/Playing Catch.jpg',
     'instructions':
-        'Throw the ball to your partner and be ready to catch it as they throw it back to you.', //description
-    'calories': 85, //wag mo na to intindihin
+        'Throw the ball to your partner and be ready to catch it as they throw it back to you.',
+    'calories': 85,
   },
   {
-    'name': 'Basketball - Shooting', //yung excercise title
-    'image': 'assets/images/Shooting, Basketball.jpg', //wag mo na to intindihin
+    'name': 'Basketball - Shooting',
+    'image': 'assets/images/Shooting, Basketball.jpg',
     'instructions':
-        'Dribble the ball with one hand while moving towards the hoop and aim to shoot it through the basket.', //description
-    'calories': 153, //wag mo na to intindihin
+        'Dribble the ball with one hand while moving towards the hoop and aim to shoot it through the basket.',
+    'calories': 153,
   },
   {
-    'name': 'Bicycling - Moderate', //yung excercise title
-    'image': 'assets/images/Bicycling - moderate.jpg', //wag mo na to intindihin
+    'name': 'Bicycling - Moderate',
+    'image': 'assets/images/Bicycling - moderate.jpg',
     'instructions':
-        'Sit on the saddle, grip the handlebars, push off with one foot, and pedal while steering to balance.', //description
-    'calories': 272, //wag mo na to intindihin
+        'Sit on the saddle, grip the handlebars, push off with one foot, and pedal while steering to balance.',
+    'calories': 272,
   },
   {
-    'name': 'Bowling', //yung excercise title
-    'image': 'assets/images/Bowling.jpg', //wag mo na to intindihin
+    'name': 'Bowling',
+    'image': 'assets/images/Bowling.jpg',
     'instructions':
-        'Grip the ball, take a few steps forward, swing your arm back, and then release the ball towards the pins while aiming for the target.', //description
-    'calories': 102, //wag mo na to intindihin
+        'Grip the ball, take a few steps forward, swing your arm back, and then release the ball towards the pins while aiming for the target.',
+    'calories': 102,
   },
   {
-    'name': 'Dancing', //yung excercise title
-    'image': 'assets/images/Dancing.jpg', //wag mo na to intindihin
+    'name': 'Dancing',
+    'image': 'assets/images/Dancing.jpg',
     'instructions':
-        'Choose upbeat music, move to the rhythm, and keep dancing continuously.', //description
-    'calories': 153, //wag mo na to intindihin
+        'Choose upbeat music, move to the rhythm, and keep dancing continuously.',
+    'calories': 153,
   },
   {
-    'name': 'Gardening', //yung excercise title
-    'image': 'assets/images/Gardening.jpg', //wag mo na to intindihin
+    'name': 'Gardening',
+    'image': 'assets/images/Gardening.jpg',
     'instructions':
-        'Spend 30 minutes digging, planting, or tending to your garden.', //description
-    'calories': 136, //wag mo na to intindihin
+        'Spend 30 minutes digging, planting, or tending to your garden.',
+    'calories': 136,
   },
   {
-    'name': 'Golf - Riding in Cart', //yung excercise title
-    'image':
-        'assets/images/Golf - riding in cart.jpg', //wag mo na to intindihin
+    'name': 'Golf - Riding in Cart',
+    'image': 'assets/images/Golf - riding in cart.jpg',
     'instructions':
-        'Walk between holes, take practice swings, and perform gentle stretches while riding in the golf cart.', //description
-    'calories': 119, //wag mo na to intindihin
+        'Walk between holes, take practice swings, and perform gentle stretches while riding in the golf cart.',
+    'calories': 119,
   },
   {
-    'name': 'Pushing Baby Stroller', //yung excercise title
-    'image':
-        'assets/images/Pushing baby stroller.jpg', //wag mo na to intindihin
+    'name': 'Pushing Baby Stroller',
+    'image': 'assets/images/Pushing baby stroller.jpg',
     'instructions':
-        'Push the stroller briskly around a park or neighborhood, varying your pace and direction.', //description
-    'calories': 85, //wag mo na to intindihin
+        'Push the stroller briskly around a park or neighborhood, varying your pace and direction.',
+    'calories': 85,
   },
   {
-    'name': 'Running', //yung excercise title
-    'image': 'assets/images/Running.jpg', //wag mo na to intindihin
+    'name': 'Running',
+    'image': 'assets/images/Running.jpg',
     'instructions':
-        'Run at a steady pace for 12 minutes, maintaining a consistent rhythm of 5mph and good form.', //description
-    'calories': 272, //wag mo na to intindihin
+        'Run at a steady pace for 12 minutes, maintaining a consistent rhythm of 5mph and good form.',
+    'calories': 272,
   },
   {
-    'name': 'Swimming', //yung excercise title
-    'image': 'assets/images/Swimming.jpg', //wag mo na to intindihin
-    'instructions': 'Swim leisurely without laps', //description
-    'calories': 204, //wag mo na to intindihin
+    'name': 'Swimming',
+    'image': 'assets/images/Swimming.jpg',
+    'instructions': 'Swim leisurely without laps',
+    'calories': 204,
   },
   {
-    'name': 'Tai Chi', //yung excercise title
-    'image': 'assets/images/Tai Chi.jpg', //wag mo na to intindihin
+    'name': 'Tai Chi',
+    'image': 'assets/images/Tai Chi.jpg',
     'instructions':
-        'Perform tai chi movements slowly, focusing on breath control and balance.', //description
-    'calories': 136, //wag mo na to intindihin
+        'Perform tai chi movements slowly, focusing on breath control and balance.',
+    'calories': 136,
   },
   {
-    'name': 'Washing Car', //yung excercise title
-    'image': 'assets/images/Washing Car.jpg', //wag mo na to intindihin
+    'name': 'Washing Car',
+    'image': 'assets/images/Washing Car.jpg',
     'instructions':
-        'Wash the car thoroughly, scrubbing, rinsing, and drying while maintaining a steady pace.', //description
-    'calories': 102, //wag mo na to intindihin
+        'Wash the car thoroughly, scrubbing, rinsing, and drying while maintaining a steady pace.',
+    'calories': 102,
   },
   {
-    'name': 'Walking a Dog', //yung excercise title
-    'image': 'assets/images/Walking a dog.jpg', //wag mo na to intindihin
+    'name': 'Walking a Dog',
+    'image': 'assets/images/Walking a dog.jpg',
     'instructions':
-        'Walk the dog at a steady pace, allowing time for exploration and occasional stops.', //description
-    'calories': 102, //wag mo na to intindihin
+        'Walk the dog at a steady pace, allowing time for exploration and occasional stops.',
+    'calories': 102,
   },
   {
-    'name': 'Yoga', //yung excercise title
-    'image': 'assets/images/Yoga.jpg', //wag mo na to intindihin
+    'name': 'Yoga',
+    'image': 'assets/images/Yoga.jpg',
     'instructions':
-        'Perform a series of yoga poses and stretches, focusing on breath and alignment.', //description
-    'calories': 85, //wag mo na to intindihin
+        'Perform a series of yoga poses and stretches, focusing on breath and alignment.',
+    'calories': 85,
   },
 ];

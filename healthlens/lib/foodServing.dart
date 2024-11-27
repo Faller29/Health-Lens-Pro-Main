@@ -12,6 +12,7 @@ import 'package:iconly/iconly.dart';
 import 'package:healthlens/entry_point.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'backend_firebase/foodExchange.dart';
+import 'package:cupertino_icons/cupertino_icons.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -825,13 +826,10 @@ class _FoodServingState extends State<FoodServing> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               children: [
-                SizedBox(
-                  height: 5,
-                ),
                 (foodItems.isNotEmpty)
                     ? Expanded(
                         child: ListView.builder(
@@ -956,113 +954,182 @@ class _FoodServingState extends State<FoodServing> {
                           },
                         ),
                       )
-                    : Container(
-                        height: (MediaQuery.sizeOf(context).height - 225),
-                        child: Center(
-                          child: Text(
-                            'No food scanned.\nUse the Add button to manually Add',
-                            style: GoogleFonts.readexPro(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
+                    : Expanded(
+                        child: Container(
+                          height: MediaQuery.sizeOf(context).height,
+                          child: Center(
+                            child: Text(
+                              'No food scanned.\nUse the Add button to manually Add',
+                              style: GoogleFonts.readexPro(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black54),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: Color(0xff4b39ef),
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: _isLoading
-                            ? null
-                            : () async {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                if (foodItems.isNotEmpty) {
-                                  await _confirmAndSendToFirebase();
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        behavior: SnackBarBehavior.floating,
-                                        elevation: 3,
-                                        duration: const Duration(seconds: 1),
-                                        backgroundColor: Colors.red,
-                                        content: Text('No Food to add')),
-                                  );
-                                }
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              },
-                        child: Text('Confirm'),
-                      ),
-                      ElevatedButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 16, 150, 34),
-                          foregroundColor: Colors.white,
-                        ),
-                        child: Text('Add', style: GoogleFonts.readexPro()),
-                        onPressed: () {
-                          showCupertinoModalPopup(
-                            context: _scaffoldKey.currentContext!,
-                            builder: (context) {
-                              return CupertinoActionSheet(
-                                title: Text('Select an item to add'),
-                                actions: itemMacronutrients.keys.map((item) {
-                                  return CupertinoActionSheetAction(
-                                    onPressed: () {
-                                      SchedulerBinding.instance!
-                                          .addPostFrameCallback((_) {
-                                        Navigator.pop(context);
-                                      });
-                                      setState(() {
-                                        // Check if item already exists in _detectedItems
-
-                                        final existingItemIndex =
-                                            _detectedItems.indexWhere(
-                                          (element) => element['tag'] == item,
-                                        );
-
-                                        if (existingItemIndex != -1) {
-                                          // If item already exists, increment the quantity
-                                          _detectedItems[existingItemIndex]
-                                                  ['quantity'] =
-                                              (_detectedItems[existingItemIndex]
-                                                      ['quantity'] as int) +
-                                                  1;
-                                        } else {
-                                          // If item doesn't exist, add it with quantity 1
-                                          _detectedItems.add({
-                                            'tag': item,
-                                            'quantity': 1,
-                                          } as Map<String, dynamic>);
-                                        }
-                                      });
-                                    },
-                                    child: Text(item),
-                                  );
-                                }).toList(),
-                                cancelButton: CupertinoActionSheetAction(
-                                  isDefaultAction: true,
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text('Cancel'),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      )
-                    ],
-                  ),
-                )
               ],
+            ),
+          ),
+          Positioned(
+            bottom: 15,
+            child: SizedBox(
+              width: MediaQuery.sizeOf(context).width,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color(0xff4b39ef),
+                        foregroundColor: Colors.white,
+                        elevation: 5,
+                      ),
+                      onPressed: _isLoading
+                          ? null
+                          : () async {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              if (foodItems.isNotEmpty) {
+                                await _confirmAndSendToFirebase();
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      behavior: SnackBarBehavior.floating,
+                                      elevation: 3,
+                                      duration: const Duration(seconds: 1),
+                                      backgroundColor: Colors.red,
+                                      content: Text('No Food to add')),
+                                );
+                              }
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            },
+                      child: Text('Confirm'),
+                    ),
+                    ElevatedButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 16, 150, 34),
+                        foregroundColor: Colors.white,
+                        elevation: 5,
+                      ),
+                      child: Text('Add', style: GoogleFonts.readexPro()),
+                      onPressed: () {
+                        // Declare the search controller and filtered items outside the bottom sheet
+                        TextEditingController searchController =
+                            TextEditingController();
+                        List<String> filteredItems = itemMacronutrients.keys
+                            .toList(); // Initial list of items
+
+                        // Open the bottom sheet with a search bar
+                        showCupertinoModalPopup(
+                          context: _scaffoldKey.currentContext!,
+                          builder: (context) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return Center(
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.8,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.95,
+                                    child: CupertinoActionSheet(
+                                      title: Text('Select an item to add'),
+                                      message: CupertinoSearchTextField(
+                                        controller: searchController,
+                                        itemSize: 30,
+                                        placeholder: 'Search',
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                        onChanged: (query) {
+                                          // Update filtered items based on the search query
+                                          setState(() {
+                                            filteredItems = itemMacronutrients
+                                                .keys
+                                                .where((item) => item
+                                                    .toLowerCase()
+                                                    .contains(
+                                                        query.toLowerCase()))
+                                                .toList();
+                                          });
+                                        },
+                                      ),
+                                      actions: filteredItems.isEmpty
+                                          ? [
+                                              CupertinoActionSheetAction(
+                                                onPressed: () {},
+                                                child: Text('No items found'),
+                                              ),
+                                            ]
+                                          : filteredItems.map((item) {
+                                              return CupertinoActionSheetAction(
+                                                onPressed: () {
+                                                  SchedulerBinding.instance!
+                                                      .addPostFrameCallback(
+                                                    (_) {
+                                                      Navigator.pop(context);
+                                                    },
+                                                  );
+
+                                                  // Add or increment the selected item
+                                                  setState(() {
+                                                    // Check if item already exists in _detectedItems
+                                                    final existingItemIndex =
+                                                        _detectedItems
+                                                            .indexWhere(
+                                                                (element) =>
+                                                                    element[
+                                                                        'tag'] ==
+                                                                    item);
+
+                                                    if (existingItemIndex !=
+                                                        -1) {
+                                                      // If item already exists, increment the quantity
+                                                      _detectedItems[
+                                                              existingItemIndex]
+                                                          [
+                                                          'quantity'] = (_detectedItems[
+                                                                  existingItemIndex]
+                                                              [
+                                                              'quantity'] as int) +
+                                                          1;
+                                                    } else {
+                                                      // If item doesn't exist, add it with quantity 1
+                                                      _detectedItems.add({
+                                                        'tag': item,
+                                                        'quantity': 1,
+                                                      } as Map<String,
+                                                          dynamic>);
+                                                    }
+                                                  });
+                                                },
+                                                child: Text(item),
+                                              );
+                                            }).toList(),
+                                      cancelButton: CupertinoActionSheetAction(
+                                        isDefaultAction: true,
+                                        onPressed: () {
+                                          Navigator.pop(
+                                              context); // Close the sheet
+                                        },
+                                        child: Text('Cancel'),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
           if (_isLoading)

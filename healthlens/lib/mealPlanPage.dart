@@ -15,6 +15,8 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
   final Set<String> selectedItems = {};
   final Map<String, int> selectedQuantities =
       {}; // Store quantities for selected foods
+  final TextEditingController _searchController = TextEditingController();
+  String searchQuery = '';
 
   int totalCarbs = 0;
   int totalFats = 0;
@@ -24,11 +26,15 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
   int userCurrentFats = 0;
   int userCurrentProteins = 0;
 
-  int userMaxCarbs = 375; // Example maximum values from Firebase
-  int userMaxFats = 70; // Example maximum values from Firebase
-  int userMaxProteins = 95; // Example maximum values from Firebase
+// will be replaced maximum values from Firebase, variables were initialized in case there was an error during development and testing
+// change later on
+  int userMaxCarbs = 375;
+  int userMaxFats = 70;
+  int userMaxProteins = 95;
 
-  List<String> chronicDiseases = ['Obesity']; // Example chronic diseases
+  List<String> chronicDiseases = [
+    'Obesity'
+  ]; // will be replaced chronic diseases values from Firebase
   List<int> chronicIndexList = [];
 
   @override
@@ -161,6 +167,19 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
     });
   }
 
+  List<String> filterFoodItems() {
+    if (searchQuery.isEmpty || searchQuery.trim().isEmpty) {
+      // If search query is empty, return all food names
+      return itemMacronutrients.keys.toList();
+    } else {
+      // If search query is present, filter foods by name
+      return itemMacronutrients.keys
+          .where((foodName) =>
+              foodName.toLowerCase().contains(searchQuery.toLowerCase()))
+          .toList();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -221,7 +240,7 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
           // Sticky Header for total macronutrients
           Container(
             width: MediaQuery.sizeOf(context).width,
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
             decoration: BoxDecoration(
               color: Color(0xff4b39ef),
               //borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
@@ -311,6 +330,86 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                     ),
                   ],
                 ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.sizeOf(context).width * 0.9,
+                        child: CupertinoSearchTextField(
+                          controller: _searchController,
+                          backgroundColor: Colors.white,
+                          /* textCapitalization: TextCapitalization.words,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 2),
+                            labelText: 'Search Ingredients',
+                            labelStyle: GoogleFonts.outfit(
+                              fontSize: 15.0,
+                              color: Colors.white,
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xffe0e3e7),
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xffe0e3e7),
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            focusedErrorBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xffe0e3e7),
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          cursorColor: Color(0xffe0e3e7), */
+                          style: GoogleFonts.outfit(
+                            fontSize: 16.0,
+                            color: Colors.black,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              searchQuery = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    /* TextButton(
+                      onPressed: () {
+                        setState(() {
+                          searchQuery = ''; // Clear the search query
+                          _searchController
+                              .clear(); // Clear the text in the search field
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            'Clear',
+                            style: GoogleFonts.outfit(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
+                      ),
+                    ), */
+                  ],
+                ),
               ],
             ),
           ),
@@ -320,121 +419,147 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
             child: ListView.builder(
               shrinkWrap: true,
               padding: EdgeInsets.fromLTRB(10, 0, 10, 70),
-              itemCount: itemMacronutrients.length,
+              itemCount: filterFoodItems().isEmpty
+                  ? 1 // Display the "No results found" message when no foods match the search query
+                  : filterFoodItems().length,
               itemBuilder: (context, index) {
-                String food = itemMacronutrients.keys.elementAt(index);
-                bool hasSelectedItems = itemMacronutrients[food]!.keys.any(
-                  (serving) {
-                    String key = '$food ($serving)';
-                    return selectedItems.contains(key);
-                  },
-                );
-
-                return Card(
-                  elevation: 2,
-                  margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                  shadowColor: Color(0xff4b39ef),
-                  child: Material(
-                    elevation: 3,
-                    color: Colors.white,
-                    shadowColor: Color(0xff4b39ef),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Theme(
-                      data: Theme.of(context)
-                          .copyWith(dividerColor: Colors.transparent),
-                      child: ExpansionTile(
-                        title: Row(
-                          children: [
-                            if (hasSelectedItems)
-                              Icon(Icons.check, color: Colors.green),
-                            SizedBox(width: 8),
-                            Text(
-                              food,
-                              style: GoogleFonts.readexPro(
-                                textStyle: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              textScaler: TextScaler.linear(1.15),
-                            ),
-                          ],
+                if (filterFoodItems().isEmpty) {
+                  // Return a single widget showing "No results found"
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text(
+                        'No results found',
+                        style: GoogleFonts.readexPro(
+                          textStyle: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
                         ),
-                        children: itemMacronutrients[food]!.keys.map((serving) {
-                          String key = '$food ($serving)';
-                          bool hasWarning = itemMacronutrients[food]![serving]!
-                              .containsKey('warnings');
-                          Map<String, dynamic> macronutrients =
-                              itemMacronutrients[food]![serving]!;
-
-                          return CheckboxListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    key,
-                                    style: GoogleFonts.readexPro(
-                                      textStyle: TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                                if (hasWarning)
-                                  Icon(IconlyBold.danger, color: Colors.red),
-                              ],
-                            ),
-                            subtitle: Column(
-                              children: [
-                                Text(
-                                  'Carbs: ${macronutrients['carbs']} g, Fats: ${macronutrients['fats']} g, Proteins: ${macronutrients['proteins']} g',
-                                  style: GoogleFonts.readexPro(
-                                    textStyle: TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ),
-                                // Quantity buttons
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("Quantity: "),
-                                    IconButton(
-                                      icon: Icon(Icons.remove),
-                                      onPressed: selectedItems.contains(key)
-                                          ? () =>
-                                              updateQuantity(food, serving, -1)
-                                          : null,
-                                    ),
-                                    Text('${selectedQuantities[key] ?? 1}'),
-                                    IconButton(
-                                      icon: Icon(Icons.add),
-                                      onPressed: selectedItems.contains(key)
-                                          ? () =>
-                                              updateQuantity(food, serving, 1)
-                                          : null,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            value: selectedItems.contains(key),
-                            onChanged: (bool? value) {
-                              toggleSelection(food, serving);
-                            },
-                          );
-                        }).toList(),
                       ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  // Otherwise, display the food items as usual
+                  String food = filterFoodItems()[index];
+                  bool hasSelectedItems = itemMacronutrients[food]!.keys.any(
+                    (serving) {
+                      String key = '$food ($serving)';
+                      return selectedItems.contains(key);
+                    },
+                  );
+
+                  return Card(
+                    elevation: 2,
+                    margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                    shadowColor: Color(0xff4b39ef),
+                    child: Material(
+                      elevation: 3,
+                      color: Colors.white,
+                      shadowColor: Color(0xff4b39ef),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Theme(
+                        data: Theme.of(context)
+                            .copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          title: Row(
+                            children: [
+                              if (hasSelectedItems)
+                                Icon(Icons.check, color: Colors.green),
+                              SizedBox(width: 8),
+                              Text(
+                                food,
+                                style: GoogleFonts.readexPro(
+                                  textStyle: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          children:
+                              itemMacronutrients[food]!.keys.map((serving) {
+                            String key = '$food ($serving)';
+                            bool hasWarning =
+                                itemMacronutrients[food]![serving]!
+                                    .containsKey('warnings');
+                            Map<String, dynamic> macronutrients =
+                                itemMacronutrients[food]![serving]!;
+
+                            return CheckboxListTile(
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      key,
+                                      style: GoogleFonts.readexPro(
+                                        textStyle: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  if (hasWarning)
+                                    Icon(IconlyBold.danger, color: Colors.red),
+                                ],
+                              ),
+                              subtitle: Column(
+                                children: [
+                                  Text(
+                                    'Carbs: ${macronutrients['carbs']} g, Fats: ${macronutrients['fats']} g, Proteins: ${macronutrients['proteins']} g',
+                                    style: GoogleFonts.readexPro(
+                                      textStyle: TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                  // Quantity buttons
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("Quantity: "),
+                                      IconButton(
+                                        icon: Icon(Icons.remove),
+                                        onPressed: selectedItems.contains(key)
+                                            ? () => updateQuantity(
+                                                food, serving, -1)
+                                            : null,
+                                      ),
+                                      Text('${selectedQuantities[key] ?? 1}'),
+                                      IconButton(
+                                        icon: Icon(Icons.add),
+                                        onPressed: selectedItems.contains(key)
+                                            ? () =>
+                                                updateQuantity(food, serving, 1)
+                                            : null,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              value: selectedItems.contains(key),
+                              onChanged: (bool? value) {
+                                toggleSelection(food, serving);
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  );
+                }
               },
             ),
-          ),
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -509,16 +634,14 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 Center(
                   child: Text(
                     'Selected Foods',
                     style: GoogleFonts.readexPro(
                       fontSize: 18.0,
-                      textStyle: const TextStyle(
-                        color: Color.fromARGB(255, 0, 0, 0),
+                      textStyle: TextStyle(
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -533,9 +656,7 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                         'No foods selected',
                         style: GoogleFonts.readexPro(
                           fontSize: 20.0,
-                          textStyle: const TextStyle(
-                            color: Color.fromARGB(255, 0, 0, 0),
-                          ),
+                          textStyle: TextStyle(color: Colors.black),
                         ),
                       ),
                     ),
@@ -545,87 +666,72 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                     child: SingleChildScrollView(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                        child: Column(children: [
-                          ...selectedFoodList
-                              .map(
-                                (food) => Column(
-                                  children: [
-                                    Table(
-                                      defaultVerticalAlignment:
-                                          TableCellVerticalAlignment.middle,
-                                      /* border: TableBorder.all(
-                                      borderRadius: BorderRadius.circular(10),
-                                      width: 0.5,
-                                    ), */
-                                      /* columnWidths: {
-                                      0: FlexColumnWidth(1),
-                                      2: FlexColumnWidth(1),
-                                      3: FlexColumnWidth(1),
-                                    }, */
-                                      children: [
-                                        TableRow(
-                                          children: [
-                                            TableCell(
+                        child: Column(
+                          children: [
+                            ...selectedFoodList
+                                .map(
+                                  (food) => Column(
+                                    children: [
+                                      Table(
+                                        children: [
+                                          TableRow(
+                                            children: [
+                                              TableCell(
                                                 child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5),
-                                              child: Text(
-                                                '${food['foodName']}', // Include quantity
-                                                style: GoogleFonts.readexPro(
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  textStyle: const TextStyle(
-                                                    color: Color.fromARGB(
-                                                        255, 0, 0, 0),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(horizontal: 5),
+                                                  child: Text(
+                                                    '${food['foodName']}',
+                                                    style:
+                                                        GoogleFonts.readexPro(
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      textStyle: TextStyle(
+                                                          color: Colors.black),
+                                                    ),
+                                                    textAlign: TextAlign.start,
                                                   ),
                                                 ),
-                                                textAlign: TextAlign.start,
                                               ),
-                                            )),
-                                            TableCell(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 2),
+                                              TableCell(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(horizontal: 2),
+                                                  child: Text(
+                                                    '(${food['servingPart']})',
+                                                    style:
+                                                        GoogleFonts.readexPro(
+                                                      fontSize: 14.0,
+                                                      textStyle: TextStyle(
+                                                          color: Colors.black),
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                              ),
+                                              TableCell(
                                                 child: Text(
-                                                  '(${food['servingPart']})', // Include quantity
+                                                  'x${food['quantity']}',
                                                   style: GoogleFonts.readexPro(
                                                     fontSize: 14.0,
-                                                    textStyle: const TextStyle(
-                                                      color: Color.fromARGB(
-                                                          255, 0, 0, 0),
-                                                    ),
+                                                    textStyle: TextStyle(
+                                                        color: Colors.black),
                                                   ),
                                                   textAlign: TextAlign.center,
                                                 ),
                                               ),
-                                            ),
-                                            TableCell(
-                                              child: Text(
-                                                'x${food['quantity']}', // Include quantity
-                                                style: GoogleFonts.readexPro(
-                                                  fontSize: 14.0,
-                                                  textStyle: const TextStyle(
-                                                    color: Color.fromARGB(
-                                                        255, 0, 0, 0),
-                                                  ),
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    Divider(
-                                      thickness: 0.5,
-                                    ),
-                                  ],
-                                ),
-                              )
-                              .toList(),
-                        ]),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Divider(thickness: 0.5),
+                                    ],
+                                  ),
+                                )
+                                .toList(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -638,26 +744,22 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                     ),
                     color: Color(0xff4b39ef),
                   ),
-                  width: MediaQuery.sizeOf(context).width,
+                  width: MediaQuery.of(context).size.width,
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(15, 15, 15, 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
                           'Total Macronutrients:',
                           style: GoogleFonts.readexPro(
                             fontSize: 16.0,
-                            textStyle: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            textStyle: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
+                        SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -665,7 +767,7 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                               'Carbs: $totalCarbs g',
                               style: GoogleFonts.readexPro(
                                 fontSize: 14.0,
-                                textStyle: const TextStyle(
+                                textStyle: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -674,7 +776,7 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                               'Fats: $totalFats g',
                               style: GoogleFonts.readexPro(
                                 fontSize: 14.0,
-                                textStyle: const TextStyle(
+                                textStyle: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -683,7 +785,7 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                               'Proteins: $totalProteins g',
                               style: GoogleFonts.readexPro(
                                 fontSize: 14.0,
-                                textStyle: const TextStyle(
+                                textStyle: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -702,25 +804,22 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                                 ),
                                 onPressed: () async {
                                   await saveSelectedFoods(selectedFoodList);
-                                  print(selectedFoodList);
-                                  // Show success Snackbar after saving
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       behavior: SnackBarBehavior.floating,
                                       elevation: 3,
-                                      duration: const Duration(seconds: 2),
+                                      duration: Duration(seconds: 2),
                                       content: Text('Saved successfully'),
                                       backgroundColor: Colors.green,
                                     ),
                                   );
-
                                   Navigator.pop(context);
                                 },
                                 child: Text(
                                   'Save',
                                   style: GoogleFonts.readexPro(
                                     fontSize: 14.0,
-                                    textStyle: const TextStyle(
+                                    textStyle: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -728,34 +827,101 @@ class _FoodSelectorPageState extends State<FoodSelectorPage> {
                               ),
                             if (selectedFoodList.isNotEmpty)
                               ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    selectedItems
-                                        .clear(); // Clear all selected items
-                                    totalCarbs =
-                                        0; // Reset total macronutrients
-                                    totalFats = 0;
-                                    totalProteins = 0;
-                                    calculateTotal(); // Recalculate totals to update UI
-                                  });
-                                  Navigator.pop(
-                                      context); // Close the bottom sheet
-                                },
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.redAccent),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            20.0), // Rounded corners for the dialog
+                                      ),
+                                      title: Text(
+                                        'Clear All Foods',
+                                        style: GoogleFonts.readexPro(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black, // Title color
+                                        ),
+                                        textAlign: TextAlign
+                                            .center, // Center align the title
+                                      ),
+                                      content: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10.0),
+                                        child: Text(
+                                          'Are you sure you want to clear all selected foods?',
+                                          style: GoogleFonts.readexPro(
+                                            fontSize: 16.0,
+                                            color: Colors
+                                                .black87, // Content text color
+                                          ),
+                                          textAlign: TextAlign
+                                              .center, // Center align the content text
+                                        ),
+                                      ),
+                                      actions: [
+                                        // Cancel Button
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(
+                                                context); // Close dialog
+                                          },
+                                          child: Text(
+                                            'Cancel',
+                                            style: GoogleFonts.readexPro(
+                                              fontSize: 16.0,
+                                              color: Colors
+                                                  .black, // Text color for Cancel button
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        // Clear All Button
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedItems
+                                                  .clear(); // Clear selected items
+                                              totalCarbs =
+                                                  0; // Reset total carbs
+                                              totalFats = 0; // Reset total fats
+                                              totalProteins =
+                                                  0; // Reset total proteins
+                                              calculateTotal(); // Recalculate totals
+                                            });
+                                            Navigator.pop(
+                                                context); // Close dialog
+                                            Navigator.pop(
+                                                context); // Close bottom sheet
+                                          },
+                                          child: Text(
+                                            'Clear All',
+                                            style: GoogleFonts.readexPro(
+                                              fontSize: 16.0,
+                                              color: Colors
+                                                  .red, // Text color for Clear All button
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                                 child: Text(
                                   'Clear All Foods',
                                   style: GoogleFonts.readexPro(
                                     fontSize: 14.0,
-                                    textStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    textStyle: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
