@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:healthlens/backend_firebase/signUp.dart';
-import 'package:healthlens/entry_point.dart';
+import 'package:healthlens/services/signUp.dart';
+import 'package:healthlens/core/entry_point.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'main.dart';
+import 'package:healthlens/main.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class healthProfile extends StatefulWidget {

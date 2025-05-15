@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthlens/backend_firebase/modals.dart';
+import 'package:healthlens/models/modals.dart';
 import 'package:iconly/iconly.dart';
-import 'homePage.dart';
-import 'camerapage.dart';
-import 'profilePage.dart';
-import 'analyticspage.dart';
+import 'package:healthlens/screens/homepage.dart';
+import 'package:healthlens/screens/camerapage.dart';
+import 'package:healthlens/screens/profilepage.dart';
+import 'package:healthlens/screens/analyticspage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:healthlens/graph_data.dart';
+import 'package:healthlens/models/graph_data.dart';
 
 class EntryPoint extends StatefulWidget {
   final PageController? pageController;

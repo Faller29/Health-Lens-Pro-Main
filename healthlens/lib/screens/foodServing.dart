@@ -9,9 +9,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthlens/main.dart';
 import 'package:iconly/iconly.dart';
-import 'package:healthlens/entry_point.dart';
+import 'package:healthlens/core/entry_point.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'backend_firebase/foodExchange.dart';
+import 'package:healthlens/services/foodExchange.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();

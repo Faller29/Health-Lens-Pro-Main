@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:healthlens/exerciseData.dart';
+import 'package:healthlens/models/exerciseData.dart';
 import 'package:healthlens/main.dart';
-import 'backend_firebase/exerciseSaving.dart';
+import 'package:healthlens/services/exerciseSaving.dart';
 
 class ExercisePage extends StatefulWidget {
   @override

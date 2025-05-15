@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:healthlens/entry_point.dart';
-import 'package:healthlens/login_page.dart';
+import 'package:healthlens/core/entry_point.dart';
+import 'package:healthlens/screens/login_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart'
     as smooth_page_indicator;
 import 'package:string_extensions/string_extensions.dart';
-import 'backend_firebase/signUp.dart';
+import 'package:healthlens/services/signUp.dart';
 
 class SetupPage extends StatefulWidget {
   @override

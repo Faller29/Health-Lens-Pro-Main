@@ -1,16 +1,13 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:healthlens/backend_firebase/modals.dart';
-import 'package:healthlens/login_page.dart';
+import 'package:healthlens/models/modals.dart';
+import 'package:healthlens/screens/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'ProfilePage.dart';
-import 'backend_firebase/auth.dart';
-export 'ProfilePage.dart';
-import 'package:healthlens/login_page.dart';
-import 'main.dart' hide Auth;
+import 'package:healthlens/services/auth.dart';
+import 'package:healthlens/main.dart' hide Auth;
 import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'entry_point.dart';
+import 'package:healthlens/core/entry_point.dart';
 
 void main() {
   runApp(MyApp());

@@ -14,8 +14,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'set_up_model';
-export 'set_up_model';
+import 'package:healthlens/models/set_up_model';
+export 'package:healthlens/models/set_up_model';
 
 class SetUpWidget extends StatefulWidget {
   const SetUpWidget({super.key});
