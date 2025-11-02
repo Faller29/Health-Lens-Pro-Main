@@ -42,6 +42,10 @@ Developed from May 2024 to October 2024
 
 Mobile Application
 
+## License
+This project is proprietary and closed-source.  
+No part of this codebase may be copied, modified, or distributed without permission.
+
 ## Screenshots
 
 ### Authentication
